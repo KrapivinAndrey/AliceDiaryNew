@@ -1,5 +1,6 @@
-from skill.dataclasses.students import Student, Students
 from pytest import fixture
+
+from skill.dataclasses.students import Student, Students
 
 
 @fixture

@@ -1,3 +1,8 @@
+import locale
+
+import pymorphy2
+
+
 class Student:
     def __init__(self):
         self.name = None
@@ -8,8 +13,6 @@ class Student:
 
         self.name = name
         self.id = id
-        import pymorphy2
-        import locale
 
         locale.setlocale(locale.LC_TIME, ("RU", "UTF8"))  # the ru locale is installed
         morph = pymorphy2.MorphAnalyzer()
