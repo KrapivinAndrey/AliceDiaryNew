@@ -48,4 +48,18 @@ class Student:
 
 class Students:
     def __init__(self):
-        pass
+        self.students = {}
+
+    def add_student(self, student: Student):
+        self.students[student.id] = student
+
+    def dump(self):
+        return [x.dump() for x in self.students.values()]
+
+    def restore(self, dump):
+        self.students = {}
+        for x in dump:
+            new_student = Student()
+            new_student.restore(x)
+            self.add_student(new_student)
+
