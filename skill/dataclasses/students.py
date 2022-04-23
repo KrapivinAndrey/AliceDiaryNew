@@ -62,4 +62,3 @@ class Students:
             new_student = Student()
             new_student.restore(x)
             self.add_student(new_student)
-
