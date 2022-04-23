@@ -53,11 +53,11 @@ def students_dump():
             "name": "Дмитрий",
             "id": "100",
             "inflect": {"родительный": "дмитрия", "дательный": "дмитрию"},
-        }
+        },
     ]
 
 
-class Test_Student:
+class TestStudent:
     def test_create(self, studentAlice):
         assert studentAlice.name == "Алиса"
         assert studentAlice.id == "1"
@@ -90,7 +90,7 @@ class Test_Student:
         assert test == studentAlice
 
 
-class Test_Students:
+class TestStudents:
     def test_empty(self):
         test = Students()
         assert test.students == {}
