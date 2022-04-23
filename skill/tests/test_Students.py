@@ -4,20 +4,31 @@ from pytest import fixture
 
 @fixture
 def studetnAlice():
-    test = Student("Алиса", "1")
+    test = Student()
+    test.create("Алиса", "1")
     return test
 
 
 @fixture
 def studetnAnotherAlice():
-    test = Student("Алиса", "2")
+    test = Student()
+    test.create("Алиса", "2")
     return test
 
 
 @fixture
 def studetnDmitry():
-    test = Student("Дмитрий", "100")
+    test = Student()
+    test.create("Дмитрий", "100")
     return test
+
+@fixture
+def student_dump():
+    return {
+            "name": "Алиса",
+            "id": "1",
+            "inflect": {"родительный": "алисы", "дательный": "алисе"},
+        }
 
 
 class Test_Student:
@@ -39,5 +50,11 @@ class Test_Student:
     def test_hash(self, studetnAlice):
         assert isinstance(hash(studetnAlice), int)
 
-    def test_dump(self, studetnAlice):
-        assert (studetnAlice.dump() == {"name": "Алиса", "id": "1"})
+    def test_dump(self, studetnAlice, student_dump):
+        assert studetnAlice.dump() == student_dump
+
+    def test_restore(self, studetnAlice, student_dump):
+        test = Student()
+        test.restore(student_dump)
+
+        assert test == studetnAlice

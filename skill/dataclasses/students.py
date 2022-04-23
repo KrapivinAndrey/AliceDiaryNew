@@ -1,15 +1,19 @@
 class Student:
-    def __init__(self, name: str, id: str):
+    def __init__(self):
+        self.name = None
+        self.id = None
+        self.inflect = {}
+
+    def create(self, name: str, id: str):
+
+        self.name = name
+        self.id = id
         import pymorphy2
         import locale
 
         locale.setlocale(locale.LC_TIME, ("RU", "UTF8"))  # the ru locale is installed
         morph = pymorphy2.MorphAnalyzer()
         parse_name = morph.parse(name)[0]
-
-        self.name = name
-        self.id = id
-        self.inflect = {}
 
         self.inflect["родительный"] = parse_name.inflect({"sing", "gent"}).word
         self.inflect["дательный"] = parse_name.inflect({"sing", "datv"}).word
@@ -32,8 +36,14 @@ class Student:
         return hash(f"{self.name}-{self.id}")
 
     def dump(self):
-        result = {"name": self.name, "id": self.id}
+        result = {"name": self.name, "id": self.id, "inflect": self.inflect}
         return result
+
+    def restore(self, dump):
+        self.name = dump["name"]
+        self.id = dump["id"]
+        for k, v in dump["inflect"].items():
+            self.inflect[k] = v
 
 
 class Students:
