@@ -5,4 +5,4 @@ black
 isort
 pyaspeller
 fluentcheck
-alice-fluentcheck
+alicefluentcheck
