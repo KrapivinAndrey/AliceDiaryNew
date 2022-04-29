@@ -8,7 +8,6 @@ import requests_mock
 from skill.dataclasses import PlannedLesson, Student, Students
 
 
-
 class NotFoundError(Exception):
     pass
 
@@ -37,12 +36,13 @@ def students_url():
 
 # endregion
 
+
 def get_students(token: str) -> List[Student]:
     result = Students()
     response = requests.get(students_url(), cookies={"X-JWT-Token": token})
 
     if response.status_code == 401:
-        raise Exception("Не удалось авторизоваться")
+        raise NeedAuth()
 
     for student in response.json().get("data", {}).get("items", []):
         name = student.get("firstname", "")

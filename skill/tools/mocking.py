@@ -1,4 +1,5 @@
 from requests_mock import Mocker
+
 from skill.dairy_api import students_url
 
 
@@ -65,7 +66,7 @@ def text_students():
                     "surname": "Менделеев",
                     "middlename": "Иванович",
                     "hash_uid": None,
-                }
+                },
             ],
             "before": 1,
             "current": 1,
