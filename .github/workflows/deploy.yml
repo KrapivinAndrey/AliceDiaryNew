@@ -9,29 +9,16 @@ on:
 
 jobs:
   Deploy:
-    name: Deploy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
       - name: Staging
-        if: github.ref != 'refs/heads/main'
         uses: goodsmileduck/yandex-serverless-action@v1
         with:
           token: ${{ secrets.YAAUTH }}
-          function_id: ${{ secrets.TEST_FUNCTION_ID }}
+          function_id: ${{ secrets.YAFUNCTION_ID }}
           runtime: 'python39'
           memory: '128'
-          environment: DEBUG=True
-          entrypoint: 'skill.main.handler'
-          source: './'
-      - name: Prod
-        if: github.ref == 'refs/heads/main'
-        uses: goodsmileduck/yandex-serverless-action@v1
-        with:
-          token: ${{ secrets.YAAUTH }}
-          function_id: ${{ secrets.FUNCTION_ID }}
-          runtime: 'python39'
-          memory: '128'
-          environment: DEBUG=False
+          environment: DAIRY_URL=${{ secrets.DAIRY_URL }},SENTRY_DSN=${{ secrets.SENTRY_DSN }}
           entrypoint: 'skill.main.handler'
           source: './'
