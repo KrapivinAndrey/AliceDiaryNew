@@ -1,10 +1,12 @@
 import os
 from datetime import date, datetime, time
-from typing import List, Dict
+from typing import Dict, List
 
 import requests
+import requests_mock
 
 from skill.dataclasses import PlannedLesson, Student, Students
+
 
 
 class NotFoundError(Exception):
@@ -35,19 +37,17 @@ def students_url():
 
 # endregion
 
-def get_schedule_on_date(token: str, ids: List[str], day=None) -> Dict[Student, List[PlannedLesson]]:
-    if day is None:
-        day = date.today()
+def get_students(token: str) -> List[Student]:
+    result = Students()
+    response = requests.get(students_url(), cookies={"X-JWT-Token": token})
 
-    start_time = datetime.combine(day, time.min)
-    finish_time = datetime.combine(day, time.max)
+    if response.status_code == 401:
+        raise Exception("Не удалось авторизоваться")
 
-    response = requests.get(
-        schedule_url(),
-        params={
-            "p_educations[]": ",".join(ids),
-            "p_datetime_from": datetime.strftime(start_time, "%d.%m.%Y %H:%M:%S"),
-            "p_datetime_to": datetime.strftime(finish_time, "%d.%m.%Y %H:%M:%S"),
-        },
-        cookies={"X-JWT-Token": token},
-    )
+    for student in response.json().get("data", {}).get("items", []):
+        name = student.get("firstname", "")
+        id = student.get("educations", [])[0].get("education_id", "")
+        new_student = Student(name, id)
+        result.add_student(new_student)
+
+    return result
