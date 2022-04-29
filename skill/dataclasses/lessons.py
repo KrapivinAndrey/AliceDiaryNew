@@ -1,4 +1,5 @@
 from datetime import time
+
 from skill.constants.entities import image_ids, subjects
 
 
