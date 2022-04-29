@@ -21,7 +21,7 @@ jobs:
           function_id: ${{ secrets.YAFUNCTION_ID }}
           runtime: 'python39'
           memory: '128'
-          environment: DAIRY_URL=${{ secrets.DAIRY_URL }},SENTRY_DSN=${{ secrets.SENTRY_DSN }},DEBUG=True
+          environment: DAIRY_URL=${{ secrets.DAIRY_URL }},SENTRY_DSN=${{ secrets.SENTRY_DSN }},DEBUG=True,ENVIRONMENT=Stage
           entrypoint: 'skill.main.handler'
           source: './'
   Production:
@@ -37,6 +37,6 @@ jobs:
           function_id: ${{ secrets.YAFUNCTION_ID }}
           runtime: 'python39'
           memory: '128'
-          environment: DAIRY_URL=${{ secrets.DAIRY_URL }},SENTRY_DSN=${{ secrets.SENTRY_DSN }},DEBUG=False
+          environment: DAIRY_URL=${{ secrets.DAIRY_URL }},SENTRY_DSN=${{ secrets.SENTRY_DSN }},DEBUG=False,ENVIRONMENT=Prod
           entrypoint: 'skill.main.handler'
           source: './'
