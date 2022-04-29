@@ -108,3 +108,6 @@ class TestStudents:
         test.restore(students_dump)
         assert len(test.students) == 2
         assert test.students["1"] == studentAlice
+
+    def test_ids(self, students_Alice_and_Dmitry):
+        assert students_Alice_and_Dmitry.ids == ["1", "100"]
