@@ -6,3 +6,4 @@ isort
 pyaspeller
 fluentcheck
 alicefluentcheck
+requests-mock

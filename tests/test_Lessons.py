@@ -1,22 +1,6 @@
-from pytest import fixture
-
 from datetime import time
-from skill.dataclasses.lessons import PlannedLesson
 
-
-@fixture
-def algebra():
-    return PlannedLesson("Алгебра", time(8, 0), time(8, 40))
-
-
-@fixture
-def russian():
-    return PlannedLesson("Русский язык", time(9, 50), time(10, 30))
-
-
-@fixture
-def geometry():
-    return PlannedLesson("Геометрия", time(16, 30), time(17, 10))
+from skill.dataclasses.lessons import Schedule
 
 
 class TestLessons:
@@ -40,3 +24,24 @@ class TestLessons:
 
     def test_duration(self, algebra):
         assert algebra.duration == "08:00 - 08:40"
+
+
+class TestSchedule:
+    def test_create(self):
+        schedule = Schedule()
+        assert schedule is not None
+        assert len(schedule.lessons) == 0
+
+    def test_get_num_in_list(self, schedule):
+        assert str(schedule.find_by_num(2)) == "Русский язык"
+
+    def test_get_num_not_in_list(self, schedule):
+        assert schedule.find_by_num(5) is None
+
+    def test_get_by_time(self, schedule):
+        test_time = time(10, 30)
+        assert str(schedule.find_by_time(test_time)) == "Русский язык"
+
+    def test_get_by_time_none(self, schedule):
+        test_time = time(17, 30)
+        assert schedule.find_by_time(test_time) is None

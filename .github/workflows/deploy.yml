@@ -9,29 +9,34 @@ on:
 
 jobs:
   Deploy:
-    name: Deploy
+    environment:
+      name: Staging
+    if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Staging
-        if: github.ref != 'refs/heads/main'
-        uses: goodsmileduck/yandex-serverless-action@v1
+      - uses: goodsmileduck/yandex-serverless-action@v1
         with:
           token: ${{ secrets.YAAUTH }}
-          function_id: ${{ secrets.TEST_FUNCTION_ID }}
+          function_id: ${{ secrets.YAFUNCTION_ID }}
           runtime: 'python39'
           memory: '128'
-          environment: DEBUG=True
+          environment: DAIRY_URL=${{ secrets.DAIRY_URL }},SENTRY_DSN=${{ secrets.SENTRY_DSN }},DEBUG=True,ENVIRONMENT=Stage
           entrypoint: 'skill.main.handler'
           source: './'
-      - name: Prod
-        if: github.ref == 'refs/heads/main'
-        uses: goodsmileduck/yandex-serverless-action@v1
+  Production:
+    environment:
+      name: Production
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: goodsmileduck/yandex-serverless-action@v1
         with:
           token: ${{ secrets.YAAUTH }}
-          function_id: ${{ secrets.FUNCTION_ID }}
+          function_id: ${{ secrets.YAFUNCTION_ID }}
           runtime: 'python39'
           memory: '128'
-          environment: DEBUG=False
+          environment: DAIRY_URL=${{ secrets.DAIRY_URL }},SENTRY_DSN=${{ secrets.SENTRY_DSN }},DEBUG=False,ENVIRONMENT=Prod
           entrypoint: 'skill.main.handler'
           source: './'

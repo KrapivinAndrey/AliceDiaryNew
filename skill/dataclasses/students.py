@@ -4,22 +4,19 @@ import pymorphy2
 
 
 class Student:
-    def __init__(self):
-        self.name = None
-        self.id = None
-        self.inflect = {}
-
-    def create(self, name: str, id: str):
-
+    def __init__(self, name=None, id=None):
         self.name = name
-        self.id = id
+        self.id = str(id)
+        self.inflect = {}
+        if name is not None:
+            locale.setlocale(
+                locale.LC_TIME, ("RU", "UTF8")
+            )  # the ru locale is installed
+            morph = pymorphy2.MorphAnalyzer()
+            parse_name = morph.parse(name)[0]
 
-        locale.setlocale(locale.LC_TIME, ("RU", "UTF8"))  # the ru locale is installed
-        morph = pymorphy2.MorphAnalyzer()
-        parse_name = morph.parse(name)[0]
-
-        self.inflect["родительный"] = parse_name.inflect({"sing", "gent"}).word
-        self.inflect["дательный"] = parse_name.inflect({"sing", "datv"}).word
+            self.inflect["родительный"] = parse_name.inflect({"sing", "gent"}).word
+            self.inflect["дательный"] = parse_name.inflect({"sing", "datv"}).word
 
     def __eq__(self, other):
         if isinstance(other, str):
@@ -65,3 +62,7 @@ class Students:
             new_student = Student()
             new_student.restore(x)
             self.add_student(new_student)
+
+    @property
+    def ids(self):
+        return [x for x in self.students.keys()]

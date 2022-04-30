@@ -1,61 +1,4 @@
-from pytest import fixture
-
 from skill.dataclasses.students import Student, Students
-
-
-@fixture
-def studentAlice():
-    test = Student()
-    test.create("Алиса", "1")
-    return test
-
-
-@fixture
-def studentAnotherAlice():
-    test = Student()
-    test.create("Алиса", "2")
-    return test
-
-
-@fixture
-def studentDmitry():
-    test = Student()
-    test.create("Дмитрий", "100")
-    return test
-
-
-@fixture
-def student_dump():
-    return {
-        "name": "Алиса",
-        "id": "1",
-        "inflect": {"родительный": "алисы", "дательный": "алисе"},
-    }
-
-
-@fixture
-def students_Alice_and_Dmitry(studentAlice, studentDmitry):
-    test = Students()
-    test.add_student(studentAlice)
-    test.add_student(studentDmitry)
-
-    return test
-
-
-@fixture
-def students_dump():
-    return [
-        {
-            "name": "Алиса",
-            "id": "1",
-            "inflect": {"родительный": "алисы", "дательный": "алисе"},
-        },
-        {
-            "name": "Дмитрий",
-            "id": "100",
-            "inflect": {"родительный": "дмитрия", "дательный": "дмитрию"},
-        },
-    ]
 
 
 class TestStudent:
@@ -108,3 +51,6 @@ class TestStudents:
         test.restore(students_dump)
         assert len(test.students) == 2
         assert test.students["1"] == studentAlice
+
+    def test_ids(self, students_Alice_and_Dmitry):
+        assert students_Alice_and_Dmitry.ids == ["1", "100"]
