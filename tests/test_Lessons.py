@@ -1,22 +1,4 @@
-from pytest import fixture
-
 from datetime import time
-from skill.dataclasses.lessons import PlannedLesson
-
-
-@fixture
-def algebra():
-    return PlannedLesson("Алгебра", time(8, 0), time(8, 40))
-
-
-@fixture
-def russian():
-    return PlannedLesson("Русский язык", time(9, 50), time(10, 30))
-
-
-@fixture
-def geometry():
-    return PlannedLesson("Геометрия", time(16, 30), time(17, 10))
 
 
 class TestLessons:

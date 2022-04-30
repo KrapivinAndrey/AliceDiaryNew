@@ -15,4 +15,6 @@ def test_get_students(requests_mock, students_dump):
 def test_get_schedule(requests_mock):
     setup_mock_schedule(requests_mock)
     schedule = dairy_api.get_schedule("111", "111")
+
     assert len(schedule.lessons) == 7
+    assert str(schedule.lessons[0]) == "Алгебра"
