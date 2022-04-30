@@ -63,7 +63,7 @@ def get_schedule(token: str, student_id: str, day=date.today()) -> List[PlannedL
     response = requests.get(
         schedule_url(),
         params={
-            "p_educations[]": id,
+            "p_educations[]": student_id,
             "p_datetime_from": datetime.strftime(start_time, "%d.%m.%Y %H:%M:%S"),
             "p_datetime_to": datetime.strftime(finish_time, "%d.%m.%Y %H:%M:%S"),
         },

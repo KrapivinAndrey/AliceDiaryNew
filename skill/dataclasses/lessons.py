@@ -1,7 +1,7 @@
 from datetime import time
+from typing import Union
 
 from skill.constants.entities import image_ids, subjects
-from typing import Union
 
 
 class PlannedLesson:
@@ -66,10 +66,6 @@ class Schedule:
 
     def find_by_time(self, find: time) -> Union[None, PlannedLesson]:
         return next(
-            (
-                lesson
-                for lesson in self.lessons
-                if lesson.start <= find <= lesson.end
-            ),
+            (lesson for lesson in self.lessons if lesson.start <= find <= lesson.end),
             None,
         )

@@ -1,6 +1,6 @@
 from requests_mock import Mocker
 
-from skill.dairy_api import students_url, schedule_url
+from skill.dairy_api import schedule_url, students_url
 
 true = True
 false = False
