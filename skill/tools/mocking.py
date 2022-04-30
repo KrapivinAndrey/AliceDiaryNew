@@ -1,9 +1,13 @@
 from requests_mock import Mocker
 
-from skill.dairy_api import students_url
+from skill.dairy_api import students_url, schedule_url
+
+true = True
+false = False
+null = None
 
 
-def text_students():
+def json_students():
     return {
         "data": {
             "items": [
@@ -81,5 +85,90 @@ def text_students():
     }
 
 
+def json_schedule():
+    return {
+        "data": {
+            "items": [
+                {
+                    "number": 7,
+                    "datetime_from": "25.04.2022 13:31:00",
+                    "datetime_to": "25.04.2022 13:55:00",
+                    "subject_id": 172516,
+                    "subject_name": "География",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 8,
+                    "datetime_from": "25.04.2022 14:31:00",
+                    "datetime_to": "25.04.2022 14:40:00",
+                    "subject_id": 172516,
+                    "subject_name": "География",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 5,
+                    "datetime_from": "25.04.2022 11:31:00",
+                    "datetime_to": "25.04.2022 12:10:00",
+                    "subject_id": 172533,
+                    "subject_name": "Информатика",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 6,
+                    "datetime_from": "25.04.2022 12:31:00",
+                    "datetime_to": "25.04.2022 12:55:00",
+                    "subject_id": 172533,
+                    "subject_name": "Информатика",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 3,
+                    "datetime_from": "25.04.2022 09:45:00",
+                    "datetime_to": "25.04.2022 10:25:00",
+                    "subject_id": 172476,
+                    "subject_name": "Алгебра",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 4,
+                    "datetime_from": "25.04.2022 10:31:00",
+                    "datetime_to": "25.04.2022 11:10:00",
+                    "subject_id": 172476,
+                    "subject_name": "Алгебра",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 8,
+                    "datetime_from": "25.04.2022 14:31:00",
+                    "datetime_to": "25.04.2022 14:40:00",
+                    "subject_id": 187951,
+                    "subject_name": "Технология 2.0",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+            ],
+            "before": 1,
+            "current": 0,
+            "last": 0,
+            "next": 0,
+            "total_pages": 0,
+            "total_items": 0,
+        },
+        "validations": [],
+        "messages": [],
+        "debug": [],
+    }
+
+
 def setup_mock_children(m: Mocker):
-    m.get(f"{students_url()}", json=text_students())
+    m.get(f"{students_url()}", json=json_students())
+
+
+def setup_mock_schedule(m: Mocker):
+    m.get(f"{schedule_url()}", json=json_schedule())

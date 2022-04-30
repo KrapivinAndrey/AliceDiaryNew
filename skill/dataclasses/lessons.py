@@ -1,6 +1,7 @@
 from datetime import time
 
 from skill.constants.entities import image_ids, subjects
+from typing import Union
 
 
 class PlannedLesson:
@@ -51,3 +52,21 @@ class PlannedLesson:
                 name_subject = key
             if not image_ids.get(name_subject) is None:
                 result = image_ids[name_subject]
+
+
+class Schedule:
+    def __init__(self):
+        self.lessons = []
+
+    def find_by_num(self, num: int) -> Union[None, PlannedLesson]:
+        if num > len(self.lessons):
+            return None
+        else:
+            return self.lessons[num - 1]
+
+    def find_by_time(self, find: time) -> Union[None, PlannedLesson]:
+        for lesson in self.lessons.values():
+            if lesson.start_time <= find <= lesson.end_time:
+                return lesson
+
+        return None
