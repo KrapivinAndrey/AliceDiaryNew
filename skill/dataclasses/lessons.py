@@ -65,8 +65,11 @@ class Schedule:
             return self.lessons[num - 1]
 
     def find_by_time(self, find: time) -> Union[None, PlannedLesson]:
-        for lesson in self.lessons.values():
-            if lesson.start_time <= find <= lesson.end_time:
-                return lesson
-
-        return None
+        return next(
+            (
+                lesson
+                for lesson in self.lessons
+                if lesson.start <= find <= lesson.end
+            ),
+            None,
+        )

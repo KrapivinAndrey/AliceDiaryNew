@@ -2,7 +2,7 @@ from datetime import time
 
 from pytest import fixture
 
-from skill.dataclasses.lessons import PlannedLesson
+from skill.dataclasses.lessons import PlannedLesson, Schedule
 from skill.dataclasses.students import Student, Students
 
 # region Студенты
@@ -84,6 +84,18 @@ def russian():
 @fixture
 def geometry():
     return PlannedLesson("Геометрия", time(16, 30), time(17, 10))
+
+
+@fixture
+def schedule(algebra, russian, geometry):
+    result = Schedule()
+    result.lessons.append(algebra)
+    result.lessons.append(russian)
+    result.lessons.append(geometry)
+
+    result.lessons.sort()
+
+    return result
 
 
 # endregion
