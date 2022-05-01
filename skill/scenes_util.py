@@ -4,12 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from skill.alice import Request
-from skill.constants.states import (
-    PERMANENT_VALUES,
-    STATE_RESPONSE_KEY,
-    USERSTATE_RESPONSE_KEY,
-    PREVIOUS_MOVES,
-)
+from skill.constants.states import PERMANENT_VALUES, PREVIOUS_MOVES, STATE_RESPONSE_KEY, USERSTATE_RESPONSE_KEY
 
 
 class Scene(ABC):
