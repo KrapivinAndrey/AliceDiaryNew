@@ -8,7 +8,7 @@ from sentry_sdk.integrations.logging import LoggingIntegration
 from skill.alice import Request
 from skill.constants.intents import GET_SCHEDULE
 from skill.constants.states import PREVIOUS_MOVES
-from skill.scenes import DEFAULT_SCENE, SCENE
+from skill.scenes import DEFAULT_SCENE, SCENES
 
 logging.basicConfig()
 
