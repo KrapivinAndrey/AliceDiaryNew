@@ -107,20 +107,19 @@ def image_list(
         "items": image_ids,
     }
     if header:
-        card_header = {"text": header}
-        card["header"] = card_header
+        card["header"] = {"text": header} # type: ignore[assignment]
     if footer or button_text or button_url or button_payload:
         card["footer"] = dict()
         if footer:
-            card["footer"]["text"] = footer
+            card["footer"]["text"] = footer # type: ignore[assignment]
         if button_text or button_url or button_payload:
             card["footer"]["button"] = dict()
             if button_text:
-                card["footer"]["button"]["text"] = button_text
+                card["footer"]["button"]["text"] = button_text # type: ignore[assignment]
             if button_url:
-                card["footer"]["button"]["url"] = button_url
+                card["footer"]["button"]["url"] = button_url # type: ignore[assignment]
             if button_payload:
-                card["footer"]["button"]["payload"] = button_payload
+                card["footer"]["button"]["payload"] = button_payload # type: ignore[assignment]
 
     return card
 
