@@ -64,7 +64,7 @@ class Scene(ABC):
         if end_session:
             response["end_session"] = end_session
 
-        webhook_response = {
+        webhook_response: dict = {
             "response": response,
             "version": "1.0",
             STATE_RESPONSE_KEY.session: {
@@ -84,7 +84,7 @@ class Scene(ABC):
 
         prev_moves = request.session.get(PREVIOUS_MOVES, [])
         prev_moves.append(request.command)
-        webhook_response[STATE_RESPONSE_KEY][PREVIOUS_MOVES] = prev_moves[-10:]
+        webhook_response[STATE_RESPONSE_KEY.session][PREVIOUS_MOVES] = prev_moves[-10:]
 
         logging.debug(f"RESPONSE {json.dumps(webhook_response, ensure_ascii=False)}")
 

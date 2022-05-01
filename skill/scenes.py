@@ -35,7 +35,7 @@ class GlobalScene(Scene):
 
     def fallback(self, request: Request):
         if request.session.get(states.NEED_FALLBACK, False):
-            text, tts = "Пытаюсь понять но не получается"
+            text = tts = "Пытаюсь понять но не получается"
             return self.make_response(request, text, tts, end_session=True)
         else:
             save_state = {}
@@ -44,7 +44,7 @@ class GlobalScene(Scene):
                 if save in request.session:
                     save_state.update({save: request.session[save]})
             save_state[states.NEED_FALLBACK] = True
-            text, tts = "Не могу понять"
+            text = tts = "Не могу понять"
             return self.make_response(
                 request,
                 text,
@@ -56,7 +56,7 @@ class GlobalScene(Scene):
 
 class Welcome(GlobalScene):
     def reply(self, request: Request):
-        text, tts = "Привет"
+        text = tts = "Привет"
         buttons = [
             button("Что ты умеешь?"),
         ]
@@ -76,13 +76,13 @@ class Welcome(GlobalScene):
 
 class Goodbye(GlobalScene):
     def reply(self, request: Request):
-        text, tts = "До свиданя"
+        text = tts = "До свиданя"
         return self.make_response(request, text, tts, end_session=True)
 
 
 class HaveMistake(GlobalScene):
     def reply(self, request: Request):
-        text, tts = "Ошибка"
+        text = tts = "Ошибка"
         return self.make_response(request, text, tts, end_session=True)
 
 
