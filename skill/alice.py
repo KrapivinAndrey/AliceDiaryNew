@@ -1,7 +1,3 @@
-STATE_RESPONSE_KEY = "session_state"
-USER_STATE_RESPONSE_KEY = "user_state_update"
-
-
 class Request:
     def __init__(self, request_body):
         self.request_body = request_body

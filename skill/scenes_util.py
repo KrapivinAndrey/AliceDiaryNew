@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from skill.alice import Request
-from skill.constants.states import PERMANENT_VALUES, PREVIOUS_MOVES, STATE_RESPONSE_KEY, USERSTATE_RESPONSE_KEY
+from skill.constants.states import PERMANENT_VALUES, PREVIOUS_MOVES, STATE_RESPONSE_KEY
 
 
 class Scene(ABC):
@@ -46,6 +46,7 @@ class Scene(ABC):
         card=None,
         state=None,
         user_state=None,
+        application_state=None,
         buttons=None,
         directives=None,
         end_session=False,
@@ -66,18 +67,20 @@ class Scene(ABC):
         webhook_response = {
             "response": response,
             "version": "1.0",
-            STATE_RESPONSE_KEY: {
+            STATE_RESPONSE_KEY.session: {
                 "scene": self.id(),
             },
         }
 
         for key, value in request.session.items():
             if key in PERMANENT_VALUES:
-                webhook_response[STATE_RESPONSE_KEY][key] = value
+                webhook_response[STATE_RESPONSE_KEY.session][key] = value
         if state is not None:
-            webhook_response[STATE_RESPONSE_KEY].update(state)
+            webhook_response[STATE_RESPONSE_KEY.session].update(state)
         if user_state is not None:
-            webhook_response[USERSTATE_RESPONSE_KEY] = user_state
+            webhook_response[STATE_RESPONSE_KEY.user] = user_state
+        if application_state is not None:
+            webhook_response[STATE_RESPONSE_KEY.application] = application_state
 
         prev_moves = request.session.get(PREVIOUS_MOVES, [])
         prev_moves.append(request.command)

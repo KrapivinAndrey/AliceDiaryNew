@@ -1,6 +1,5 @@
 STATE_REQUEST_KEY = "session"
-STATE_RESPONSE_KEY = "session_state"
-USERSTATE_RESPONSE_KEY = "user_state_update"
+STATE_RESPONSE_KEY = {"session": "session_state", "user": "user_state_update", "application":"application_state"}
 
 # Отладочная информация
 # Последние фразы пользователя
