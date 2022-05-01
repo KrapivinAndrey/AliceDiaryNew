@@ -107,7 +107,8 @@ def image_list(
         "items": image_ids,
     }
     if header:
-        card["header"] = {"text": header}
+        card_header = {"text": header}
+        card["header"] = card_header
     if footer or button_text or button_url or button_payload:
         card["footer"] = dict()
         if footer:
