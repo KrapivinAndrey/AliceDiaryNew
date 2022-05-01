@@ -76,7 +76,7 @@ class Welcome(GlobalScene):
 
 class Goodbye(GlobalScene):
     def reply(self, request: Request):
-        text = tts = "До свиданя"
+        text = tts = "До свидания"
         return self.make_response(request, text, tts, end_session=True)
 
 
