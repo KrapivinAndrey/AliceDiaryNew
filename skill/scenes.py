@@ -4,6 +4,7 @@ import sys
 from skill.alice import Request, button, image_button, image_list
 from skill.constants import entities, intents, states
 from skill.scenes_util import Scene
+import skill.texts as texts
 
 # region Общие сцены
 
@@ -35,7 +36,7 @@ class GlobalScene(Scene):
 
     def fallback(self, request: Request):
         if request.session.get(states.NEED_FALLBACK, False):
-            text = tts = "Пытаюсь понять но не получается"
+            text, tts = texts.sorry_and_goodbye()
             return self.make_response(request, text, tts, end_session=True)
         else:
             save_state = {}
@@ -44,7 +45,7 @@ class GlobalScene(Scene):
                 if save in request.session:
                     save_state.update({save: request.session[save]})
             save_state[states.NEED_FALLBACK] = True
-            text = tts = "Не могу понять"
+            text, tts = texts.fallback()
             return self.make_response(
                 request,
                 text,

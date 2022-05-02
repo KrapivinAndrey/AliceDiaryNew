@@ -45,13 +45,15 @@ class PlannedLesson:
 
     @property
     def link_url(self):
-        result = ""
+        result = image_ids["default"]
         for key, value in subjects.items():
             name_subject = ""
             if self.name.lower() in value:
                 name_subject = key
-            if not image_ids.get(name_subject) is None:
+            if image_ids.get(name_subject) is not None:
                 result = image_ids[name_subject]
+
+        return result
 
 
 class Schedule:
