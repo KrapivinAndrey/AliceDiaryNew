@@ -83,6 +83,9 @@ class Request:
             if entity["type"] == entity_type
         ]
 
+    def is_intent(self, intent: str):
+        return intent in self.intents
+
 
 def big_image(image_id: list, title=None, description=None):
     my_image = {"type": "BigImage", "image_id": image_id}

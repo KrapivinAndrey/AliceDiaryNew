@@ -8,8 +8,6 @@ from skill.scenes_util import Scene
 
 # region Общие сцены
 
-# класс общая сцена
-
 
 class GlobalScene(Scene):
     def reply(self, request: Request):
@@ -19,7 +17,7 @@ class GlobalScene(Scene):
 
         # Должны быть обработаны в первую очередь
         if intents.HELP in request.intents:
-            return HelpMenu()
+            return HelpMenuStart()
         if intents.WHAT_CAN_YOU_DO in request.intents:
             return WhatCanDo()
         if intents.CLEAN in request.intents:
@@ -86,6 +84,32 @@ class HaveMistake(GlobalScene):
         return self.make_response(request, text, tts, end_session=True)
 
 
+# endregion
+
+# region Помощь
+
+
+class HelpMenuStart(GlobalScene):
+    def reply(self, request: Request):
+        text, tts = texts.help_menu_start()
+        return self.make_response(request, text, tts, buttons=YES_NO)
+
+    def handle_local_intents(self, request: Request):
+        if request.is_intent(intents.CONFIRM):
+            return HelpMenuSpec()
+        if request.is_intent(intents.REJECT):
+            return Welcome()
+
+
+class HelpMenuSpec(GlobalScene):
+    def reply(self, request: Request):
+        text, tts = texts.help_menu_spec()
+        return self.make_response(request, text, tts, buttons=DEFAULT_BUTTONS)
+
+    def handle_local_intents(self, request: Request):
+        pass
+
+
 class WhatCanDo(GlobalScene):
     def reply(self, request: Request):
         return self.make_response(
@@ -98,17 +122,12 @@ class WhatCanDo(GlobalScene):
 
     def handle_local_intents(self, request: Request):
         if intents.CONFIRM in request.intents:
-            return HelpMenu()
+            return HelpMenuStart()
         if intents.REJECT in request.intents:
             return Welcome()
 
 
-class HelpMenu(GlobalScene):
-    def reply(self, request: Request):
-        return self.make_response(request, "Помощь", "Помощь", buttons=YES_NO)
-
-    def handle_local_intents(self, request: Request):
-        pass
+# endregion
 
 
 class ClearSettings(GlobalScene):

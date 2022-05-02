@@ -50,6 +50,12 @@ class Students:
     def __init__(self):
         self.students = {}
 
+    def __str__(self):
+        return ", ".join([str(x) for x in self.students])
+
+    def __repr__(self):
+        return str(self)
+
     def add_student(self, student: Student):
         self.students[student.id] = student
 
