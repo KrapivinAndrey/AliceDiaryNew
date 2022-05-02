@@ -66,7 +66,6 @@ class Welcome(GlobalScene):
             text,
             tts,
             buttons=buttons,
-            directives={"start_account_linking": {}},
             user_state=None,
         )
 
