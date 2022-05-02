@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from skill.alice import Request
-from skill.constants.states import PERMANENT_VALUES, PREVIOUS_MOVES, STATE_RESPONSE_KEY
+from skill.constants.states import PERMANENT_VALUES, PREVIOUS_MOVES, StateResponseKey
 
 
 class Scene(ABC):
@@ -67,24 +67,24 @@ class Scene(ABC):
         webhook_response: dict = {
             "response": response,
             "version": "1.0",
-            STATE_RESPONSE_KEY.session: {
+            StateResponseKey.SESSION: {
                 "scene": self.id(),
             },
         }
 
         for key, value in request.session.items():
             if key in PERMANENT_VALUES:
-                webhook_response[STATE_RESPONSE_KEY.session][key] = value
+                webhook_response[StateResponseKey.SESSION][key] = value
         if state is not None:
-            webhook_response[STATE_RESPONSE_KEY.session].update(state)
+            webhook_response[StateResponseKey.SESSION].update(state)
         if user_state is not None:
-            webhook_response[STATE_RESPONSE_KEY.user] = user_state
+            webhook_response[StateResponseKey.USER] = user_state
         if application_state is not None:
-            webhook_response[STATE_RESPONSE_KEY.application] = application_state
+            webhook_response[StateResponseKey.APPLICATION] = application_state
 
         prev_moves = request.session.get(PREVIOUS_MOVES, [])
         prev_moves.append(request.command)
-        webhook_response[STATE_RESPONSE_KEY.session][PREVIOUS_MOVES] = prev_moves[-10:]
+        webhook_response[StateResponseKey.SESSION][PREVIOUS_MOVES] = prev_moves[-10:]
 
         logging.debug(f"RESPONSE {json.dumps(webhook_response, ensure_ascii=False)}")
 

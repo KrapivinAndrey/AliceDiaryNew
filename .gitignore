@@ -133,3 +133,5 @@ dmypy.json
 .idea/
 .vs/
 .vscode/
+
+emulate_response.json
