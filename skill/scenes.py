@@ -1,10 +1,10 @@
 import inspect
 import sys
 
+import skill.texts as texts
 from skill.alice import Request, button, image_button, image_list
 from skill.constants import entities, intents, states
 from skill.scenes_util import Scene
-import skill.texts as texts
 
 # region Общие сцены
 
