@@ -55,7 +55,7 @@ class GlobalScene(Scene):
 
 class Welcome(GlobalScene):
     def reply(self, request: Request):
-        text = tts = "Привет"
+        text, tts = texts.
         buttons = [
             button("Что ты умеешь?"),
         ]
