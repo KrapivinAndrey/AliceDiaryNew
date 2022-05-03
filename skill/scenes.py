@@ -1,10 +1,88 @@
 import inspect
+import logging
 import sys
+
+import self as self
 
 import skill.texts as texts
 from skill.alice import Request, button, image_button, image_list
 from skill.constants import entities, intents, states
+from skill.dataclasses.students import Students
 from skill.scenes_util import Scene
+
+logging.basicConfig()
+
+logging.getLogger().setLevel(logging.DEBUG)
+root_handler = logging.getLogger().handlers[0]
+root_handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(name)s\t%(message)s\n"))
+
+# region Декоратор: проверить что надо авторизоваться
+
+
+def need_auth():
+    def decorate(cls):
+        setattr(cls, "reply", get_students(getattr(cls, "reply")))
+        setattr(
+            cls,
+            "handle_local_intents",
+            finish_auth(getattr(cls, "handle_local_intents")),
+        )
+        return cls
+
+    return decorate
+
+
+def get_students(f):
+    def wrapper(*args, **kw):
+        scene = args[0]
+        request: Request = args[1]
+        if request.access_token is None:
+            logging.info("Need authentication for %s", scene.id())
+            text, tts = texts.need_auth(scene.id())
+            buttons = [
+                button("Что ты умеешь?"),
+            ]
+            return scene.make_response(
+                request,
+                text,
+                tts,
+                buttons=buttons,
+                directives={"start_account_linking": {}},
+                user_state=None,
+            )
+        else:
+            scene.students = get_all_students_from_request(request)
+            return f(*args, **kw)
+
+    return wrapper
+
+
+def finish_auth(f):
+    def wrapper(*args, **kw):
+        scene = args[0]
+        request: Request = args[1]
+        if request.authorization_complete:
+            students = dairy_api.get_students(request.access_token)
+            self.students = students
+            return SCENES[scene.id()]
+        else:
+            return f(*args, **kw)
+
+    return wrapper
+
+
+def get_all_students_from_request(request: Request) -> Students:
+    dump = request.user.get(states.STUDENTS, None)
+    if dump is None:
+        return []
+    else:
+        students = Students()
+        students.restore(dump)
+
+    return students
+
+
+# endregion
 
 # region Общие сцены
 
@@ -53,6 +131,7 @@ class GlobalScene(Scene):
             )
 
 
+@need_auth()
 class Welcome(GlobalScene):
     def reply(self, request: Request):
         text, tts = texts.hello(None)
