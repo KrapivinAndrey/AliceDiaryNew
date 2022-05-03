@@ -177,4 +177,3 @@ def button(title, payload=None, url=None, hide=False):
     if url is not None:
         my_button["url"] = url
     return my_button
-

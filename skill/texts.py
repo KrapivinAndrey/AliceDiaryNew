@@ -150,6 +150,6 @@ def what_can_i_do():
 
 # endregion
 
+
 def hello(students):
     text = tts = "Здесь будет todo"
-
