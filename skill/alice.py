@@ -178,6 +178,3 @@ def button(title, payload=None, url=None, hide=False):
         my_button["url"] = url
     return my_button
 
-
-def has_location(event):
-    return event["session"].get("location") is not None
