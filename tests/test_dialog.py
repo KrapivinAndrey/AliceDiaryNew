@@ -10,7 +10,7 @@ class TestHello:
     # Тесты начала диалога
     def test_start_dialog(self, start_skill):
         result = AliceAnswer(main.handler(start_skill, None))
-        assert result.text == "Здесь будет todo"
+        assert result.text == texts.need_auth("Welcome")[0]
 
 
 class TestFallback:

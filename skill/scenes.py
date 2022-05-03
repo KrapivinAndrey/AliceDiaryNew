@@ -2,8 +2,7 @@ import inspect
 import logging
 import sys
 
-import self as self
-
+import skill.dairy_api as dairy_api
 import skill.texts as texts
 from skill.alice import Request, button, image_button, image_list
 from skill.constants import entities, intents, states
