@@ -112,10 +112,11 @@ class HelpMenuSpec(GlobalScene):
 
 class WhatCanDo(GlobalScene):
     def reply(self, request: Request):
+        text, tts = texts.what_can_i_do()
         return self.make_response(
             request,
-            "Что я умею",
-            "Что я умею",
+            text,
+            tts,
             buttons=YES_NO,
             state={},
         )
