@@ -149,6 +149,9 @@ def _list_scenes():
     for name, obj in inspect.getmembers(current_module):
         if inspect.isclass(obj) and issubclass(obj, Scene):
             scenes.append(obj)
+
+    scenes.remove(GlobalScene)
+    scenes.remove(Scene)
     return scenes
 
 

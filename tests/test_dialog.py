@@ -1,0 +1,41 @@
+import pytest
+from alicefluentcheck import AliceAnswer, AliceRequest
+
+import skill.main as main
+import skill.texts as texts
+from skill.scenes import SCENES
+
+
+class TestHello:
+    # Тесты начала диалога
+    def test_start_dialog(self, start_skill):
+        result = AliceAnswer(main.handler(start_skill, None))
+        assert result.text == "Здесь будет todo"
+
+
+class TestFallback:
+    # Реакция на неизвестные/ошибочные команды
+    @pytest.mark.parametrize("scene_id", SCENES)
+    def test_first_fallback(self, scene_id):
+        test = (
+            AliceRequest()
+            .command("рамамба хару мамбуру")
+            .from_scene(scene_id)
+            .build()
+        )
+        result = AliceAnswer(main.handler(test, None))
+        assert result.text == texts.fallback()[0]
+        assert not result.is_end_of_session
+
+    @pytest.mark.parametrize("scene_id", SCENES)
+    def test_second_fallback(self, scene_id):
+        test = (
+            AliceRequest()
+            .command("рамамба хару мамбуру")
+            .from_scene(scene_id)
+            .add_to_state_session("fallback", True)
+            .build()
+        )
+        result = AliceAnswer(main.handler(test, None))
+        assert result.text == texts.sorry_and_goodbye()[0]
+        assert result.is_end_of_session

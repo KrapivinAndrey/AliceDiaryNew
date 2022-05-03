@@ -153,3 +153,4 @@ def what_can_i_do():
 
 def hello(students):
     text = tts = "Здесь будет todo"
+    return text, tts

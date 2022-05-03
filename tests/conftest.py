@@ -1,5 +1,6 @@
 from datetime import time
 
+from alicefluentcheck import AliceEntity, AliceIntent, AliceIntentSlot, AliceRequest
 from pytest import fixture
 
 from skill.dataclasses.lessons import PlannedLesson, Schedule
@@ -97,5 +98,22 @@ def schedule(algebra, russian, geometry):
 
     return result
 
+
+# endregion
+
+# region Базовое поведение
+
+# region Начало диалога
+
+@fixture()
+def start_skill():
+    return AliceRequest().command("").build()
+
+# endregion
+
+# region Некорректные команды
+
+
+# endregion
 
 # endregion

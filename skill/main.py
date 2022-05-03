@@ -37,7 +37,7 @@ def handler(event, context):
     current_scene_id = get_id_scene(request)
     logging.info(f"Current scene: {current_scene_id}")
     logging.debug(f"Current event: {event}")
-
+    moves = request.session.get(PREVIOUS_MOVES, [])
     try:
 
         if current_scene_id is None:
@@ -45,7 +45,6 @@ def handler(event, context):
 
         current_scene = SCENES.get(current_scene_id, DEFAULT_SCENE)()
         next_scene = current_scene.move(request)
-        moves = request.session.get(PREVIOUS_MOVES, [])
 
         if next_scene is not None:
             logging.info(f"Moving from scene {current_scene.id()} to {next_scene.id()}")
