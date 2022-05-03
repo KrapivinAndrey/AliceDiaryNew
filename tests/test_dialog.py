@@ -47,9 +47,21 @@ class TestHelp:
             .command("Что ты умеешь")
             .from_scene(scene_id)
             .add_intent(AliceIntent().what_can_you_do())
-            .add_to_state_session("fallback", True)
             .build()
         )
         result = AliceAnswer(main.handler(test, None))
         assert result.text == texts.what_can_i_do()[0]
+        assert len(result.response.get("buttons")) == 2
+
+    @pytest.mark.parametrize("scene_id", SCENES)
+    def test_helpme(self, scene_id):
+        test = (
+            AliceRequest()
+                .command("Па-ма-ги-тееее!")
+                .from_scene(scene_id)
+                .add_intent(AliceIntent().help())
+                .build()
+        )
+        result = AliceAnswer(main.handler(test, None))
+        assert result.text == texts.help_menu_start()[0]
         assert len(result.response.get("buttons")) == 2
