@@ -1,13 +1,12 @@
 import inspect
 import sys
 
+import skill.texts as texts
 from skill.alice import Request, button, image_button, image_list
 from skill.constants import entities, intents, states
 from skill.scenes_util import Scene
 
 # region Общие сцены
-
-# класс общая сцена
 
 
 class GlobalScene(Scene):
@@ -18,7 +17,7 @@ class GlobalScene(Scene):
 
         # Должны быть обработаны в первую очередь
         if intents.HELP in request.intents:
-            return HelpMenu()
+            return HelpMenuStart()
         if intents.WHAT_CAN_YOU_DO in request.intents:
             return WhatCanDo()
         if intents.CLEAN in request.intents:
@@ -35,7 +34,7 @@ class GlobalScene(Scene):
 
     def fallback(self, request: Request):
         if request.session.get(states.NEED_FALLBACK, False):
-            text = tts = "Пытаюсь понять но не получается"
+            text, tts = texts.sorry_and_goodbye()
             return self.make_response(request, text, tts, end_session=True)
         else:
             save_state = {}
@@ -44,7 +43,7 @@ class GlobalScene(Scene):
                 if save in request.session:
                     save_state.update({save: request.session[save]})
             save_state[states.NEED_FALLBACK] = True
-            text = tts = "Не могу понять"
+            text, tts = texts.fallback()
             return self.make_response(
                 request,
                 text,
@@ -56,7 +55,7 @@ class GlobalScene(Scene):
 
 class Welcome(GlobalScene):
     def reply(self, request: Request):
-        text = tts = "Привет"
+        text, tts = texts.hello(None)
         buttons = [
             button("Что ты умеешь?"),
         ]
@@ -85,29 +84,51 @@ class HaveMistake(GlobalScene):
         return self.make_response(request, text, tts, end_session=True)
 
 
+# endregion
+
+# region Помощь
+
+
+class HelpMenuStart(GlobalScene):
+    def reply(self, request: Request):
+        text, tts = texts.help_menu_start()
+        return self.make_response(request, text, tts, buttons=YES_NO)
+
+    def handle_local_intents(self, request: Request):
+        if request.is_intent(intents.CONFIRM):
+            return HelpMenuSpec()
+        if request.is_intent(intents.REJECT):
+            return Welcome()
+
+
+class HelpMenuSpec(GlobalScene):
+    def reply(self, request: Request):
+        text, tts = texts.help_menu_spec()
+        return self.make_response(request, text, tts, buttons=DEFAULT_BUTTONS)
+
+    def handle_local_intents(self, request: Request):
+        pass
+
+
 class WhatCanDo(GlobalScene):
     def reply(self, request: Request):
+        text, tts = texts.what_can_i_do()
         return self.make_response(
             request,
-            "Что я умею",
-            "Что я умею",
+            text,
+            tts,
             buttons=YES_NO,
             state={},
         )
 
     def handle_local_intents(self, request: Request):
         if intents.CONFIRM in request.intents:
-            return HelpMenu()
+            return HelpMenuStart()
         if intents.REJECT in request.intents:
             return Welcome()
 
 
-class HelpMenu(GlobalScene):
-    def reply(self, request: Request):
-        return self.make_response(request, "Помощь", "Помощь", buttons=YES_NO)
-
-    def handle_local_intents(self, request: Request):
-        pass
+# endregion
 
 
 class ClearSettings(GlobalScene):
@@ -129,6 +150,9 @@ def _list_scenes():
     for name, obj in inspect.getmembers(current_module):
         if inspect.isclass(obj) and issubclass(obj, Scene):
             scenes.append(obj)
+
+    scenes.remove(GlobalScene)
+    scenes.remove(Scene)
     return scenes
 
 

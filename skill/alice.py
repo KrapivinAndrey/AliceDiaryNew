@@ -83,6 +83,9 @@ class Request:
             if entity["type"] == entity_type
         ]
 
+    def is_intent(self, intent: str):
+        return intent in self.intents
+
 
 def big_image(image_id: list, title=None, description=None):
     my_image = {"type": "BigImage", "image_id": image_id}
@@ -174,7 +177,3 @@ def button(title, payload=None, url=None, hide=False):
     if url is not None:
         my_button["url"] = url
     return my_button
-
-
-def has_location(event):
-    return event["session"].get("location") is not None

@@ -96,6 +96,7 @@ images = {
     "foreignLanguage": "https://img.icons8.com/nolan/64/abc.png",
     "civics": "https://img.icons8.com/nolan/64/parliament.png",
     "nativeLanguage": "https://img.icons8.com/nolan/64/home-page.png",
+    "default": "https://img.icons8.com/nolan/64/courses.png",
 }
 
 image_ids = {
@@ -134,4 +135,5 @@ image_ids = {
     "foreignLanguage": "1652229/2f7ec9e4872b4a7ad034",
     "civics": "1521359/adc2c83be5a27d149859",
     "nativeLanguage": "213044/1ac5d3f9ebe9babf8f6b",
+    "default": "1030494/da413e2fa4dd571dd852",
 }
