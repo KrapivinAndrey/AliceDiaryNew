@@ -50,7 +50,14 @@ def get_students(f):
                 user_state=None,
             )
         else:
-            scene.students = get_all_students_from_request(request)
+            try:
+
+                scene.students = get_all_students_from_request(request)
+
+            except Exception as e:
+                logging.warning("Old format for students %s", e)
+                scene.students = dairy_api.get_students(request.access_token)
+
             return f(*args, **kw)
 
     return wrapper
@@ -62,7 +69,7 @@ def finish_auth(f):
         request: Request = args[1]
         if request.authorization_complete:
             students = dairy_api.get_students(request.access_token)
-            self.students = students
+            scene.students = students
             return SCENES[scene.id()]
         else:
             return f(*args, **kw)
@@ -71,7 +78,7 @@ def finish_auth(f):
 
 
 def get_all_students_from_request(request: Request) -> Students:
-    dump = request.user.get(states.STUDENTS, None)
+    dump = request.user[states.STUDENTS]
     if dump is None:
         return []
     else:
@@ -143,7 +150,7 @@ class Welcome(GlobalScene):
             text,
             tts,
             buttons=buttons,
-            user_state=None,
+            user_state={states.STUDENTS: self.students.dump()},
         )
 
     def handle_local_intents(self, request: Request):
