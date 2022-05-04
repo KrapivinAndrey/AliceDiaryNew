@@ -49,6 +49,25 @@ def get_students(f):
                 directives={"start_account_linking": {}},
                 user_state=None,
             )
+        elif request.authorization_complete:
+            try:
+                scene.students = dairy_api.get_students(request.access_token)
+                return f(*args, **kw)
+            except Exception as e:
+                logging.info("Need authentication for %s", scene.id())
+                text, tts = texts.need_auth(scene.id())
+                buttons = [
+                    button("Что ты умеешь?"),
+                ]
+                return scene.make_response(
+                    request,
+                    text,
+                    tts,
+                    buttons=buttons,
+                    directives={"start_account_linking": {}},
+                    user_state=None,
+                )
+
         else:
             try:
 

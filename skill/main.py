@@ -44,7 +44,10 @@ def handler(event, context):
             return DEFAULT_SCENE().reply(request)
 
         current_scene = SCENES.get(current_scene_id, DEFAULT_SCENE)()
-        next_scene = current_scene.move(request)
+        if request.authorization_complete:
+            next_scene = current_scene
+        else:
+            next_scene = current_scene.move(request)
 
         if next_scene is not None:
             logging.info(f"Moving from scene {current_scene.id()} to {next_scene.id()}")
