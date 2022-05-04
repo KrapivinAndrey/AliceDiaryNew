@@ -4,16 +4,8 @@ from typing import Dict, List
 
 import requests
 
+from skill.constants.exceptions import NeedAuth, NotFoundError
 from skill.dataclasses import PlannedLesson, Schedule, Student, Students
-
-
-class NotFoundError(Exception):
-    pass
-
-
-class NeedAuth(Exception):
-    pass
-
 
 # region URLs
 

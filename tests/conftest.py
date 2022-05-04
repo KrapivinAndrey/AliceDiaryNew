@@ -105,9 +105,18 @@ def schedule(algebra, russian, geometry):
 
 # region Начало диалога
 
-@fixture()
+
+@fixture
 def start_skill():
     return AliceRequest().command("").build()
+
+
+@fixture
+def start_skill_auth():
+    req = AliceRequest().command("").access_token("777").build()
+
+    return req
+
 
 # endregion
 
