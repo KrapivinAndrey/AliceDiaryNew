@@ -22,7 +22,7 @@ class Scene(ABC):
 
     def move(self, request: Request):
         if request.authorization_complete:
-            next_scene = self
+            next_scene = self.id()
         else:
             next_scene = self.handle_local_intents(request)
             if next_scene is None:
