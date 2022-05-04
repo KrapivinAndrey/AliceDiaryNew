@@ -58,7 +58,8 @@ class TestHelp:
         )
         result = AliceAnswer(main.handler(test, None))
         assert result.text == texts.what_can_i_do()[0]
-        assert len(result.response.get("buttons")) == 2
+        assert result.has_button("Да")
+        assert result.has_button("Нет")
 
     @pytest.mark.parametrize("scene_id", SCENES)
     def test_helpme(self, scene_id):

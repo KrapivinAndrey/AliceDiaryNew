@@ -113,8 +113,8 @@ def start_skill():
 
 @fixture
 def start_skill_auth():
-    req = AliceRequest().command("").build()
-    req.get("session", {}).get("user", {})["access_token"] = "---"
+    req = AliceRequest().command("").access_token("777").build()
+
     return req
 
 

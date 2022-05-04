@@ -21,9 +21,12 @@ class Scene(ABC):
     """Проверка перехода к новой сцене"""
 
     def move(self, request: Request):
-        next_scene = self.handle_local_intents(request)
-        if next_scene is None:
-            next_scene = self.handle_global_intents(request)
+        if request.authorization_complete:
+            next_scene = self
+        else:
+            next_scene = self.handle_local_intents(request)
+            if next_scene is None:
+                next_scene = self.handle_global_intents(request)
         return next_scene
 
     @abstractmethod

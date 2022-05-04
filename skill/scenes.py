@@ -6,6 +6,7 @@ import skill.dairy_api as dairy_api
 import skill.texts as texts
 from skill.alice import Request, button, image_button, image_list
 from skill.constants import entities, intents, states
+from skill.constants.exceptions import NeedAuth
 from skill.dataclasses.students import Students
 from skill.scenes_util import Scene
 
@@ -16,84 +17,6 @@ root_handler = logging.getLogger().handlers[0]
 root_handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(name)s\t%(message)s\n"))
 
 # region Декоратор: проверить что надо авторизоваться
-
-
-def need_auth():
-    def decorate(cls):
-        setattr(cls, "reply", get_students(getattr(cls, "reply")))
-        setattr(
-            cls,
-            "handle_local_intents",
-            finish_auth(getattr(cls, "handle_local_intents")),
-        )
-        return cls
-
-    return decorate
-
-
-def get_students(f):
-    def wrapper(*args, **kw):
-        scene = args[0]
-        request: Request = args[1]
-        if request.access_token is None:
-            logging.info("Need authentication for %s", scene.id())
-            text, tts = texts.need_auth(scene.id())
-            buttons = [
-                button("Что ты умеешь?"),
-            ]
-            return scene.make_response(
-                request,
-                text,
-                tts,
-                buttons=buttons,
-                directives={"start_account_linking": {}},
-                user_state=None,
-            )
-        elif request.authorization_complete:
-            try:
-                scene.students = dairy_api.get_students(request.access_token)
-                return f(*args, **kw)
-            except Exception as e:
-                logging.info("Need authentication for %s", scene.id())
-                text, tts = texts.need_auth(scene.id())
-                buttons = [
-                    button("Что ты умеешь?"),
-                ]
-                return scene.make_response(
-                    request,
-                    text,
-                    tts,
-                    buttons=buttons,
-                    directives={"start_account_linking": {}},
-                    user_state=None,
-                )
-
-        else:
-            try:
-
-                scene.students = get_all_students_from_request(request)
-
-            except Exception as e:
-                logging.warning("Old format for students %s", e)
-                scene.students = dairy_api.get_students(request.access_token)
-
-            return f(*args, **kw)
-
-    return wrapper
-
-
-def finish_auth(f):
-    def wrapper(*args, **kw):
-        scene = args[0]
-        request: Request = args[1]
-        if request.authorization_complete:
-            students = dairy_api.get_students(request.access_token)
-            scene.students = students
-            return SCENES[scene.id()]
-        else:
-            return f(*args, **kw)
-
-    return wrapper
 
 
 def get_all_students_from_request(request: Request) -> Students:
@@ -156,9 +79,49 @@ class GlobalScene(Scene):
             )
 
 
-@need_auth()
-class Welcome(GlobalScene):
+class SceneWithAuth(GlobalScene):
+    def __init__(self, students=None, context=None):
+        self.students = students
+        self.context = context
+
     def reply(self, request: Request):
+        auth = False
+        if request.access_token is None:
+            # TODO: Сохранить контекст для повторного вызова
+            auth = True
+        elif request.authorization_complete:
+            try:
+                self.students = dairy_api.get_students(request.access_token)
+            except NeedAuth as e:
+                auth = True
+        else:
+            try:
+                self.students = get_all_students_from_request(request)
+            except Exception as e:
+                logging.warning("Old format for students %s", e)
+                self.students = dairy_api.get_students(request.access_token)
+        if auth:
+            logging.info("Need authentication for %s", self.id())
+            text, tts = texts.need_auth(self.id())
+            buttons = [
+                button("Что ты умеешь?"),
+            ]
+            return self.make_response(
+                request,
+                text,
+                tts,
+                buttons=buttons,
+                directives={"start_account_linking": {}},
+                user_state=None,
+            )
+
+
+class Welcome(SceneWithAuth):
+    def reply(self, request: Request):
+        auth = super().reply(request)
+        if auth is not None:
+            return auth
+
         text, tts = texts.hello(None)
         buttons = [
             button("Что ты умеешь?"),
