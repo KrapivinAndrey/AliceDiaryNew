@@ -250,14 +250,17 @@ class GetSchedule(SceneWithAuth):
             return self.make_response(
                 request, text, tts, state={states.NEED_FALLBACK: True}
             )
-
+        text = []
+        tts = []
         for student in req_students:
             schedule = dairy_api.get_schedule(
                 request.access_token, student.id, req_date
             )
-            text, tts = texts.schedule_for_student(student, schedule)
+            new_text, new_tts = texts.schedule_for_student(student, schedule)
+            text.append(new_text)
+            tts.append(new_tts)
 
-        return self.make_response(request, text, tts)
+        return self.make_response(request, '\n'.join(text), "sil<[500]>".join(tts))
 
 
 # endregion

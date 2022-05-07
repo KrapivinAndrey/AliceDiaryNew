@@ -101,7 +101,7 @@ class TestSchedule:
         intent = AliceIntent("get_schedule")
         test = (
             AliceRequest()
-            .command("Расписание на завтра для Гоши")
+            .command("Расписание уроков для Алисы")
             .from_scene("Welcome")
             .access_token("111")
             .add_to_state_user("students", students_dump)
@@ -111,3 +111,20 @@ class TestSchedule:
         )
         result = AliceAnswer(main.handler(test, None))
         assert "Алиса. 6 уроков" in result.text
+        assert "Дмитрий. 6 уроков" not in result.text
+
+    def test_all_student(self, students_dump, requests_mock):
+        setup_mock_schedule(requests_mock)
+        intent = AliceIntent("get_schedule")
+        test = (
+            AliceRequest()
+            .command("Расписание на завтра")
+            .from_scene("Welcome")
+            .access_token("111")
+            .add_to_state_user("students", students_dump)
+            .add_intent(intent)
+            .build()
+        )
+        result = AliceAnswer(main.handler(test, None))
+        assert "Алиса. 6 уроков" in result.text
+        assert "Дмитрий. 6 уроков" in result.text
