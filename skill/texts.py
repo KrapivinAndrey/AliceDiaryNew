@@ -182,7 +182,7 @@ def schedule_for_student(student: Student, schedule: PlannedLesson):
 
     # Расписание
     for lesson in schedule.lessons:
-        text.append(f"{lesson.name} {lesson.duration()}")
+        text.append(f"{lesson} {lesson.duration}")
 
     return "\n".join(text), tts
 
