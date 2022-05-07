@@ -48,7 +48,9 @@ def get_students(token: str) -> List[Student]:
     return result
 
 
-def get_schedule(token: str, student_id: str, day=date.today()) -> List[PlannedLesson]:
+def get_schedule(token: str, student_id: str, day=None) -> List[PlannedLesson]:
+    if day is None:
+        day = date.today()
     start_time = datetime.combine(day, time.min)
     finish_time = datetime.combine(day, time.max)
 
