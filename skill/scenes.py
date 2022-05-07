@@ -54,7 +54,10 @@ def get_students_from_request(request: Request, students: Students):
     result = []
     if entities.FIO in request.entities_list:
         for fio in request.entity(entities.FIO):
-            result.append(students.by_name(fio["first_name"]))
+            found = students.by_name(fio["first_name"])
+            if found is None:
+                return None
+            result.append(found)
     else:
         result = students.to_list()
 
@@ -242,7 +245,7 @@ class GetSchedule(SceneWithAuth):
         students.restore(request.user[states.STUDENTS])
         req_students = get_students_from_request(request, students)
 
-        if not req_students:  # нет данных для запроса. Возможно не то имя
+        if req_students is None:  # нет данных для запроса. Возможно не то имя
             text, tts = texts.unknown_student()
             return self.make_response(
                 request, text, tts, state={states.NEED_FALLBACK: True}
