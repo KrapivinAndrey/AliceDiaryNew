@@ -76,6 +76,7 @@ class TestHelp:
 
 
 class TestSchedule:
+    # проверим только один раз Глобально
     @pytest.mark.parametrize("scene_id", SCENES)
     def test_wrong_student(self, scene_id, students_dump, requests_mock):
         setup_mock_schedule(requests_mock)
@@ -94,15 +95,14 @@ class TestSchedule:
         result = AliceAnswer(main.handler(test, None))
         assert result.text == texts.unknown_student()[0]
 
-    @pytest.mark.parametrize("scene_id", SCENES)
-    def test_name_of_student(self, scene_id, students_dump, requests_mock):
+    def test_name_of_student(self, students_dump, requests_mock):
         setup_mock_schedule(requests_mock)
         fio = AliceEntity().fio(first_name="Алиса")
         intent = AliceIntent("get_schedule")
         test = (
             AliceRequest()
             .command("Расписание на завтра для Гоши")
-            .from_scene(scene_id)
+            .from_scene("Welcome")
             .access_token("111")
             .add_to_state_user("students", students_dump)
             .add_entity(fio)
