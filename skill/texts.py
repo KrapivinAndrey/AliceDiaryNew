@@ -1,7 +1,8 @@
 import datetime
 
+from skill.dataclasses import PlannedLesson, Student
+
 # region Общие сцены
-from skill.dataclasses import Student, PlannedLesson
 
 
 def mistake():
@@ -183,7 +184,7 @@ def schedule_for_student(student: Student, lessons: PlannedLesson):
     for lesson in lessons:
         text.append(f"{lesson.name} {lesson.duration()}")
 
-    return '\n'.join(text), tts
+    return "\n".join(text), tts
 
 
 def __title_date(date):

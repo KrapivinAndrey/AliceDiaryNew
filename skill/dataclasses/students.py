@@ -1,4 +1,5 @@
 import locale
+from typing import Union
 
 import pymorphy2
 
@@ -73,7 +74,7 @@ class Students:
     def ids(self):
         return [x for x in self.students.keys()]
 
-    def by_name(self, search_name: str) -> Student:
+    def by_name(self, search_name: str) -> Union[Student, None]:
         for name in self.students.values():
             if name == search_name:
                 return name
