@@ -10,7 +10,9 @@ from skill.constants import entities, intents, states
 from skill.constants.exceptions import NeedAuth
 from skill.dataclasses.students import Students
 from skill.scenes_util import Scene
-from skill.tools.dates_transformations import transform_yandex_datetime_value_to_datetime as ya_date_transform
+from skill.tools.dates_transformations import (
+    transform_yandex_datetime_value_to_datetime as ya_date_transform,
+)
 
 logging.basicConfig()
 
