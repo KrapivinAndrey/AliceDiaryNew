@@ -17,6 +17,9 @@ class PlannedLesson:
     def __repr__(self):
         return str(self)
 
+    def __eq__(self, other):
+        return self.name == other.name
+
     def __lt__(self, other):
         return self.start < other.start
 

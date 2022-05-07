@@ -178,13 +178,37 @@ def schedule_for_student(student: Student, schedule: PlannedLesson):
     count_str = __how_many_lessons(count)
 
     text = [f"{student.name}. {count_str}"]
-    tts = f"У {student.inflect['родительный']} {count_str}"
+    tts = [f"У {student.inflect['родительный']} {count_str}"]
+    if schedule.lessons[0].num != 0:
+        tts.append(
+            f"К {schedule.lessons[0].num} уроку в {schedule.lessons[0].start_time}"
+        )
+    else:
+        tts.append(f"Уроки начинаются в {schedule.lessons[0].start_time}")
 
     # Расписание
-    for lesson in schedule.lessons:
+    repeat_lessons_count = 1
+    for i in range(len(schedule.lessons)):
+        lesson = schedule.lessons[i]
         text.append(f"{lesson.num}. {lesson} {lesson.duration}")
+        if i == 0:
+            tts.append(lesson.name)
+        else:
+            if schedule.lessons[i - 1] == lesson:
+                repeat_lessons_count += 1
+            elif repeat_lessons_count > 1:
+                tts[-1] += " " + __how_many_lessons(repeat_lessons_count)
+                repeat_lessons_count = 1
+                tts.append(lesson.name)
+            else:
+                tts.append(lesson.name)
 
-    return "\n".join(text), tts
+    if repeat_lessons_count > 1:
+        tts[-1] += " " + __how_many_lessons(repeat_lessons_count)
+
+    tts.append(f"Уроки закончатся в {schedule.lessons[-1].end_time}")
+
+    return "\n".join(text), "sil<[100]>".join(tts)
 
 
 def __title_date(date):
