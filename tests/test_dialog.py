@@ -4,7 +4,7 @@ from alicefluentcheck import AliceAnswer, AliceEntity, AliceIntent, AliceRequest
 import skill.main as main
 import skill.texts as texts
 from skill.scenes import SCENES
-from skill.tools.mocking import setup_mock_children, setup_mock_schedule
+from skill.tools.mocking import setup_mock_children, setup_mock_schedule, setup_mock_schedule_normal
 
 
 class TestHello:
@@ -113,8 +113,13 @@ class TestSchedule:
         assert "Алиса. 6 уроков" in result.text
         assert "Дмитрий. 6 уроков" not in result.text
 
+        # в ттс дополнительная информация
+        assert "К 3 уроку в 09:45" in result.tts
+        assert "Уроки закончатся в 14:40" in result.tts
+        assert "Информатика 2 урока" in result.tts
+
     def test_all_student(self, students_dump, requests_mock):
-        setup_mock_schedule(requests_mock)
+        setup_mock_schedule_normal(requests_mock)
         intent = AliceIntent("get_schedule")
         test = (
             AliceRequest()
@@ -128,3 +133,5 @@ class TestSchedule:
         result = AliceAnswer(main.handler(test, None))
         assert "Алиса. 6 уроков" in result.text
         assert "Дмитрий. 6 уроков" in result.text
+        for i in range(1,9):
+            assert f"К {i} уроку" not in result.text

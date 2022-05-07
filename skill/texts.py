@@ -179,7 +179,7 @@ def schedule_for_student(student: Student, schedule: PlannedLesson):
 
     text = [f"{student.name}. {count_str}"]
     tts = [f"У {student.inflect['родительный']} {count_str}"]
-    if schedule.lessons[0].num != 0:
+    if schedule.lessons[0].num != 1:
         tts.append(
             f"К {schedule.lessons[0].num} уроку в {schedule.lessons[0].start_time}"
         )

@@ -162,7 +162,7 @@ def json_schedule_2():
         "data": {
             "items": [
                 {
-                    "number": 7,
+                    "number": 6,
                     "datetime_from": "25.04.2022 13:31:00",
                     "datetime_to": "25.04.2022 13:55:00",
                     "subject_id": 172516,
@@ -171,7 +171,7 @@ def json_schedule_2():
                     "override_by_priority": true,
                 },
                 {
-                    "number": 8,
+                    "number": 5,
                     "datetime_from": "25.04.2022 14:31:00",
                     "datetime_to": "25.04.2022 14:40:00",
                     "subject_id": 172516,
@@ -180,7 +180,7 @@ def json_schedule_2():
                     "override_by_priority": true,
                 },
                 {
-                    "number": 5,
+                    "number": 4,
                     "datetime_from": "25.04.2022 11:31:00",
                     "datetime_to": "25.04.2022 12:10:00",
                     "subject_id": 172533,
@@ -189,7 +189,7 @@ def json_schedule_2():
                     "override_by_priority": true,
                 },
                 {
-                    "number": 6,
+                    "number": 3,
                     "datetime_from": "25.04.2022 12:31:00",
                     "datetime_to": "25.04.2022 12:55:00",
                     "subject_id": 172533,
@@ -198,7 +198,7 @@ def json_schedule_2():
                     "override_by_priority": true,
                 },
                 {
-                    "number": 3,
+                    "number": 1,
                     "datetime_from": "25.04.2022 09:45:00",
                     "datetime_to": "25.04.2022 10:25:00",
                     "subject_id": 172476,
@@ -207,23 +207,14 @@ def json_schedule_2():
                     "override_by_priority": true,
                 },
                 {
-                    "number": 4,
+                    "number": 2,
                     "datetime_from": "25.04.2022 10:31:00",
                     "datetime_to": "25.04.2022 11:10:00",
                     "subject_id": 172476,
                     "subject_name": "Алгебра",
                     "priority": 0,
                     "override_by_priority": true,
-                },
-                {
-                    "number": 8,
-                    "datetime_from": "25.04.2022 14:31:00",
-                    "datetime_to": "25.04.2022 14:40:00",
-                    "subject_id": 187951,
-                    "subject_name": "Технология 2.0",
-                    "priority": 0,
-                    "override_by_priority": true,
-                },
+                }
             ],
             "before": 1,
             "current": 0,
@@ -247,4 +238,4 @@ def setup_mock_schedule(m: Mocker):
 
 
 def setup_mock_schedule_normal(m: Mocker):
-    m.get(f"{schedule_url()}", json=json_schedule_1())
+    m.get(f"{schedule_url()}", json=json_schedule_2())
