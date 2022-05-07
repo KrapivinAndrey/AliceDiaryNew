@@ -85,7 +85,79 @@ def json_students():
     }
 
 
-def json_schedule():
+def json_schedule_1():
+    return {
+        "data": {
+            "items": [
+                {
+                    "number": 7,
+                    "datetime_from": "25.04.2022 13:31:00",
+                    "datetime_to": "25.04.2022 13:55:00",
+                    "subject_id": 172516,
+                    "subject_name": "География",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 8,
+                    "datetime_from": "25.04.2022 14:31:00",
+                    "datetime_to": "25.04.2022 14:40:00",
+                    "subject_id": 172516,
+                    "subject_name": "География",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 5,
+                    "datetime_from": "25.04.2022 11:31:00",
+                    "datetime_to": "25.04.2022 12:10:00",
+                    "subject_id": 172533,
+                    "subject_name": "Информатика",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 6,
+                    "datetime_from": "25.04.2022 12:31:00",
+                    "datetime_to": "25.04.2022 12:55:00",
+                    "subject_id": 172533,
+                    "subject_name": "Информатика",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 3,
+                    "datetime_from": "25.04.2022 09:45:00",
+                    "datetime_to": "25.04.2022 10:25:00",
+                    "subject_id": 172476,
+                    "subject_name": "Алгебра",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 4,
+                    "datetime_from": "25.04.2022 10:31:00",
+                    "datetime_to": "25.04.2022 11:10:00",
+                    "subject_id": 172476,
+                    "subject_name": "Алгебра",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+            ],
+            "before": 1,
+            "current": 0,
+            "last": 0,
+            "next": 0,
+            "total_pages": 0,
+            "total_items": 0,
+        },
+        "validations": [],
+        "messages": [],
+        "debug": [],
+    }
+
+
+def json_schedule_2():
     return {
         "data": {
             "items": [
@@ -171,4 +243,8 @@ def setup_mock_children(m: Mocker):
 
 
 def setup_mock_schedule(m: Mocker):
-    m.get(f"{schedule_url()}", json=json_schedule())
+    m.get(f"{schedule_url()}", json=json_schedule_1())
+
+
+def setup_mock_schedule_normal(m: Mocker):
+    m.get(f"{schedule_url()}", json=json_schedule_1())

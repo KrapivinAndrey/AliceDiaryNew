@@ -110,4 +110,4 @@ class TestSchedule:
             .build()
         )
         result = AliceAnswer(main.handler(test, None))
-        assert "Алиса. 7 уроков" in result.text
+        assert "Алиса. 6 уроков" in result.text
