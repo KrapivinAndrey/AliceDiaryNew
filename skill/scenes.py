@@ -1,3 +1,4 @@
+import datetime
 import inspect
 import logging
 import sys
@@ -9,6 +10,9 @@ from skill.constants import entities, intents, states
 from skill.constants.exceptions import NeedAuth
 from skill.dataclasses.students import Students
 from skill.scenes_util import Scene
+from skill.tools.dates_transformations import (
+    transform_yandex_datetime_value_to_datetime as ya_date_transform,
+)
 
 logging.basicConfig()
 
@@ -16,7 +20,7 @@ logging.getLogger().setLevel(logging.DEBUG)
 root_handler = logging.getLogger().handlers[0]
 root_handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(name)s\t%(message)s\n"))
 
-# region Декоратор: проверить что надо авторизоваться
+# region Выделение данных для запроса
 
 
 def get_all_students_from_request(request: Request) -> Students:
@@ -28,6 +32,33 @@ def get_all_students_from_request(request: Request) -> Students:
         students.restore(dump)
 
     return students
+
+
+def get_date_from_request(request: Request):
+    if entities.DATETIME in request.entities_list:
+        ya_date = request.entity(entities.DATETIME)[0]
+        ya_date = ya_date_transform(ya_date)
+    elif intents.DAY in request.intents:
+        day = request.slot(intents.DAY, "Day")
+        delta = DAYS.index(day) - datetime.date.today().weekday()
+        if delta < 0:
+            delta += 7
+        ya_date = datetime.datetime.today() + datetime.timedelta(days=delta)
+    else:
+        ya_date = None
+
+    return ya_date
+
+
+def get_students_from_request(request: Request, students: Students):
+    result = []
+    if entities.FIO in request.entities_list:
+        for fio in request.entity(entities.FIO):
+            result.append(students.by_name(fio["first_name"]))
+    else:
+        result = students.to_list()
+
+    return result
 
 
 # endregion
@@ -197,6 +228,39 @@ class WhatCanDo(GlobalScene):
 
 # endregion
 
+# region Расписание
+
+
+class GetSchedule(SceneWithAuth):
+    def reply(self, request: Request):
+        auth = super().reply(request)
+        if auth is not None:
+            return auth
+
+        req_date = get_date_from_request(request)
+        students = Students()
+        students.restore(request.session[states.STUDENTS])
+        req_students = get_students_from_request(request, students)
+
+        if not req_students:  # нет данных для запроса. Возможно не то имя
+            text, tts = texts.unknown_student()
+            return self.make_response(
+                request, text, tts, state={states.NEED_FALLBACK: True}
+            )
+
+        for student in req_students:
+            schedule = dairy_api.get_schedule(
+                request.access_token, student.id, req_date
+            )
+            text, tts = texts.schedule_for_student(student, schedule)
+
+        return self.make_response(request, text, tts)
+
+
+# endregion
+
+# region Отладка
+
 
 class ClearSettings(GlobalScene):
     def reply(self, request: Request):
@@ -209,6 +273,9 @@ class ClearSettings(GlobalScene):
             user_state={x: None for x in request.user.keys()},
             end_session=True,
         )
+
+
+# endregion
 
 
 def _list_scenes():

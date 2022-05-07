@@ -72,7 +72,7 @@ def get_schedule(token: str, student_id: str, day=date.today()) -> List[PlannedL
         time_from = datetime.strptime(lesson["datetime_from"], template).time()
         time_to = datetime.strptime(lesson["datetime_to"], template).time()
         result.lessons.append(
-            PlannedLesson(lesson["subject_name"], time_from, time_to),
+            PlannedLesson(lesson["number"], lesson["subject_name"], time_from, time_to),
         )
 
     result.lessons.sort()

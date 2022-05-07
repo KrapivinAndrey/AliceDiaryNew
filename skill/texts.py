@@ -1,4 +1,7 @@
+import datetime
+
 # region Общие сцены
+from skill.dataclasses import Student, PlannedLesson
 
 
 def mistake():
@@ -117,14 +120,14 @@ def help_menu_spec():
     tts = (
         "У меня есть несколько режимов запуска:\n"
         "Можете сказать:\n"
-        'sil<[100]>"Алиса, запусти навык Дневник ученика Питера"\n'
+        "sil<[100]>Алиса, запусти навык Дневник ученика Питера\n"
         "И попадете в это приложение:\n"
         "А можете сказать:\n"
-        'sil<[100]>"Алиса, спроси у Дневника ученика Питера какие уроки завтра?"\n'
+        "sil<[100]>Алиса, спроси у Дневника ученика Питера какие уроки завтра?\n"
         "Тогда я сразу отвечу на ваш вопрос.\n"
         "Дату можете указать любую.\n"
         "Теперь вы знаете как пользоваться навыком. \n"
-        'Скажите "Главное меню" или "Расписание уроков".'
+        "Скажите Главное меню или Расписание уроков."
     )
 
     return text, tts
@@ -154,3 +157,66 @@ def what_can_i_do():
 def hello(students):
     text = tts = "Здесь будет todo"
     return text, tts
+
+
+def unknown_student():
+    text = (
+        "Прошу прощения. Но у меня нет данных.\n" "Возможно ошиблись в имени ученика?"
+    )
+    tts = (
+        '<speaker audio="alice-sounds-human-crowd-2.opus">'
+        "Прошу прощения. Но у меня нет данных.\n"
+        "sil<[100]>Возможно ошиблись в имени ученика?"
+    )
+
+    return text, tts
+
+
+def schedule_for_student(student: Student, lessons: PlannedLesson):
+    count = len(lessons)
+    count_str = __how_many_lessons(count)
+
+    text = [f"{student.name}. {count_str}"]
+    tts = f"У {student.inflect['родительный']} {count_str}"
+
+    # Расписание
+    for lesson in lessons:
+        text.append(f"{lesson.name} {lesson.duration()}")
+
+    return '\n'.join(text), tts
+
+
+def __title_date(date):
+    if date is None:
+        str_date = "Сегодня"
+    elif date.date() in KNOWN_DATES:
+        str_date = KNOWN_DATES[date.date()]
+    else:
+        str_date = datetime.date.strftime(date.date(), "%d %B")
+
+    return str_date
+
+
+def __how_many_lessons(n: int) -> str:
+    if n == 0:
+        return "Нет уроков."
+    first = n % 10
+    second = n % 100
+
+    if (2 <= first <= 4) and not (12 <= second <= 14):
+        last = "урока"
+    elif first == 1 and not second == 11:
+        last = "урок"
+    else:
+        last = "уроков"
+
+    return f"{str(n)} {last}"
+
+
+KNOWN_DATES = {
+    datetime.date.today(): "Сегодня",
+    datetime.date.today() + datetime.timedelta(days=1): "Завтра",
+    datetime.date.today() + datetime.timedelta(days=2): "Послезавтра",
+    datetime.date.today() + datetime.timedelta(days=-1): "Вчера",
+    datetime.date.today() + datetime.timedelta(days=-2): "Позавчера",
+}

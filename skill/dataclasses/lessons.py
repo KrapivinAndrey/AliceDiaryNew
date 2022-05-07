@@ -5,7 +5,8 @@ from skill.constants.entities import image_ids, subjects
 
 
 class PlannedLesson:
-    def __init__(self, name: str, start: time, end: time):
+    def __init__(self, num: int, name: str, start: time, end: time):
+        self.num = num
         self.name = name
         self.start = start
         self.end = end

@@ -72,3 +72,16 @@ class Students:
     @property
     def ids(self):
         return [x for x in self.students.keys()]
+
+    def by_name(self, search_name: str) -> Student:
+        for name in self.students.values():
+            if name == search_name:
+                return name
+
+        return None
+
+    def name_by_id(self, search_id: str):
+        return str(self.students[search_id])
+
+    def to_list(self):
+        return [x for x in self.values()]
