@@ -82,9 +82,9 @@ class GlobalScene(Scene):
 
         # Глобальные команды
         if intents.GET_SCHEDULE in request.intents:
-            pass
+            return GetSchedule()
         if intents.MAIN_MENU in request.intents:
-            pass
+            Welcome()
 
     def handle_local_intents(self, request: Request):
         pass  # Здесь не нужно пока ничего делать
@@ -239,7 +239,7 @@ class GetSchedule(SceneWithAuth):
 
         req_date = get_date_from_request(request)
         students = Students()
-        students.restore(request.session[states.STUDENTS])
+        students.restore(request.user[states.STUDENTS])
         req_students = get_students_from_request(request, students)
 
         if not req_students:  # нет данных для запроса. Возможно не то имя

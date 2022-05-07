@@ -85,4 +85,4 @@ class Students:
         return str(self.students[search_id])
 
     def to_list(self):
-        return [x for x in self.values()]
+        return [x for x in self.students.values()]

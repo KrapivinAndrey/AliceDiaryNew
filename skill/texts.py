@@ -173,15 +173,15 @@ def unknown_student():
     return text, tts
 
 
-def schedule_for_student(student: Student, lessons: PlannedLesson):
-    count = len(lessons)
+def schedule_for_student(student: Student, schedule: PlannedLesson):
+    count = len(schedule.lessons)
     count_str = __how_many_lessons(count)
 
     text = [f"{student.name}. {count_str}"]
     tts = f"У {student.inflect['родительный']} {count_str}"
 
     # Расписание
-    for lesson in lessons:
+    for lesson in schedule.lessons:
         text.append(f"{lesson.name} {lesson.duration()}")
 
     return "\n".join(text), tts
