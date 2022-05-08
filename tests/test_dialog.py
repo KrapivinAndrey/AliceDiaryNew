@@ -4,18 +4,22 @@ from alicefluentcheck import AliceAnswer, AliceEntity, AliceIntent, AliceRequest
 import skill.main as main
 import skill.texts as texts
 from skill.scenes import SCENES
-from skill.tools.mocking import setup_mock_children, setup_mock_schedule, setup_mock_schedule_normal
+from skill.tools.mocking import (
+    setup_mock_children,
+    setup_mock_schedule,
+    setup_mock_schedule_normal,
+)
 
 
 class TestHello:
     # Тесты начала диалога
     def test_start_dialog(self, start_skill):
-        result = AliceAnswer(main.handler(start_skill, None))
+        result = AliceAnswer(main.handler(start_skill))
         assert result.text == texts.need_auth("Welcome")[0]
 
     def test_start_dialog_auth(self, start_skill_auth, students_dump, requests_mock):
         setup_mock_children(requests_mock)
-        result = AliceAnswer(main.handler(start_skill_auth, None))
+        result = AliceAnswer(main.handler(start_skill_auth))
         assert result.text == texts.hello(None)[0]
         assert result.user_state["students"] == students_dump
 
@@ -27,7 +31,7 @@ class TestFallback:
         test = (
             AliceRequest().command("рамамба хару мамбуру").from_scene(scene_id).build()
         )
-        result = AliceAnswer(main.handler(test, None))
+        result = AliceAnswer(main.handler(test))
         assert result.text == texts.fallback()[0]
         assert not result.is_end_of_session
 
@@ -40,7 +44,7 @@ class TestFallback:
             .add_to_state_session("fallback", True)
             .build()
         )
-        result = AliceAnswer(main.handler(test, None))
+        result = AliceAnswer(main.handler(test))
         assert result.text == texts.sorry_and_goodbye()[0]
         assert result.is_end_of_session
 
@@ -56,7 +60,7 @@ class TestHelp:
             .add_intent(AliceIntent().what_can_you_do())
             .build()
         )
-        result = AliceAnswer(main.handler(test, None))
+        result = AliceAnswer(main.handler(test))
         assert result.text == texts.what_can_i_do()[0]
         assert result.has_button("Да")
         assert result.has_button("Нет")
@@ -70,7 +74,7 @@ class TestHelp:
             .add_intent(AliceIntent().help())
             .build()
         )
-        result = AliceAnswer(main.handler(test, None))
+        result = AliceAnswer(main.handler(test))
         assert result.text == texts.help_menu_start()[0]
         assert len(result.response.get("buttons")) == 2
 
@@ -92,7 +96,7 @@ class TestSchedule:
             .add_intent(intent)
             .build()
         )
-        result = AliceAnswer(main.handler(test, None))
+        result = AliceAnswer(main.handler(test))
         assert result.text == texts.unknown_student()[0]
 
     def test_name_of_student(self, students_dump, requests_mock):
@@ -109,7 +113,7 @@ class TestSchedule:
             .add_intent(intent)
             .build()
         )
-        result = AliceAnswer(main.handler(test, None))
+        result = AliceAnswer(main.handler(test))
         assert "Алиса. 6 уроков" in result.text
         assert "Дмитрий. 6 уроков" not in result.text
 
@@ -130,8 +134,8 @@ class TestSchedule:
             .add_intent(intent)
             .build()
         )
-        result = AliceAnswer(main.handler(test, None))
+        result = AliceAnswer(main.handler(test))
         assert "Алиса. 6 уроков" in result.text
         assert "Дмитрий. 6 уроков" in result.text
-        for i in range(1,9):
+        for i in range(1, 9):
             assert f"К {i} уроку" not in result.text

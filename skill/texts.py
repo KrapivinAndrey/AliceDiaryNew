@@ -181,7 +181,7 @@ def schedule_for_student(student: Student, schedule: PlannedLesson):
     tts = [f"У {student.inflect['родительный']} {count_str}"]
     if schedule.lessons[0].num != 1:
         tts.append(
-            f"К {schedule.lessons[0].num} уроку в {schedule.lessons[0].start_time}"
+            f"К {ORDINAL_NUMBERS[schedule.lessons[0].num]} уроку в {schedule.lessons[0].start_time}"
         )
     else:
         tts.append(f"Уроки начинаются в {schedule.lessons[0].start_time}")
@@ -245,3 +245,17 @@ KNOWN_DATES = {
     datetime.date.today() + datetime.timedelta(days=-1): "Вчера",
     datetime.date.today() + datetime.timedelta(days=-2): "Позавчера",
 }
+
+ORDINAL_NUMBERS = [
+    "",
+    "первому",
+    "второму",
+    "третьему",
+    "четвертому",
+    "пятому",
+    "шестому",
+    "седьмому",
+    "восьмому",
+    "девятому",
+    "десятому",
+]

@@ -19,7 +19,7 @@ root_handler = logging.getLogger().handlers[0]
 root_handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(name)s\t%(message)s\n"))
 
 
-def handler(event, context):
+def handler(event, context=None):
 
     # если контекст пустой - это отладка или тесты
     if context is not None:
