@@ -1,6 +1,6 @@
 import datetime
 
-from skill.dataclasses import PlannedLesson, Student
+from skill.dataclasses import Schedule, Student
 
 # region Общие сцены
 
@@ -72,6 +72,9 @@ def need_auth(scene_id):
             "Я могу подсказать расписание уроков на любой день."
             "Скажите sil<[100]>Что ты умеешь? и расскажу подробнее."
         )
+    else:
+        text = "Сеанс устарел. Обновите данные."
+        tts = text
 
     return text, tts
 
@@ -173,7 +176,7 @@ def unknown_student():
     return text, tts
 
 
-def schedule_for_student(student: Student, schedule: PlannedLesson):
+def schedule_for_student(student: Student, schedule: Schedule):
     count = len(schedule.lessons)
     count_str = __how_many_lessons(count)
 
