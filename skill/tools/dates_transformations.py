@@ -1,13 +1,10 @@
-import datetime
+from datetime import datetime
 
 from dateutil import relativedelta
 
 
-def adjust_relative_dates(
-    *, initial_date: datetime.datetime, yandex_dict: dict
-) -> datetime.datetime:
-    if "value" in yandex_dict:
-        yandex_dict = yandex_dict["value"]
+def adjust_relative_dates(yandex_dict: dict) -> datetime:
+    initial_date = datetime.today()
     relative_year = (
         yandex_dict["year"] if yandex_dict.get("year_is_relative", False) else 0
     )
@@ -41,39 +38,44 @@ def adjust_relative_dates(
     )
 
 
-def adjust_absolute_dates(
-    *, initial_date: datetime.datetime, yandex_dict: dict
-) -> datetime.datetime:
-    if "value" in yandex_dict:
-        yandex_dict = yandex_dict["value"]
-    adjusted_date = initial_date
-    if yandex_dict.get("year_is_relative", False) is False:
+def adjust_absolute_dates(yandex_dict: dict) -> datetime:
+    adjusted_date = datetime.today()
+    if "year" in yandex_dict:
         adjusted_date = adjusted_date.replace(year=yandex_dict.get("year", 0))
 
-    if yandex_dict.get("month_is_relative", False) is False:
+    if "month" in yandex_dict:
         adjusted_date = adjusted_date.replace(month=yandex_dict.get("month", 0))
 
-    if yandex_dict.get("day_is_relative", False) is False:
+    if "day" in yandex_dict:
         adjusted_date = adjusted_date.replace(day=yandex_dict.get("day", 0))
 
-    if yandex_dict.get("hour_is_relative", False) is False:
+    if "hour" in yandex_dict:
         adjusted_date = adjusted_date.replace(hour=yandex_dict.get("hour", 0))
 
-    if yandex_dict.get("minute_is_relative", False) is False:
+    if "minute" in yandex_dict:
         adjusted_date = adjusted_date.replace(minute=yandex_dict.get("minute", 0))
 
-    if yandex_dict.get("second_is_relative", False) is False:
+    if "second" in yandex_dict:
         adjusted_date = adjusted_date.replace(second=yandex_dict.get("second", 0))
 
     return adjusted_date
 
 
 def transform_yandex_datetime_value_to_datetime(
-    yandex_datetime_value_dict,
-) -> datetime.datetime:
-    return adjust_absolute_dates(
-        initial_date=adjust_relative_dates(
-            initial_date=datetime.datetime.now(), yandex_dict=yandex_datetime_value_dict
-        ),
-        yandex_dict=yandex_datetime_value_dict,
+    yandex_datetime,
+) -> datetime:
+    relative = (
+        yandex_datetime.get("year_is_relative", False)
+        or yandex_datetime.get("month_is_relative", False)
+        or yandex_datetime.get("day_is_relative", False)
+        or yandex_datetime.get("hour_is_relative", False)
+        or yandex_datetime.get("minute_is_relative", False)
+        or yandex_datetime.get("second_is_relative", False)
     )
+
+    if relative:
+
+        return adjust_relative_dates(yandex_datetime)
+
+    else:
+        return adjust_absolute_dates(yandex_datetime)
