@@ -264,6 +264,11 @@ class GetSchedule(SceneWithAuth):
             )
         text = []
         tts = []
+
+        title_text, title_tts = texts.title("Расписание", req_date)
+        text.append(title_text)
+        tts.append(title_tts)
+
         for student in req_students:
             schedule = dairy_api.get_schedule(
                 request.access_token, student.id, req_date

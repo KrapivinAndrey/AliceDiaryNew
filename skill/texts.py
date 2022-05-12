@@ -176,6 +176,19 @@ def unknown_student():
     return text, tts
 
 
+def title(start: str, req_date):
+    if req_date is None:
+        str_date = "Сегодня"
+    elif req_date.date() in KNOWN_DATES:
+        str_date = KNOWN_DATES[req_date.date()]
+    else:
+        str_date = datetime.date.strftime(req_date.date(), "%d %B")
+
+    text = f"{start} на {str_date}"
+
+    return text, text
+
+
 def schedule_for_student(student: Student, schedule: Schedule):
     count = len(schedule.lessons)
     count_str = __how_many_lessons(count)
