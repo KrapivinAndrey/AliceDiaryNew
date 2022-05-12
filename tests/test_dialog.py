@@ -8,7 +8,8 @@ import skill.constants.states as states
 from skill.tools.mocking import (
     setup_mock_children,
     setup_mock_schedule,
-    setup_mock_schedule_reauth,
+    setup_mock_schedule_no_auth,
+    setup_mock_schedule_auth,
 )
 
 
@@ -145,14 +146,14 @@ class TestSchedule:
 class TestNeedAuthForScene:
     # Запрос конкретного расписания -> Авторизация -> Возврат в ту же сцену
     def test_scene_need_auth_return(self, students_dump, requests_mock):
-        setup_mock_schedule_reauth(requests_mock)
+        setup_mock_schedule_no_auth(requests_mock)
 
         fio = AliceEntity().fio(first_name="Алиса")
         req_date = AliceEntity().datetime(day=1, month=1, year=2021)
         intent = AliceIntent("get_schedule")
         test = (
             AliceRequest()
-            .command("Расписание уроков для Алисы")
+            .command("Какие уроки будут у Алисы 01.01.2021")
             .add_to_state_user("students", students_dump)
             .add_entity(fio)
             .add_entity(req_date)
@@ -164,6 +165,9 @@ class TestNeedAuthForScene:
         assert "Сеанс устарел" in result.text
         assert result.get_state_session(states.INTENTS) is not None
         assert result.get_state_session(states.ENTITIES) is not None
+
+        requests_mock.reset_mock()
+        setup_mock_schedule_auth(requests_mock)
 
         test = (
             AliceRequest()
@@ -180,4 +184,5 @@ class TestNeedAuthForScene:
             .build()
         )
         result = AliceAnswer(main.handler(test))
-        assert "Сеанс устарел" in result.text
+        assert "Сеанс устарел" not in result.text
+        assert "Алиса. 6 уроков" in result.text

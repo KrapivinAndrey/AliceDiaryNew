@@ -251,7 +251,10 @@ class GetSchedule(SceneWithAuth):
 
         req_date = get_date_from_request(request)
         students = Students()
-        students.restore(request.user[states.STUDENTS])
+        if self.students is None:
+            students.restore(request.user[states.STUDENTS])
+        else:
+            students = self.students
         req_students = get_students_from_request(request, students)
 
         if req_students is None:  # нет данных для запроса. Возможно не то имя

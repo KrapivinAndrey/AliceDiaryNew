@@ -248,9 +248,9 @@ def setup_mock_schedule(m: Mocker, from_first_lesson=True):
         )
 
 
-def setup_mock_schedule_reauth(m: Mocker):
+def setup_mock_schedule_no_auth(m: Mocker):
     m.get(
-        f"{schedule_url()}/?p_educations%5B%5D=453000&p_datetime_from=01.01.2021+00%3A00%3A00&p_datetime_to=01.01.2021+23%3A59%3A59",
+        f"{schedule_url()}?p_educations%5B%5D=1&p_datetime_from=01.01.2021+00%3A00%3A00&p_datetime_to=01.01.2021+23%3A59%3A59",
         request_headers={"Cookie": "X-JWT-Token=222"},
         text="work",
         status_code=200,
@@ -264,3 +264,13 @@ def setup_mock_schedule_reauth(m: Mocker):
         status_code=403,
     )
 
+
+def setup_mock_schedule_auth(m: Mocker):
+    m.get(
+        f"{schedule_url()}?p_educations%5B%5D=1&p_datetime_from=01.01.2021+00%3A00%3A00&p_datetime_to=01.01.2021+23%3A59%3A59",
+        request_headers={"Cookie": "X-JWT-Token=222"},
+        json=json_schedule_from_first_lesson(),
+        status_code=200,
+    )
+
+    m.get(f"{students_url()}", json=json_students())
