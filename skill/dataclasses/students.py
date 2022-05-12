@@ -5,9 +5,9 @@ import pymorphy2
 
 
 class Student:
-    def __init__(self, name=None, id=None):
+    def __init__(self, name=None, student_id=None):
         self.name = name
-        self.id = str(id)
+        self.id = str(student_id)
         self.inflect = {}
         if name is not None:
             locale.setlocale(
