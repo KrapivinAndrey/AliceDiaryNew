@@ -1,4 +1,5 @@
 import datetime
+import locale
 
 from skill.dataclasses import Schedule, Student
 
@@ -253,6 +254,8 @@ def __how_many_lessons(n: int) -> str:
 
     return f"{str(n)} {last}"
 
+
+locale.setlocale(locale.LC_TIME, ("RU", "UTF8"))  # the ru locale is installed
 
 KNOWN_DATES = {
     datetime.date.today(): "Сегодня",
