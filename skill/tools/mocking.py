@@ -85,7 +85,7 @@ def json_students():
     }
 
 
-def json_schedule_1():
+def json_schedule_from_third_lesson():
     return {
         "data": {
             "items": [
@@ -157,7 +157,7 @@ def json_schedule_1():
     }
 
 
-def json_schedule_2():
+def json_schedule_from_first_lesson():
     return {
         "data": {
             "items": [
@@ -233,9 +233,8 @@ def setup_mock_children(m: Mocker):
     m.get(f"{students_url()}", json=json_students())
 
 
-def setup_mock_schedule(m: Mocker):
-    m.get(f"{schedule_url()}", json=json_schedule_1())
-
-
-def setup_mock_schedule_normal(m: Mocker):
-    m.get(f"{schedule_url()}", json=json_schedule_2())
+def setup_mock_schedule(m: Mocker, from_first_lesson = True):
+    if from_first_lesson:
+        m.get(f"{schedule_url()}", json=json_schedule_from_first_lesson())
+    else:
+        m.get(f"{schedule_url()}", json=json_schedule_from_third_lesson())

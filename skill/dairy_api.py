@@ -1,10 +1,9 @@
 import os
 from datetime import date, datetime, time
-from typing import Dict, List
 
 import requests
 
-from skill.constants.exceptions import NeedAuth, NotFoundError
+from skill.constants.exceptions import NeedAuth
 from skill.dataclasses import PlannedLesson, Schedule, Student, Students
 
 # region URLs
@@ -28,7 +27,7 @@ def students_url():
 # endregion
 
 
-def get_students(token: str) -> List[Student]:
+def get_students(token: str) -> Students:
     result = Students()
     response = requests.get(
         students_url(),
@@ -48,7 +47,7 @@ def get_students(token: str) -> List[Student]:
     return result
 
 
-def get_schedule(token: str, student_id: str, day=None) -> List[PlannedLesson]:
+def get_schedule(token: str, student_id: str, day=None) -> Schedule:
     if day is None:
         day = date.today()
     start_time = datetime.combine(day, time.min)

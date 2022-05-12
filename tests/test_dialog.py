@@ -4,11 +4,7 @@ from alicefluentcheck import AliceAnswer, AliceEntity, AliceIntent, AliceRequest
 import skill.main as main
 import skill.texts as texts
 from skill.scenes import SCENES
-from skill.tools.mocking import (
-    setup_mock_children,
-    setup_mock_schedule,
-    setup_mock_schedule_normal,
-)
+from skill.tools.mocking import setup_mock_children, setup_mock_schedule
 
 
 class TestHello:
@@ -100,7 +96,7 @@ class TestSchedule:
         assert result.text == texts.unknown_student()[0]
 
     def test_name_of_student(self, students_dump, requests_mock):
-        setup_mock_schedule(requests_mock)
+        setup_mock_schedule(requests_mock, False)
         fio = AliceEntity().fio(first_name="Алиса")
         intent = AliceIntent("get_schedule")
         test = (
@@ -118,12 +114,12 @@ class TestSchedule:
         assert "Дмитрий. 6 уроков" not in result.text
 
         # в ттс дополнительная информация
-        assert "К 3 уроку в 09:45" in result.tts
+        assert "К третьему уроку в 09:45" in result.tts
         assert "Уроки закончатся в 14:40" in result.tts
         assert "Информатика 2 урока" in result.tts
 
     def test_all_student(self, students_dump, requests_mock):
-        setup_mock_schedule_normal(requests_mock)
+        setup_mock_schedule(requests_mock)
         intent = AliceIntent("get_schedule")
         test = (
             AliceRequest()
@@ -139,3 +135,8 @@ class TestSchedule:
         assert "Дмитрий. 6 уроков" in result.text
         for i in range(1, 9):
             assert f"К {i} уроку" not in result.text
+
+class TestNeedAuthForScene:
+    # Запрос конкретного расписания -> Авторизация -> Возврат в ту же сцену
+    def test_scene_auth_return(self, requests_mock):
+        setup_mock_schedule(requests_mock)

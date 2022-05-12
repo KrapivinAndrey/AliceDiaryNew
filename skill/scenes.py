@@ -25,10 +25,8 @@ root_handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(name)s\t%(messag
 
 def get_all_students_from_request(request: Request) -> Students:
     dump = request.user[states.STUDENTS]
-    if dump is None:
-        return []
-    else:
-        students = Students()
+    students = Students()
+    if dump is not None:
         students.restore(dump)
 
     return students
