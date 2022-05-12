@@ -4,7 +4,12 @@ from alicefluentcheck import AliceAnswer, AliceEntity, AliceIntent, AliceRequest
 import skill.main as main
 import skill.texts as texts
 from skill.scenes import SCENES
-from skill.tools.mocking import setup_mock_children, setup_mock_schedule
+import skill.constants.states as states
+from skill.tools.mocking import (
+    setup_mock_children,
+    setup_mock_schedule,
+    setup_mock_schedule_reauth,
+)
 
 
 class TestHello:
@@ -136,7 +141,43 @@ class TestSchedule:
         for i in range(1, 9):
             assert f"К {i} уроку" not in result.text
 
+
 class TestNeedAuthForScene:
     # Запрос конкретного расписания -> Авторизация -> Возврат в ту же сцену
-    def test_scene_auth_return(self, requests_mock):
-        setup_mock_schedule(requests_mock)
+    def test_scene_need_auth_return(self, students_dump, requests_mock):
+        setup_mock_schedule_reauth(requests_mock)
+
+        fio = AliceEntity().fio(first_name="Алиса")
+        req_date = AliceEntity().datetime(day=1, month=1, year=2021)
+        intent = AliceIntent("get_schedule")
+        test = (
+            AliceRequest()
+            .command("Расписание уроков для Алисы")
+            .add_to_state_user("students", students_dump)
+            .add_entity(fio)
+            .add_entity(req_date)
+            .add_intent(intent)
+            .build()
+        )
+        result = AliceAnswer(main.handler(test))
+
+        assert "Сеанс устарел" in result.text
+        assert result.get_state_session(states.INTENTS) is not None
+        assert result.get_state_session(states.ENTITIES) is not None
+
+        test = (
+            AliceRequest()
+            .command("")
+            .account_linking_complete()
+            .access_token("222")
+            .from_scene("GetSchedule")
+            .add_to_state_session(
+                states.INTENTS, result.get_state_session(states.INTENTS)
+            )
+            .add_to_state_session(
+                states.ENTITIES, result.get_state_session(states.ENTITIES)
+            )
+            .build()
+        )
+        result = AliceAnswer(main.handler(test))
+        assert "Сеанс устарел" in result.text

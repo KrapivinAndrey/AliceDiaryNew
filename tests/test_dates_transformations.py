@@ -29,3 +29,9 @@ def test_tomorrow():
     entity = AliceEntity().datetime(day=1, day_is_relative=True).val
     result = ya_transform(entity)
     assert result.strftime("%d.%m.%Y") == tomorrow.strftime("%d.%m.%Y")
+
+
+def test_absolute():
+    entity = AliceEntity().datetime(day=1, month=1, year=2020).val
+    result = ya_transform(entity)
+    assert result.strftime("%d.%m.%Y") == "01.01.2020"
