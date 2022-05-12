@@ -21,7 +21,7 @@ class Student:
 
     def __eq__(self, other):
         if isinstance(other, str):
-            return self.name == other
+            return self.name.lower() == other.lower()
         elif isinstance(other, Student):
             return self.name == other.name and self.id == other.id
 

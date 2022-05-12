@@ -128,8 +128,8 @@ class SceneWithAuth(GlobalScene):
         elif request.authorization_complete:
             try:
                 self.students = dairy_api.get_students(request.access_token)
-                self.entities = request.session.get(states.ENTITIES, {})
-                self.intents = request.session.get(states.INTENTS, {})
+                request.restore_entities(request.session.get(states.ENTITIES, {}))
+                request.restore_intents(request.session.get(states.INTENTS, {}))
             except NeedAuth as e:
                 auth = True
                 save_entities = {
