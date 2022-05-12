@@ -214,7 +214,7 @@ def json_schedule_from_first_lesson():
                     "subject_name": "Алгебра",
                     "priority": 0,
                     "override_by_priority": true,
-                }
+                },
             ],
             "before": 1,
             "current": 0,
@@ -233,8 +233,16 @@ def setup_mock_children(m: Mocker):
     m.get(f"{students_url()}", json=json_students())
 
 
-def setup_mock_schedule(m: Mocker, from_first_lesson = True):
+def setup_mock_schedule(m: Mocker, from_first_lesson=True):
     if from_first_lesson:
-        m.get(f"{schedule_url()}", json=json_schedule_from_first_lesson())
+        m.get(
+            f"{schedule_url()}",
+            request_headers={"Cookie": "X-JWT-Token=111"},
+            json=json_schedule_from_first_lesson(),
+        )
     else:
-        m.get(f"{schedule_url()}", json=json_schedule_from_third_lesson())
+        m.get(
+            f"{schedule_url()}",
+            request_headers={"Cookie": "X-JWT-Token=111"},
+            json=json_schedule_from_third_lesson(),
+        )

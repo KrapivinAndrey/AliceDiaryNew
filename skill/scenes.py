@@ -112,20 +112,30 @@ class GlobalScene(Scene):
 
 
 class SceneWithAuth(GlobalScene):
-    def __init__(self, students=None, context=None):
+    def __init__(self, students=None, saved_entities={}, saved_intents={}):
         self.students = students
-        self.context = context
+        self.entities = saved_entities
+        self.intents = saved_intents
 
     def reply(self, request: Request):
         auth = False
         if request.access_token is None:
-            # TODO: Сохранить контекст для повторного вызова
+            save_entities = {
+                states.ENTITIES: request.entities,
+                states.INTENTS: request.intents,
+            }
             auth = True
         elif request.authorization_complete:
             try:
                 self.students = dairy_api.get_students(request.access_token)
+                self.entities = request.session.get(states.ENTITIES, {})
+                self.intents = request.session.get(states.INTENTS, {})
             except NeedAuth as e:
                 auth = True
+                save_entities = {
+                    states.ENTITIES: request.session.get(states.ENTITIES, {}),
+                    states.INTENTS: request.session.get(states.INTENTS, {}),
+                }
         else:
             try:
                 self.students = get_all_students_from_request(request)
@@ -144,6 +154,7 @@ class SceneWithAuth(GlobalScene):
                 tts,
                 buttons=buttons,
                 directives={"start_account_linking": {}},
+                state=save_entities,
                 user_state=None,
             )
 
