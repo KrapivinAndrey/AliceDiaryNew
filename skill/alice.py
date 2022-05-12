@@ -28,7 +28,7 @@ class Request:
             self.request_body["request"]["nlu"] = {}
         if self.request_body.get("request").get("nlu").get("entities") is None:
             self.request_body["request"]["nlu"]["entities"] = []
-        self.request_body["request"]["nlu"]["entities"]+=saved
+        self.request_body["request"]["nlu"]["entities"] += saved
 
     def restore_intents(self, saved: dict):
         if self.request_body.get("request") is None:
