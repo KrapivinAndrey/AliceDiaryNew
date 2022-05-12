@@ -5,7 +5,8 @@ from skill.constants.entities import image_ids, subjects
 
 
 class PlannedLesson:
-    def __init__(self, name: str, start: time, end: time):
+    def __init__(self, num: int, name: str, start: time, end: time):
+        self.num = num
         self.name = name
         self.start = start
         self.end = end
@@ -15,6 +16,9 @@ class PlannedLesson:
 
     def __repr__(self):
         return str(self)
+
+    def __eq__(self, other):
+        return self.name == other.name
 
     def __lt__(self, other):
         return self.start < other.start

@@ -54,3 +54,9 @@ class TestStudents:
 
     def test_ids(self, students_Alice_and_Dmitry):
         assert students_Alice_and_Dmitry.ids == ["1", "100"]
+
+    def test_search_name(self, students_Alice_and_Dmitry, studentAlice):
+        assert students_Alice_and_Dmitry.by_name("Алиса") == studentAlice
+        assert students_Alice_and_Dmitry.by_name("Гриша") is None
+
+

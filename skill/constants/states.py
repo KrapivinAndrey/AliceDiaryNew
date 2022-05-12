@@ -11,16 +11,15 @@ class StateResponseKey:
 # Последние фразы пользователя
 PREVIOUS_MOVES = "prev_moves"
 
-# признак уточнения после того, как не смогли разобрать фразу.
+# Признак уточнения после того, как не смогли разобрать фразу.
 # Если снова не разобрали - выходим
 NEED_FALLBACK = "fallback"
 
-
-# region State of dialog
+# Сохраняем сущности для авторизации
+ENTITIES = "save_entities"
+INTENTS = "save_intents"
 
 STUDENTS = "students"
-
-# endregion
 
 # help menu
 PREVIOUS_STATE = "previous_state"

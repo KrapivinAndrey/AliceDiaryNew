@@ -1,12 +1,13 @@
 import locale
+from typing import Union
 
 import pymorphy2
 
 
 class Student:
-    def __init__(self, name=None, id=None):
+    def __init__(self, name=None, student_id=None):
         self.name = name
-        self.id = str(id)
+        self.id = str(student_id)
         self.inflect = {}
         if name is not None:
             locale.setlocale(
@@ -20,7 +21,7 @@ class Student:
 
     def __eq__(self, other):
         if isinstance(other, str):
-            return self.name == other
+            return self.name.lower() == other.lower()
         elif isinstance(other, Student):
             return self.name == other.name and self.id == other.id
 
@@ -72,3 +73,16 @@ class Students:
     @property
     def ids(self):
         return [x for x in self.students.keys()]
+
+    def by_name(self, search_name: str) -> Union[Student, None]:
+        for name in self.students.values():
+            if name == search_name:
+                return name
+
+        return None
+
+    def name_by_id(self, search_id: str):
+        return str(self.students[search_id])
+
+    def to_list(self):
+        return [x for x in self.students.values()]

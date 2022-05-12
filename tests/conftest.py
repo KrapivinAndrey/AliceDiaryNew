@@ -74,23 +74,34 @@ def students_dump():
 
 @fixture
 def algebra():
-    return PlannedLesson("Алгебра", time(8, 0), time(8, 40))
+    return PlannedLesson(1, "Алгебра", time(8, 0), time(8, 40))
 
 
 @fixture
 def russian():
-    return PlannedLesson("Русский язык", time(9, 50), time(10, 30))
+    return PlannedLesson(2, "Русский язык", time(9, 50), time(10, 30))
 
 
 @fixture
 def geometry():
-    return PlannedLesson("Геометрия", time(16, 30), time(17, 10))
+    return PlannedLesson(3, "Геометрия", time(16, 30), time(17, 10))
 
 
 @fixture
 def schedule(algebra, russian, geometry):
     result = Schedule()
     result.lessons.append(algebra)
+    result.lessons.append(russian)
+    result.lessons.append(geometry)
+
+    result.lessons.sort()
+
+    return result
+
+
+@fixture
+def schedule_short(russian, geometry):
+    result = Schedule()
     result.lessons.append(russian)
     result.lessons.append(geometry)
 

@@ -85,7 +85,7 @@ def json_students():
     }
 
 
-def json_schedule():
+def json_schedule_from_third_lesson():
     return {
         "data": {
             "items": [
@@ -143,12 +143,75 @@ def json_schedule():
                     "priority": 0,
                     "override_by_priority": true,
                 },
+            ],
+            "before": 1,
+            "current": 0,
+            "last": 0,
+            "next": 0,
+            "total_pages": 0,
+            "total_items": 0,
+        },
+        "validations": [],
+        "messages": [],
+        "debug": [],
+    }
+
+
+def json_schedule_from_first_lesson():
+    return {
+        "data": {
+            "items": [
                 {
-                    "number": 8,
+                    "number": 6,
+                    "datetime_from": "25.04.2022 13:31:00",
+                    "datetime_to": "25.04.2022 13:55:00",
+                    "subject_id": 172516,
+                    "subject_name": "География",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 5,
                     "datetime_from": "25.04.2022 14:31:00",
                     "datetime_to": "25.04.2022 14:40:00",
-                    "subject_id": 187951,
-                    "subject_name": "Технология 2.0",
+                    "subject_id": 172516,
+                    "subject_name": "География",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 4,
+                    "datetime_from": "25.04.2022 11:31:00",
+                    "datetime_to": "25.04.2022 12:10:00",
+                    "subject_id": 172533,
+                    "subject_name": "Информатика",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 3,
+                    "datetime_from": "25.04.2022 12:31:00",
+                    "datetime_to": "25.04.2022 12:55:00",
+                    "subject_id": 172533,
+                    "subject_name": "Информатика",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 1,
+                    "datetime_from": "25.04.2022 09:45:00",
+                    "datetime_to": "25.04.2022 10:25:00",
+                    "subject_id": 172476,
+                    "subject_name": "Алгебра",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 2,
+                    "datetime_from": "25.04.2022 10:31:00",
+                    "datetime_to": "25.04.2022 11:10:00",
+                    "subject_id": 172476,
+                    "subject_name": "Алгебра",
                     "priority": 0,
                     "override_by_priority": true,
                 },
@@ -170,5 +233,44 @@ def setup_mock_children(m: Mocker):
     m.get(f"{students_url()}", json=json_students())
 
 
-def setup_mock_schedule(m: Mocker):
-    m.get(f"{schedule_url()}", json=json_schedule())
+def setup_mock_schedule(m: Mocker, from_first_lesson=True):
+    if from_first_lesson:
+        m.get(
+            f"{schedule_url()}",
+            request_headers={"Cookie": "X-JWT-Token=111"},
+            json=json_schedule_from_first_lesson(),
+        )
+    else:
+        m.get(
+            f"{schedule_url()}",
+            request_headers={"Cookie": "X-JWT-Token=111"},
+            json=json_schedule_from_third_lesson(),
+        )
+
+
+def setup_mock_schedule_no_auth(m: Mocker):
+    m.get(
+        f"{schedule_url()}?p_educations%5B%5D=1&p_datetime_from=01.01.2021+00%3A00%3A00&p_datetime_to=01.01.2021+23%3A59%3A59",
+        request_headers={"Cookie": "X-JWT-Token=222"},
+        text="work",
+        status_code=200,
+    )
+
+    m.get(f"{students_url()}", json=json_students())
+
+    m.get(
+        f"{schedule_url()}",
+        text="Need authenticate",
+        status_code=403,
+    )
+
+
+def setup_mock_schedule_auth(m: Mocker):
+    m.get(
+        f"{schedule_url()}?p_educations%5B%5D=1&p_datetime_from=01.01.2021+00%3A00%3A00&p_datetime_to=01.01.2021+23%3A59%3A59",
+        request_headers={"Cookie": "X-JWT-Token=222"},
+        json=json_schedule_from_first_lesson(),
+        status_code=200,
+    )
+
+    m.get(f"{students_url()}", json=json_students())

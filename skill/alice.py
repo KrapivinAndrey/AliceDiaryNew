@@ -18,13 +18,30 @@ class Request:
         return self.request_body.get("request", {}).get("nlu", {}).get("intents", {})
 
     @property
+    def entities(self):
+        return self.request_body.get("request", {}).get("nlu", {}).get("entities", {})
+
+    def restore_entities(self, saved: dict):
+        if self.request_body.get("request") is None:
+            self.request_body["request"] = {}
+        if self.request_body.get("request").get("nlu") is None:
+            self.request_body["request"]["nlu"] = {}
+        if self.request_body.get("request").get("nlu").get("entities") is None:
+            self.request_body["request"]["nlu"]["entities"] = []
+        self.request_body["request"]["nlu"]["entities"] += saved
+
+    def restore_intents(self, saved: dict):
+        if self.request_body.get("request") is None:
+            self.request_body["request"] = {}
+        if self.request_body.get("request").get("nlu") is None:
+            self.request_body["request"]["nlu"] = {}
+        if self.request_body.get("request").get("nlu").get("intents") is None:
+            self.request_body["request"]["nlu"]["intents"] = {}
+        self.request_body["request"]["nlu"]["intents"].update(saved)
+
+    @property
     def entities_list(self):
-        return [
-            entity["type"]
-            for entity in self.request_body.get("request", {})
-            .get("nlu", {})
-            .get("entities", [])
-        ]
+        return [entity["type"] for entity in self.entities]
 
     @property
     def type(self):
@@ -76,11 +93,7 @@ class Request:
 
     def entity(self, entity_type: str):
         return [
-            entity["value"]
-            for entity in self.request_body.get("request", {})
-            .get("nlu", {})
-            .get("entities", [])
-            if entity["type"] == entity_type
+            entity["value"] for entity in self.entities if entity["type"] == entity_type
         ]
 
     def is_intent(self, intent: str):
