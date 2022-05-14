@@ -165,6 +165,7 @@ class Welcome(SceneWithAuth):
         if auth is not None:
             return auth
 
+
         text, tts = texts.hello(None)
         buttons = [
             button("Что ты умеешь?"),
@@ -315,7 +316,7 @@ def _list_scenes():
 
 SCENES = {scene.id(): scene for scene in _list_scenes()}
 
-DEFAULT_SCENE = Welcome
+DEFAULT_SCENE = GetSchedule
 YES_NO = [button("Да"), button("Нет")]
 HELP = [button("Помощь")]
 DEFAULT_BUTTONS = [
