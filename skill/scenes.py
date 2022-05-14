@@ -10,9 +10,7 @@ from skill.constants import entities, intents, states
 from skill.constants.exceptions import NeedAuth
 from skill.dataclasses.students import Students
 from skill.scenes_util import Scene
-from skill.tools.dates_transformations import (
-    transform_yandex_datetime_value_to_datetime as ya_date_transform,
-)
+from skill.tools.dates_transformations import transform_yandex_datetime_value_to_datetime as ya_date_transform
 
 logging.basicConfig()
 
@@ -186,7 +184,12 @@ class Welcome(SceneWithAuth):
             text.append(new_text)
             tts.append(new_tts)
 
-        return self.make_response(request, "\n".join(text), "sil<[500]>".join(tts))
+        return self.make_response(
+            request,
+            "\n".join(text),
+            "sil<[500]>".join(tts),
+            user_state={states.STUDENTS: self.students.dump()},
+        )
 
     def handle_local_intents(self, request: Request):
         pass
@@ -287,7 +290,12 @@ class GetSchedule(SceneWithAuth):
             text.append(new_text)
             tts.append(new_tts)
 
-        return self.make_response(request, "\n".join(text), "sil<[500]>".join(tts))
+        return self.make_response(
+            request,
+            "\n".join(text),
+            "sil<[500]>".join(tts),
+            user_state={states.STUDENTS: self.students.dump()},
+        )
 
 
 # endregion
