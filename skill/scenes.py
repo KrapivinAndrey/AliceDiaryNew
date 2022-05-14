@@ -188,7 +188,7 @@ class Welcome(SceneWithAuth):
             request,
             "\n".join(text),
             "sil<[500]>".join(tts),
-            user_state={states.STUDENTS: self.students.dump()},
+            user_state={states.STUDENTS: students.dump()},
         )
 
     def handle_local_intents(self, request: Request):
@@ -294,7 +294,7 @@ class GetSchedule(SceneWithAuth):
             request,
             "\n".join(text),
             "sil<[500]>".join(tts),
-            user_state={states.STUDENTS: self.students.dump()},
+            user_state={states.STUDENTS: students.dump()},
         )
 
 
