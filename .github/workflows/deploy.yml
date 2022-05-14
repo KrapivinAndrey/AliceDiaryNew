@@ -31,7 +31,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - run: echo 'Деплой на мастер пока отключен'
       - uses: goodsmileduck/yandex-serverless-action@v1
         with:
           token: ${{ secrets.YAAUTH }}
