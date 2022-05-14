@@ -165,17 +165,32 @@ class Welcome(SceneWithAuth):
         if auth is not None:
             return auth
 
-        text, tts = texts.hello(None)
-        buttons = [
-            button("Что ты умеешь?"),
-        ]
+        students = Students()
+        if self.students is None:
+            students.restore(request.user[states.STUDENTS])
+        else:
+            students = self.students
+        req_date = datetime.datetime.today()
+        text = []
+        tts = []
+
+        title_text, title_tts = texts.title("Расписание", req_date)
+        text.append(title_text)
+        tts.append(title_tts)
+
+        for student in students.to_list():
+            schedule = dairy_api.get_schedule(
+                request.access_token, student.id, req_date
+            )
+            new_text, new_tts = texts.schedule_for_student(student, schedule)
+            text.append(new_text)
+            tts.append(new_tts)
 
         return self.make_response(
             request,
-            text,
-            tts,
-            buttons=buttons,
-            user_state={states.STUDENTS: self.students.dump()},
+            "\n".join(text),
+            "sil<[500]>".join(tts),
+            user_state={states.STUDENTS: students.dump()},
         )
 
     def handle_local_intents(self, request: Request):
@@ -277,7 +292,12 @@ class GetSchedule(SceneWithAuth):
             text.append(new_text)
             tts.append(new_tts)
 
-        return self.make_response(request, "\n".join(text), "sil<[500]>".join(tts))
+        return self.make_response(
+            request,
+            "\n".join(text),
+            "sil<[500]>".join(tts),
+            user_state={states.STUDENTS: students.dump()},
+        )
 
 
 # endregion

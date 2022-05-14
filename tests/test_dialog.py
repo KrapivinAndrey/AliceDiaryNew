@@ -21,8 +21,10 @@ class TestHello:
 
     def test_start_dialog_auth(self, start_skill_auth, students_dump, requests_mock):
         setup_mock_children(requests_mock)
+        setup_mock_schedule(requests_mock)
         result = AliceAnswer(main.handler(start_skill_auth))
-        assert result.text == texts.hello(None)[0]
+        assert "Алиса. 6 уроков" in result.text
+        assert "Дмитрий. 6 уроков" in result.text
         assert result.user_state["students"] == students_dump
 
 
