@@ -77,6 +77,7 @@ def get_schedule(token: str, student_id: str, day=None) -> Schedule:
             f"Не удалось разобрать тело ответа: {response.status_code}",
             extra={"body": response.text},
         )
+        raise
 
     for lesson in api_lessons:
         template = "%d.%m.%Y %H:%M:%S"
