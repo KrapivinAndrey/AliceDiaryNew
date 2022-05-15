@@ -75,7 +75,7 @@ def get_schedule(token: str, student_id: str, day=None) -> Schedule:
     except Exception as e:
         logging.exception(
             f"Не удалось разобрать тело ответа: {response.status_code}",
-            extra={"body", response.text},
+            extra={"body": response.text},
         )
         raise Exception("Некорректный ответ сервера")
 
