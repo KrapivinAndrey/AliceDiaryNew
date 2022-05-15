@@ -80,6 +80,8 @@ class GlobalScene(Scene):
             return WhatCanDo()
         if intents.CLEAN in request.intents:
             return ClearSettings()
+        if intents.REPEAT in request.intents:
+            return Repeat()
 
         # Глобальные команды
         if intents.GET_SCHEDULE in request.intents:
@@ -255,6 +257,21 @@ class WhatCanDo(GlobalScene):
 
 # endregion
 
+# region Повтори
+
+class Repeat(GlobalScene):
+    def reply(self, request:Request):
+        text = request.session.get(states.SAVE_TEXT)
+        tts = request.session.get(states.SAVE_TTS, text)
+
+        if text is None:
+            text, tts = texts.NothingToRepeat()
+            return self.make_response(request, text, tts, buttons=HELP)
+        else:
+            return self.make_response(request, text, tts, buttons=DEFAULT_BUTTONS)
+
+# endregion
+
 # region Расписание
 
 
@@ -292,11 +309,17 @@ class GetSchedule(SceneWithAuth):
             text.append(new_text)
             tts.append(new_tts)
 
+        result_text = "\n".join(text)
+        result_tts = "sil<[500]>".join(tts)
         return self.make_response(
             request,
-            "\n".join(text),
-            "sil<[500]>".join(tts),
-            user_state={states.STUDENTS: students.dump()},
+            result_text,
+            result_tts,
+            user_state={
+                states.STUDENTS: students.dump(),
+                states.SAVE_TEXT: result_text,
+                states.SAVE_TTS: result_tts,
+            },
         )
 
 

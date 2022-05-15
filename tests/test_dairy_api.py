@@ -1,5 +1,5 @@
 import skill.dairy_api as dairy_api
-from skill.tools.mocking import setup_mock_children, setup_mock_schedule
+from tests.mocking import setup_mock_children, setup_mock_schedule
 
 
 def test_get_url():

@@ -5,7 +5,7 @@ import skill.main as main
 import skill.texts as texts
 from skill.scenes import SCENES
 import skill.constants.states as states
-from skill.tools.mocking import (
+from tests.mocking import (
     setup_mock_children,
     setup_mock_schedule,
     setup_mock_schedule_no_auth,
