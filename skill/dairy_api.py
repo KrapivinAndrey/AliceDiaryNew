@@ -39,8 +39,15 @@ def get_students(token: str) -> Students:
 
     if response.status_code == 401:
         raise NeedAuth()
+    try:
+        api_students = response.json().get("data", {}).get("items", [])
+    except (Exception,):
+        logger.exception(
+            f"Не удалось разобрать тело ответа: {response.text}",
+        )
+        raise
 
-    for student in response.json().get("data", {}).get("items", []):
+    for student in api_students:
         name = student.get("firstname", "")
         education_id = student.get("educations", [])[0].get("education_id", "")
         new_student = Student(name, education_id)
@@ -74,8 +81,7 @@ def get_schedule(token: str, student_id: str, day=None) -> Schedule:
         api_lessons = response.json().get("data", {}).get("items", [])
     except (Exception,):
         logger.exception(
-            f"Не удалось разобрать тело ответа: {response.status_code}",
-            extra={"body": response.text},
+            f"Не удалось разобрать тело ответа: {response.text}",
         )
         raise
 
