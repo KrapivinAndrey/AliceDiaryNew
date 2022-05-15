@@ -43,8 +43,7 @@ def get_students(token: str) -> Students:
         api_students = response.json().get("data", {}).get("items", [])
     except (Exception,):
         logger.exception(
-            f"Не удалось разобрать тело ответа",
-            extra = {"body": response.text}
+            f"Не удалось разобрать тело ответа", extra={"body": response.text}
         )
         raise
 
@@ -82,8 +81,7 @@ def get_schedule(token: str, student_id: str, day=None) -> Schedule:
         api_lessons = response.json().get("data", {}).get("items", [])
     except (Exception,):
         logger.exception(
-            f"Не удалось разобрать тело ответа",
-            extra={"body": response.text}
+            f"Не удалось разобрать тело ответа", extra={"body": response.text}
         )
         raise
 
