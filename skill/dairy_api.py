@@ -72,7 +72,7 @@ def get_schedule(token: str, student_id: str, day=None) -> Schedule:
     result = Schedule()
     try:
         api_lessons = response.json().get("data", {}).get("items", [])
-    except (Exception, ):
+    except (Exception,):
         logger.exception(
             f"Не удалось разобрать тело ответа: {response.status_code}",
             extra={"body": response.text},
