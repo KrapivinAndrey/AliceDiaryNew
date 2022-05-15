@@ -1,5 +1,7 @@
 import os
 from datetime import date, datetime, time
+import logging
+
 
 import requests
 
@@ -68,7 +70,16 @@ def get_schedule(token: str, student_id: str, day=None) -> Schedule:
         raise NeedAuth()
 
     result = Schedule()
-    for lesson in response.json().get("data", {}).get("items", []):
+    try:
+        api_lessons = response.json().get("data", {}).get("items", [])
+    except Exception as e:
+        logging.exception(
+            f"Не удалось разобрать тело ответа: {response.status_code}",
+            extra={"body", response.text},
+        )
+        raise Exception("Некорректный ответ сервера")
+
+    for lesson in api_lessons:
         template = "%d.%m.%Y %H:%M:%S"
         time_from = datetime.strptime(lesson["datetime_from"], template).time()
         time_to = datetime.strptime(lesson["datetime_to"], template).time()
