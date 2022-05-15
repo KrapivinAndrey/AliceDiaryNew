@@ -31,7 +31,7 @@ class LoggerFactory(object):
         elif log_level == "DEBUG":
             LoggerFactory._LOG.setLevel(logging.DEBUG)
 
-        if os.environ.get("SENTRY_DSN") is None:
+        if os.environ.get("SENTRY_DSN") is not None:
             sentry_logging = LoggingIntegration(
                 level=logging.INFO, event_level=logging.WARN
             )
