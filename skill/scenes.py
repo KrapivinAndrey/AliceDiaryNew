@@ -315,11 +315,8 @@ class GetSchedule(SceneWithAuth):
             request,
             result_text,
             result_tts,
-            user_state={
-                states.STUDENTS: students.dump(),
-                states.SAVE_TEXT: result_text,
-                states.SAVE_TTS: result_tts,
-            },
+            user_state={states.STUDENTS: students.dump()},
+            session_state={states.SAVE_TEXT: result_text, states.SAVE_TTS: result_tts},
         )
 
 
