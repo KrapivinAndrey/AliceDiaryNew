@@ -75,3 +75,7 @@ class Schedule:
             (lesson for lesson in self.lessons if lesson.start <= find <= lesson.end),
             None,
         )
+
+    @property
+    def no_lessons(self):
+        return len(self.lessons) == 0

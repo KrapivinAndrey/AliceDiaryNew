@@ -5,7 +5,7 @@ import skill.main as main
 import skill.texts as texts
 from skill.scenes import SCENES
 import skill.constants.states as states
-from skill.tools.mocking import (
+from tests.mocking import (
     setup_mock_children,
     setup_mock_schedule,
     setup_mock_schedule_no_auth,
@@ -143,6 +143,10 @@ class TestSchedule:
         assert "Дмитрий. 6 уроков" in result.text
         for i in range(1, 9):
             assert f"К {i} уроку" not in result.text
+
+    def test_no_schedule(self):
+        # TODO: добавить тест когда нет уроков
+        pass
 
 
 class TestNeedAuthForScene:

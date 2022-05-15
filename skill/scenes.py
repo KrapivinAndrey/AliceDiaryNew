@@ -1,25 +1,21 @@
 import datetime
 import inspect
-import logging
 import sys
 
 import skill.dairy_api as dairy_api
 import skill.texts as texts
-from skill.alice import Request, button, image_button, image_list
+from skill.alice import Request, big_image, button
 from skill.constants import entities, intents, states
 from skill.constants.exceptions import NeedAuth
+from skill.constants.images import CONFUSED
 from skill.dataclasses.students import Students
+from skill.loggerfactory import LoggerFactory
 from skill.scenes_util import Scene
 from skill.tools.dates_transformations import (
     transform_yandex_datetime_value_to_datetime as ya_date_transform,
 )
 
-logging.basicConfig()
-
-logging.getLogger().setLevel(logging.DEBUG)
-root_handler = logging.getLogger().handlers[0]
-root_handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(name)s\t%(message)s\n"))
-
+logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
 # region Выделение данных для запроса
 
 
@@ -80,6 +76,8 @@ class GlobalScene(Scene):
             return WhatCanDo()
         if intents.CLEAN in request.intents:
             return ClearSettings()
+        if intents.REPEAT in request.intents:
+            return Repeat()
 
         # Глобальные команды
         if intents.GET_SCHEDULE in request.intents:
@@ -140,10 +138,10 @@ class SceneWithAuth(GlobalScene):
             try:
                 self.students = get_all_students_from_request(request)
             except Exception as e:
-                logging.warning("Old format for students %s", e)
+                logger.warning("Old format for students %s", e)
                 self.students = dairy_api.get_students(request.access_token)
         if auth:
-            logging.info("Need authentication for %s", self.id())
+            logger.info("Need authentication for %s", self.id())
             text, tts = texts.need_auth(self.id())
             buttons = [
                 button("Что ты умеешь?"),
@@ -255,6 +253,25 @@ class WhatCanDo(GlobalScene):
 
 # endregion
 
+# region Повтори
+
+
+class Repeat(GlobalScene):
+    def reply(self, request: Request):
+        text = request.session.get(states.SAVE_TEXT)
+        tts = request.session.get(states.SAVE_TTS, text)
+
+        if text is None:
+            text, tts = texts.nothing_to_repeat()
+            return self.make_response(
+                request, tts, card=big_image(CONFUSED, description=text), buttons=HELP
+            )
+        else:
+            return self.make_response(request, text, tts, buttons=DEFAULT_BUTTONS)
+
+
+# endregion
+
 # region Расписание
 
 
@@ -292,11 +309,14 @@ class GetSchedule(SceneWithAuth):
             text.append(new_text)
             tts.append(new_tts)
 
+        result_text = "\n".join(text)
+        result_tts = "sil<[500]>".join(tts)
         return self.make_response(
             request,
-            "\n".join(text),
-            "sil<[500]>".join(tts),
+            result_text,
+            result_tts,
             user_state={states.STUDENTS: students.dump()},
+            state={states.SAVE_TEXT: result_text, states.SAVE_TTS: result_tts},
         )
 
 

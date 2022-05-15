@@ -19,7 +19,12 @@ NEED_FALLBACK = "fallback"
 ENTITIES = "save_entities"
 INTENTS = "save_intents"
 
+# Ученики
 STUDENTS = "students"
+
+# Текст и произношение для команды Повтори
+SAVE_TEXT = "save_text"
+SAVE_TTS = "save_tts"
 
 # help menu
 PREVIOUS_STATE = "previous_state"

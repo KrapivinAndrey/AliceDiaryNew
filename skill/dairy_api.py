@@ -5,7 +5,9 @@ import requests
 
 from skill.constants.exceptions import NeedAuth
 from skill.dataclasses import PlannedLesson, Schedule, Student, Students
+from skill.loggerfactory import LoggerFactory
 
+logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
 # region URLs
 
 
@@ -32,13 +34,20 @@ def get_students(token: str) -> Students:
     response = requests.get(
         students_url(),
         cookies={"X-JWT-Token": token},
-        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
+        # headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
     )
 
     if response.status_code == 401:
         raise NeedAuth()
+    try:
+        api_students = response.json().get("data", {}).get("items", [])
+    except (Exception,):
+        logger.exception(
+            f"Не удалось разобрать тело ответа", extra={"body": response.text}
+        )
+        raise
 
-    for student in response.json().get("data", {}).get("items", []):
+    for student in api_students:
         name = student.get("firstname", "")
         education_id = student.get("educations", [])[0].get("education_id", "")
         new_student = Student(name, education_id)
@@ -61,14 +70,22 @@ def get_schedule(token: str, student_id: str, day=None) -> Schedule:
             "p_datetime_to": datetime.strftime(finish_time, "%d.%m.%Y %H:%M:%S"),
         },
         cookies={"X-JWT-Token": token},
-        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
+        # headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
     )
 
     if response.status_code == 401:
         raise NeedAuth()
 
     result = Schedule()
-    for lesson in response.json().get("data", {}).get("items", []):
+    try:
+        api_lessons = response.json().get("data", {}).get("items", [])
+    except (Exception,):
+        logger.exception(
+            f"Не удалось разобрать тело ответа", extra={"body": response.text}
+        )
+        raise
+
+    for lesson in api_lessons:
         template = "%d.%m.%Y %H:%M:%S"
         time_from = datetime.strptime(lesson["datetime_from"], template).time()
         time_to = datetime.strptime(lesson["datetime_to"], template).time()
