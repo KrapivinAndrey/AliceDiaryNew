@@ -1,26 +1,19 @@
 import datetime
 import inspect
-import logging
 import sys
 
 import skill.dairy_api as dairy_api
 import skill.texts as texts
-from skill.alice import Request, button, big_image
+from skill.alice import Request, big_image, button
 from skill.constants import entities, intents, states
 from skill.constants.exceptions import NeedAuth
-from skill.dataclasses.students import Students
-from skill.scenes_util import Scene
 from skill.constants.images import CONFUSED
-from skill.tools.dates_transformations import (
-    transform_yandex_datetime_value_to_datetime as ya_date_transform,
-)
+from skill.dataclasses.students import Students
+from skill.loggerfactory import LoggerFactory
+from skill.scenes_util import Scene
+from skill.tools.dates_transformations import transform_yandex_datetime_value_to_datetime as ya_date_transform
 
-logging.basicConfig()
-
-logging.getLogger().setLevel(logging.DEBUG)
-root_handler = logging.getLogger().handlers[0]
-root_handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(name)s\t%(message)s\n"))
-
+logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
 # region Выделение данных для запроса
 
 
@@ -143,10 +136,10 @@ class SceneWithAuth(GlobalScene):
             try:
                 self.students = get_all_students_from_request(request)
             except Exception as e:
-                logging.warning("Old format for students %s", e)
+                logger.warning("Old format for students %s", e)
                 self.students = dairy_api.get_students(request.access_token)
         if auth:
-            logging.info("Need authentication for %s", self.id())
+            logger.info("Need authentication for %s", self.id())
             text, tts = texts.need_auth(self.id())
             buttons = [
                 button("Что ты умеешь?"),

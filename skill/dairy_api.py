@@ -1,13 +1,13 @@
 import os
 from datetime import date, datetime, time
-import logging
-
 
 import requests
 
 from skill.constants.exceptions import NeedAuth
 from skill.dataclasses import PlannedLesson, Schedule, Student, Students
+from skill.loggerfactory import LoggerFactory
 
+logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
 # region URLs
 
 
@@ -72,12 +72,11 @@ def get_schedule(token: str, student_id: str, day=None) -> Schedule:
     result = Schedule()
     try:
         api_lessons = response.json().get("data", {}).get("items", [])
-    except Exception as e:
-        logging.exception(
+    except (Exception, ):
+        logger.exception(
             f"Не удалось разобрать тело ответа: {response.status_code}",
             extra={"body": response.text},
         )
-        raise Exception("Некорректный ответ сервера")
 
     for lesson in api_lessons:
         template = "%d.%m.%Y %H:%M:%S"
