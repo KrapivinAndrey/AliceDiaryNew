@@ -164,17 +164,7 @@ def hello(students):
     return text, tts
 
 
-def unknown_student():
-    text = (
-        "Прошу прощения. Но у меня нет данных.\n" "Возможно ошиблись в имени ученика?"
-    )
-    tts = (
-        '<speaker audio="alice-sounds-human-crowd-2.opus">'
-        "Прошу прощения. Но у меня нет данных.\n"
-        "sil<[100]>Возможно ошиблись в имени ученика?"
-    )
-
-    return text, tts
+# region Вспомогательные
 
 
 def title(start: str, req_date):
@@ -188,6 +178,46 @@ def title(start: str, req_date):
     text = f"{start} на {str_date}"
 
     return text, text
+
+
+def nothing_to_repeat():
+    text = "Нечего повторять"
+    tts = "Простите! Но я не знаю, что надо повторить."
+    "sil<[100]>Скажите помощь и я расскажу что умею"
+
+    return text, tts
+
+
+def __how_many_lessons(n: int) -> str:
+    if n == 0:
+        return "Нет уроков."
+    first = n % 10
+    second = n % 100
+
+    if (2 <= first <= 4) and not (12 <= second <= 14):
+        last = "урока"
+    elif first == 1 and not second == 11:
+        last = "урок"
+    else:
+        last = "уроков"
+
+    return f"{str(n)} {last}"
+
+
+# endregion
+
+
+def unknown_student():
+    text = (
+        "Прошу прощения. Но у меня нет данных.\n" "Возможно ошиблись в имени ученика?"
+    )
+    tts = (
+        '<speaker audio="alice-sounds-human-crowd-2.opus">'
+        "Прошу прощения. Но у меня нет данных.\n"
+        "sil<[100]>Возможно ошиблись в имени ученика?"
+    )
+
+    return text, tts
 
 
 def schedule_for_student(student: Student, schedule: Schedule):
@@ -226,33 +256,6 @@ def schedule_for_student(student: Student, schedule: Schedule):
     tts.append(f"Уроки закончатся в {schedule.lessons[-1].end_time}")
 
     return "\n".join(text), "sil<[100]>".join(tts)
-
-
-def __title_date(date):
-    if date is None:
-        str_date = "Сегодня"
-    elif date.date() in KNOWN_DATES:
-        str_date = KNOWN_DATES[date.date()]
-    else:
-        str_date = datetime.date.strftime(date.date(), "%d %B")
-
-    return str_date
-
-
-def __how_many_lessons(n: int) -> str:
-    if n == 0:
-        return "Нет уроков."
-    first = n % 10
-    second = n % 100
-
-    if (2 <= first <= 4) and not (12 <= second <= 14):
-        last = "урока"
-    elif first == 1 and not second == 11:
-        last = "урок"
-    else:
-        last = "уроков"
-
-    return f"{str(n)} {last}"
 
 
 locale.setlocale(locale.LC_TIME, ("RU", "UTF8"))  # the ru locale is installed
