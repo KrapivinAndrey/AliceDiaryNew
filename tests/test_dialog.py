@@ -144,6 +144,10 @@ class TestSchedule:
         for i in range(1, 9):
             assert f"К {i} уроку" not in result.text
 
+    def test_no_schedule(self):
+        # TODO: добавить тест когда нет уроков
+        pass
+
 
 class TestNeedAuthForScene:
     # Запрос конкретного расписания -> Авторизация -> Возврат в ту же сцену
