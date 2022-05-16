@@ -34,7 +34,7 @@ def get_students(token: str) -> Students:
     response = requests.get(
         students_url(),
         cookies={"X-JWT-Token": token},
-        # headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
+        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
     )
 
     if response.status_code == 401:
@@ -70,7 +70,7 @@ def get_schedule(token: str, student_id: str, day=None) -> Schedule:
             "p_datetime_to": datetime.strftime(finish_time, "%d.%m.%Y %H:%M:%S"),
         },
         cookies={"X-JWT-Token": token},
-        # headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
+        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
     )
 
     if response.status_code == 401:
