@@ -2,7 +2,7 @@ from skill.alice import Request
 from skill.constants.intents import GET_SCHEDULE
 from skill.constants.states import PREVIOUS_MOVES
 from skill.loggerfactory import LoggerFactory
-from skill.scenes import DEFAULT_SCENE, SCENES
+from skill.scenes import global_scene_from_request, SCENES, DEFAULT_SCENE
 
 
 def handler(event, context=None):
@@ -44,7 +44,7 @@ def handler(event, context=None):
 
 def get_id_scene(request: Request):
     res = request.session.get("scene")
-    if res is None and GET_SCHEDULE in request.intents:
-        res = "get_schedule"
+    if res is None:
+        res = global_scene_from_request(request).id()
 
     return res

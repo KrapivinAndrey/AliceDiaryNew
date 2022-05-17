@@ -85,33 +85,37 @@ def get_students_from_request(
 # region Общие сцены
 
 
+def global_scene_from_request(request: Request):
+    if intents.HELP in request.intents:
+        next_scene = HelpMenuStart
+    elif intents.WHAT_CAN_YOU_DO in request.intents:
+        next_scene = WhatCanDo
+    elif intents.CLEAN in request.intents:
+        next_scene = ClearSettings
+    elif intents.REPEAT in request.intents:
+        next_scene = Repeat
+    # Глобальные команды
+    elif intents.GET_SCHEDULE in request.intents:
+        next_scene = GetSchedule
+    elif intents.MAIN_MENU in request.intents:
+        next_scene = Welcome
+    elif intents.LESSON_BY_NUM in request.intents:
+        next_scene = LessonByNum
+    elif intents.LESSON_BY_DATE in request.intents:
+        next_scene = LessonByDate
+    else:
+        next_scene = None
+
+    return next_scene
+
+
 class GlobalScene(Scene):
     def reply(self, request: Request):
         pass  # Здесь не нужно пока ничего делать
 
     def handle_global_intents(self, request):
         # Должны быть обработаны в первую очередь
-        if intents.HELP in request.intents:
-            next_scene = HelpMenuStart()
-        elif intents.WHAT_CAN_YOU_DO in request.intents:
-            next_scene = WhatCanDo()
-        elif intents.CLEAN in request.intents:
-            next_scene = ClearSettings()
-        elif intents.REPEAT in request.intents:
-            next_scene = Repeat()
-        # Глобальные команды
-        elif intents.GET_SCHEDULE in request.intents:
-            next_scene = GetSchedule()
-        elif intents.MAIN_MENU in request.intents:
-            next_scene = Welcome()
-        elif intents.LESSON_BY_NUM in request.intents:
-            next_scene = LessonByNum()
-        elif intents.LESSON_BY_DATE in request.intents:
-            next_scene = LessonByDate()
-        else:
-            next_scene = None
-
-        return next_scene
+        return global_scene_from_request(request)()
 
     def handle_local_intents(self, request: Request):
         pass  # Здесь не нужно пока ничего делать
@@ -452,7 +456,6 @@ def _list_scenes():
 
 
 SCENES = {scene.id(): scene for scene in _list_scenes()}
-
 DEFAULT_SCENE = Welcome
 YES_NO = [button("Да"), button("Нет")]
 HELP = [button("Помощь")]
