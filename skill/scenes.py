@@ -1,6 +1,7 @@
 import datetime
 import inspect
 import sys
+from typing import List, Union
 
 import skill.dairy_api as dairy_api
 import skill.texts as texts
@@ -11,10 +12,7 @@ from skill.constants.images import CONFUSED
 from skill.dataclasses.students import Students
 from skill.loggerfactory import LoggerFactory
 from skill.scenes_util import Scene
-from skill.tools.dates_transformations import (
-    transform_yandex_datetime_value_to_datetime as ya_date_transform,
-)
-from typing import List
+from skill.tools.dates_transformations import transform_yandex_datetime_value_to_datetime as ya_date_transform
 
 logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
 # region Выделение данных для запроса
@@ -61,7 +59,7 @@ def get_time_from_request(request: Request) -> datetime.time:
     return ya_date
 
 
-def get_students_from_request(request: Request, students: Students) -> List:
+def get_students_from_request(request: Request, students: Students) -> Union[List, None]:
     result = []
     if entities.FIO in request.entities_list:
         for fio in request.entity(entities.FIO):

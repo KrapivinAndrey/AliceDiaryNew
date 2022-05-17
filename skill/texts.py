@@ -1,7 +1,7 @@
 import datetime
 import locale
 
-from skill.dataclasses import Schedule, Student, PlannedLesson
+from skill.dataclasses import PlannedLesson, Schedule, Student
 
 # region Общие сцены
 
