@@ -48,10 +48,7 @@ def get_students_from_request(request: Request, students: Students):
     result = []
     if entities.FIO in request.entities_list:
         for fio in request.entity(entities.FIO):
-            if (
-                fio.value["first_name"] == "Алиса"
-                and fio.start == 0
-            ):
+            if fio.value["first_name"] == "Алиса" and fio.start == 0:
                 # Кто-то начал команду словами Алиса...
                 continue
             found = students.by_name(fio.value["first_name"])
