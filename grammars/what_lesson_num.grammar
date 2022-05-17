@@ -1,0 +1,5 @@
+filler:
+    какие|какая|какое|какой|пожалуйста
+root:
+    .* [$YANDEX.NUMBER $lesson] .*
+    .* [$YANDEX.NUMBER $YANDEX.DATETIME $lesson] .*

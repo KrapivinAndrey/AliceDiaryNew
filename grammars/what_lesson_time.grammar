@@ -1,0 +1,5 @@
+filler:
+    какие|какая|какое|какой|пожалуйста|будет
+root:
+    $lesson $YANDEX.DATETIME
+
