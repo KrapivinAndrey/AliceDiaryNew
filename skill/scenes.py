@@ -381,7 +381,7 @@ class LessonByNum(SceneWithAuth):
 
         req_date = get_date_from_request(request)
 
-        title_text, title_tts = texts.schedule_title(req_date)
+        title_text, title_tts = texts.lesson_num_title(num, req_date)
 
         text.append(title_text)
         tts.append(title_tts)
