@@ -385,18 +385,18 @@ class LessonByNum(SceneWithAuth):
 
         text.append(title_text)
         tts.append(title_tts)
-
+        number = num[0].value
         for student in req_students:
             schedule = dairy_api.get_schedule(
                 request.access_token, student.id, req_date
             )
-            lesson = schedule.find_by_num(num)
+            lesson = schedule.find_by_num(number)
             if lesson is None:
-                new_text, new_tts = texts.no_lesson(student, num)
+                new_text, new_tts = texts.no_lesson(student, number)
                 text.append(new_text)
                 tts.append(new_tts)
             else:
-                new_text, new_tts = texts.num_lesson(student, lesson, num)
+                new_text, new_tts = texts.num_lesson(student, lesson, number)
                 text.append(new_text)
                 tts.append(new_tts)
 
