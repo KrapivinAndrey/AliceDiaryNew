@@ -9,7 +9,7 @@ from skill.alice import Request, big_image, button
 from skill.constants import entities, intents, states
 from skill.constants.exceptions import NeedAuth
 from skill.constants.images import CONFUSED
-from skill.dataclasses.students import Students
+from skill.dataclasses import Students
 from skill.loggerfactory import LoggerFactory
 from skill.scenes_util import Scene
 from skill.tools.dates_transformations import transform_yandex_datetime_value_to_datetime as ya_date_transform
