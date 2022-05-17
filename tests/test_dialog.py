@@ -1,4 +1,5 @@
 import pytest
+import datetime
 from alicefluentcheck import AliceAnswer, AliceEntity, AliceIntent, AliceRequest
 
 import skill.main as main
@@ -10,6 +11,7 @@ from tests.mocking import (
     setup_mock_schedule,
     setup_mock_schedule_no_auth,
     setup_mock_schedule_auth,
+    setup_mock_schedule_with_params,
 )
 
 
@@ -105,7 +107,7 @@ class TestSchedule:
 
     def test_name_of_student(self, students_dump, requests_mock):
         setup_mock_schedule(requests_mock, False)
-        fio = AliceEntity().fio(first_name="Алиса")
+        fio = AliceEntity().fio(first_name="Алиса").tokens(4, 5)
         intent = AliceIntent("get_schedule")
         test = (
             AliceRequest()
@@ -154,7 +156,7 @@ class TestNeedAuthForScene:
     def test_scene_need_auth_return(self, students_dump, requests_mock):
         setup_mock_schedule_no_auth(requests_mock)
 
-        fio = AliceEntity().fio(first_name="Алиса")
+        fio = AliceEntity().fio(first_name="Алиса").tokens(5, 6)
         req_date = AliceEntity().datetime(day=1, month=1, year=2021)
         intent = AliceIntent("get_schedule")
         test = (
@@ -192,3 +194,34 @@ class TestNeedAuthForScene:
         result = AliceAnswer(main.handler(test))
         assert "Сеанс устарел" not in result.text
         assert "Алиса. 6 уроков" in result.text
+
+
+class TestIssue:
+    # Тесты на всякие найденные баги
+
+    def test_say_alice_first(self, students_dump, requests_mock):
+        setup_mock_schedule_with_params(
+            requests_mock,
+            edu_id="100",
+            ask_day=datetime.datetime(2021, 1, 1),
+            token="222",
+        )
+
+        say_alice = AliceEntity().fio(first_name="Алиса").tokens(0, 1)
+        fio = AliceEntity().fio(first_name="Дмитрий").tokens(4, 5)
+        req_date = AliceEntity().datetime(day=1, month=1, year=2021)
+        intent = AliceIntent("get_schedule")
+        test = (
+            AliceRequest()
+            .command("Алиса какие занятия у Дмитрия 01.01.2021")
+            .access_token("222")
+            .add_to_state_user("students", students_dump)
+            .add_entity(say_alice)
+            .add_entity(fio)
+            .add_entity(req_date)
+            .add_intent(intent)
+            .build()
+        )
+
+        result = AliceAnswer(main.handler(test))
+        assert "Дмитрий. 6 уроков" in result.text

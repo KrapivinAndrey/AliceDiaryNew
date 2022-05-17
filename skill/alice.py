@@ -93,11 +93,32 @@ class Request:
 
     def entity(self, entity_type: str):
         return [
-            entity["value"] for entity in self.entities if entity["type"] == entity_type
+            RequestEntity(entity)
+            for entity in self.entities
+            if entity["type"] == entity_type
         ]
 
     def is_intent(self, intent: str):
         return intent in self.intents
+
+
+class RequestEntity:
+    def __init__(self, entity):
+        self.value = entity["value"]
+        self.start = entity["tokens"]["start"]
+        self.end = entity["tokens"]["end"]
+
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return self.value == other
+        else:
+            raise Exception("Можно сравнивать только со строкой")
+
+    def __str__(self):
+        return self.value
+
+    def __repr__(self):
+        return str(self)
 
 
 def big_image(image_id: list, title=None, description=None):

@@ -1,5 +1,5 @@
 from requests_mock import Mocker
-
+from datetime import datetime
 from skill.dairy_api import schedule_url, students_url
 
 true = True
@@ -249,12 +249,7 @@ def setup_mock_schedule(m: Mocker, from_first_lesson=True):
 
 
 def setup_mock_schedule_no_auth(m: Mocker):
-    m.get(
-        f"{schedule_url()}?p_educations%5B%5D=1&p_datetime_from=01.01.2021+00%3A00%3A00&p_datetime_to=01.01.2021+23%3A59%3A59",
-        request_headers={"Cookie": "X-JWT-Token=222"},
-        text="work",
-        status_code=200,
-    )
+    setup_mock_schedule_with_params(m, edu_id="1", ask_day=datetime(2021, 1, 1), token="222")
 
     m.get(f"{students_url()}", json=json_students())
 
@@ -266,11 +261,24 @@ def setup_mock_schedule_no_auth(m: Mocker):
 
 
 def setup_mock_schedule_auth(m: Mocker):
-    m.get(
-        f"{schedule_url()}?p_educations%5B%5D=1&p_datetime_from=01.01.2021+00%3A00%3A00&p_datetime_to=01.01.2021+23%3A59%3A59",
-        request_headers={"Cookie": "X-JWT-Token=222"},
-        json=json_schedule_from_first_lesson(),
-        status_code=200,
-    )
+    setup_mock_schedule_with_params(m, edu_id="1", ask_day=datetime(2021, 1, 1), token="222")
 
     m.get(f"{students_url()}", json=json_students())
+
+
+def setup_mock_schedule_with_params(m: Mocker, *, edu_id="", ask_day=None, token: str, first_lesson=True):
+    headers = {}
+    if token:
+        headers = {"Cookie": f"X-JWT-Token={token}"}
+    url = schedule_url()
+    if edu_id:
+        url += f"?p_educations%5B%5D={edu_id}"
+    if ask_day is not None:
+        url += f"&p_datetime_from={datetime.strftime(ask_day, '%d.%m.%Y')}+00%3A00%3A00&p_datetime_to={datetime.strftime(ask_day, '%d.%m.%Y')}+23%3A59%3A59"
+
+    m.get(
+        url,
+        request_headers=headers,
+        json=json_schedule_from_first_lesson() if first_lesson else json_schedule_from_third_lesson(),
+        status_code=200,
+    )
