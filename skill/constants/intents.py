@@ -13,6 +13,8 @@ PREV = "prev"
 
 GET_SCHEDULE = "get_schedule"
 GET_HOMEWORK = "get_homework"
+LESSON_BY_NUM = "what_lesson_num"
+LESSON_BY_DATE = "what_lesson_time"
 CLEAN = "reset_settings"
 MAIN_MENU = "main_menu"
 
