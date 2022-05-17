@@ -30,7 +30,7 @@ def get_all_students_from_request(request: Request) -> Students:
 
 def get_date_from_request(request: Request):
     if entities.DATETIME in request.entities_list:
-        ya_date = request.entity(entities.DATETIME)[0]
+        ya_date = request.entity(entities.DATETIME)[0].value
         ya_date = ya_date_transform(ya_date)
     elif intents.DAY in request.intents:
         day = request.slot(intents.DAY, "Day")
@@ -48,7 +48,10 @@ def get_students_from_request(request: Request, students: Students):
     result = []
     if entities.FIO in request.entities_list:
         for fio in request.entity(entities.FIO):
-            found = students.by_name(fio["first_name"])
+            if fio.value["first_name"] == "Алиса" and fio.start == 0:
+                # Кто-то начал команду словами Алиса...
+                continue
+            found = students.by_name(fio.value["first_name"])
             if found is None:
                 return None
             result.append(found)
