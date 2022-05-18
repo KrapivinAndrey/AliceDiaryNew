@@ -96,13 +96,13 @@ def global_scene_from_request(request: Request):
         next_scene = Repeat
     # Глобальные команды
     elif intents.GET_SCHEDULE in request.intents:
-        next_scene = GetSchedule
+        next_scene = GetSchedule  # type: ignore
     elif intents.MAIN_MENU in request.intents:
-        next_scene = Welcome
+        next_scene = Welcome  # type: ignore
     elif intents.LESSON_BY_NUM in request.intents:
-        next_scene = LessonByNum
+        next_scene = LessonByNum  # type: ignore
     elif intents.LESSON_BY_DATE in request.intents:
-        next_scene = LessonByDate
+        next_scene = LessonByDate  # type: ignore
     else:
         next_scene = None
 
@@ -115,7 +115,9 @@ class GlobalScene(Scene):
 
     def handle_global_intents(self, request):
         # Должны быть обработаны в первую очередь
-        return global_scene_from_request(request)()
+        scene = global_scene_from_request(request)
+        if scene is not None:
+            return scene()
 
     def handle_local_intents(self, request: Request):
         pass  # Здесь не нужно пока ничего делать
@@ -365,7 +367,7 @@ class LessonByNum(SceneWithAuth):
         if not num:
             # Странная ситуация. В запросе не пришел номер урока...
             # Тогда вернем целиком расписание
-            return GetSchedule(request)
+            return GetSchedule().reply(request)
 
         if self.students is None:
             students = Students()
@@ -380,16 +382,17 @@ class LessonByNum(SceneWithAuth):
                 request, text, tts, state={states.NEED_FALLBACK: True}
             )
 
+        number = num[0].value
+
         text = []
         tts = []
 
         req_date = get_date_from_request(request)
 
-        title_text, title_tts = texts.lesson_num_title(num, req_date)
-
+        title_text, title_tts = texts.lesson_num_title(number, req_date)
         text.append(title_text)
         tts.append(title_tts)
-        number = num[0].value
+
         for student in req_students:
             schedule = dairy_api.get_schedule(
                 request.access_token, student.id, req_date

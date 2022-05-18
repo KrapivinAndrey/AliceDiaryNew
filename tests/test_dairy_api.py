@@ -1,5 +1,5 @@
 import skill.dairy_api as dairy_api
-from tests.mocking import setup_mock_children, setup_mock_schedule
+from tests.mocking import setup_mock_children, setup_mock_schedule_with_params
 
 
 def test_get_url():
@@ -13,7 +13,7 @@ def test_get_students(requests_mock, students_dump):
 
 
 def test_get_schedule(requests_mock):
-    setup_mock_schedule(requests_mock)
+    setup_mock_schedule_with_params(requests_mock, token="111", num=1)
     schedule = dairy_api.get_schedule("111", "111")
 
     assert len(schedule.lessons) == 6

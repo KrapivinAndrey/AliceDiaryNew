@@ -45,6 +45,8 @@ def handler(event, context=None):
 def get_id_scene(request: Request):
     res = request.session.get("scene")
     if res is None:
-        res = global_scene_from_request(request).id()
+        res = global_scene_from_request(request)
+        if res is not None:
+            return res.id()
 
     return res

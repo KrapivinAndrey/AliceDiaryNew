@@ -85,78 +85,6 @@ def json_students():
     }
 
 
-def json_schedule_from_third_lesson():
-    return {
-        "data": {
-            "items": [
-                {
-                    "number": 7,
-                    "datetime_from": "25.04.2022 13:31:00",
-                    "datetime_to": "25.04.2022 13:55:00",
-                    "subject_id": 172516,
-                    "subject_name": "География",
-                    "priority": 0,
-                    "override_by_priority": true,
-                },
-                {
-                    "number": 8,
-                    "datetime_from": "25.04.2022 14:31:00",
-                    "datetime_to": "25.04.2022 14:40:00",
-                    "subject_id": 172516,
-                    "subject_name": "География",
-                    "priority": 0,
-                    "override_by_priority": true,
-                },
-                {
-                    "number": 5,
-                    "datetime_from": "25.04.2022 11:31:00",
-                    "datetime_to": "25.04.2022 12:10:00",
-                    "subject_id": 172533,
-                    "subject_name": "Информатика",
-                    "priority": 0,
-                    "override_by_priority": true,
-                },
-                {
-                    "number": 6,
-                    "datetime_from": "25.04.2022 12:31:00",
-                    "datetime_to": "25.04.2022 12:55:00",
-                    "subject_id": 172533,
-                    "subject_name": "Информатика",
-                    "priority": 0,
-                    "override_by_priority": true,
-                },
-                {
-                    "number": 3,
-                    "datetime_from": "25.04.2022 09:45:00",
-                    "datetime_to": "25.04.2022 10:25:00",
-                    "subject_id": 172476,
-                    "subject_name": "Алгебра",
-                    "priority": 0,
-                    "override_by_priority": true,
-                },
-                {
-                    "number": 4,
-                    "datetime_from": "25.04.2022 10:31:00",
-                    "datetime_to": "25.04.2022 11:10:00",
-                    "subject_id": 172476,
-                    "subject_name": "Алгебра",
-                    "priority": 0,
-                    "override_by_priority": true,
-                },
-            ],
-            "before": 1,
-            "current": 0,
-            "last": 0,
-            "next": 0,
-            "total_pages": 0,
-            "total_items": 0,
-        },
-        "validations": [],
-        "messages": [],
-        "debug": [],
-    }
-
-
 def json_schedule_from_first_lesson():
     return {
         "data": {
@@ -229,27 +157,103 @@ def json_schedule_from_first_lesson():
     }
 
 
+def json_schedule_from_third_lesson():
+    return {
+        "data": {
+            "items": [
+                {
+                    "number": 7,
+                    "datetime_from": "25.04.2022 13:31:00",
+                    "datetime_to": "25.04.2022 13:55:00",
+                    "subject_id": 172516,
+                    "subject_name": "География",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 8,
+                    "datetime_from": "25.04.2022 14:31:00",
+                    "datetime_to": "25.04.2022 14:40:00",
+                    "subject_id": 172516,
+                    "subject_name": "География",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 5,
+                    "datetime_from": "25.04.2022 11:31:00",
+                    "datetime_to": "25.04.2022 12:10:00",
+                    "subject_id": 172533,
+                    "subject_name": "Информатика",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 6,
+                    "datetime_from": "25.04.2022 12:31:00",
+                    "datetime_to": "25.04.2022 12:55:00",
+                    "subject_id": 172533,
+                    "subject_name": "Информатика",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 3,
+                    "datetime_from": "25.04.2022 09:45:00",
+                    "datetime_to": "25.04.2022 10:25:00",
+                    "subject_id": 172476,
+                    "subject_name": "Алгебра",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+                {
+                    "number": 4,
+                    "datetime_from": "25.04.2022 10:31:00",
+                    "datetime_to": "25.04.2022 11:10:00",
+                    "subject_id": 172476,
+                    "subject_name": "Алгебра",
+                    "priority": 0,
+                    "override_by_priority": true,
+                },
+            ],
+            "before": 1,
+            "current": 0,
+            "last": 0,
+            "next": 0,
+            "total_pages": 0,
+            "total_items": 0,
+        },
+        "validations": [],
+        "messages": [],
+        "debug": [],
+    }
+
+
+def json_schedule_empty():
+    return {
+        "data": {
+            "items": [],
+            "before": 1,
+            "current": 0,
+            "last": 0,
+            "next": 0,
+            "total_pages": 0,
+            "total_items": 0,
+        },
+        "validations": [],
+        "messages": [],
+        "debug": [],
+    }
+
+
 def setup_mock_children(m: Mocker):
     m.get(f"{students_url()}", json=json_students())
 
 
-def setup_mock_schedule(m: Mocker, from_first_lesson=True):
-    if from_first_lesson:
-        m.get(
-            f"{schedule_url()}",
-            request_headers={"Cookie": "X-JWT-Token=111"},
-            json=json_schedule_from_first_lesson(),
-        )
-    else:
-        m.get(
-            f"{schedule_url()}",
-            request_headers={"Cookie": "X-JWT-Token=111"},
-            json=json_schedule_from_third_lesson(),
-        )
-
-
 def setup_mock_schedule_no_auth(m: Mocker):
-    setup_mock_schedule_with_params(m, edu_id="1", ask_day=datetime(2021, 1, 1), token="222")
+    setup_mock_schedule_with_params(
+        m, edu_id="1", ask_day=datetime(2021, 1, 1), token="222", num=1
+    )
 
     m.get(f"{students_url()}", json=json_students())
 
@@ -261,12 +265,23 @@ def setup_mock_schedule_no_auth(m: Mocker):
 
 
 def setup_mock_schedule_auth(m: Mocker):
-    setup_mock_schedule_with_params(m, edu_id="1", ask_day=datetime(2021, 1, 1), token="222")
+    setup_mock_schedule_with_params(
+        m, edu_id="1", ask_day=datetime(2021, 1, 1), token="222", num=1
+    )
 
     m.get(f"{students_url()}", json=json_students())
 
 
-def setup_mock_schedule_with_params(m: Mocker, *, edu_id="", ask_day=None, token: str, first_lesson=True):
+def setup_mock_schedule_with_params(
+    m: Mocker, *, edu_id="", ask_day=None, token: str, num: int
+):
+    if num == 0:
+        json = json_schedule_empty()
+    elif num == 1:
+        json = json_schedule_from_first_lesson()
+    elif num == 3:
+        json = json_schedule_from_third_lesson()
+
     headers = {}
     if token:
         headers = {"Cookie": f"X-JWT-Token={token}"}
@@ -279,6 +294,6 @@ def setup_mock_schedule_with_params(m: Mocker, *, edu_id="", ask_day=None, token
     m.get(
         url,
         request_headers=headers,
-        json=json_schedule_from_first_lesson() if first_lesson else json_schedule_from_third_lesson(),
+        json=json,
         status_code=200,
     )

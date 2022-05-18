@@ -8,7 +8,6 @@ from skill.scenes import SCENES
 import skill.constants.states as states
 from tests.mocking import (
     setup_mock_children,
-    setup_mock_schedule,
     setup_mock_schedule_no_auth,
     setup_mock_schedule_auth,
     setup_mock_schedule_with_params,
@@ -23,7 +22,7 @@ class TestHello:
 
     def test_start_dialog_auth(self, start_skill_auth, students_dump, requests_mock):
         setup_mock_children(requests_mock)
-        setup_mock_schedule(requests_mock)
+        setup_mock_schedule_with_params(requests_mock, token="111", num=1)
         result = AliceAnswer(main.handler(start_skill_auth))
         assert "Алиса. 6 уроков" in result.text
         assert "Дмитрий. 6 уроков" in result.text
@@ -89,7 +88,7 @@ class TestSchedule:
     # проверим только один раз Глобально
     @pytest.mark.parametrize("scene_id", SCENES)
     def test_wrong_student(self, scene_id, students_dump, requests_mock):
-        setup_mock_schedule(requests_mock)
+        setup_mock_schedule_with_params(requests_mock, token="111", num=1)
         fio = AliceEntity().fio(first_name="Георгий")
         intent = AliceIntent("get_schedule")
         test = (
@@ -106,7 +105,7 @@ class TestSchedule:
         assert result.text == texts.unknown_student()[0]
 
     def test_name_of_student(self, students_dump, requests_mock):
-        setup_mock_schedule(requests_mock, False)
+        setup_mock_schedule_with_params(requests_mock, token="111", num=3)
         fio = AliceEntity().fio(first_name="Алиса").tokens(4, 5)
         intent = AliceIntent("get_schedule")
         test = (
@@ -129,7 +128,7 @@ class TestSchedule:
         assert "Информатика 2 урока" in result.tts
 
     def test_all_student(self, students_dump, requests_mock):
-        setup_mock_schedule(requests_mock)
+        setup_mock_schedule_with_params(requests_mock, token="111", num=1)
         intent = AliceIntent("get_schedule")
         test = (
             AliceRequest()
@@ -146,9 +145,78 @@ class TestSchedule:
         for i in range(1, 9):
             assert f"К {i} уроку" not in result.text
 
-    def test_no_schedule(self):
-        # TODO: добавить тест когда нет уроков
-        pass
+    def test_no_schedule(self, students_dump, requests_mock):
+        setup_mock_schedule_with_params(requests_mock, token="111", num=0)
+        intent = AliceIntent("get_schedule")
+        test = (
+            AliceRequest()
+            .command("Расписание на завтра")
+            .from_scene("Welcome")
+            .access_token("111")
+            .add_to_state_user("students", students_dump)
+            .add_intent(intent)
+            .build()
+        )
+        result = AliceAnswer(main.handler(test))
+        assert (
+            "Расписание уроков. Сегодня\n"
+            "Алиса. Нет уроков.\n"
+            "Дмитрий. Нет уроков." == result.text
+        )
+
+    def test_what_lesson_both(self, students_dump, requests_mock):
+        setup_mock_schedule_with_params(requests_mock, token="111", edu_id="1", num=1)
+        setup_mock_schedule_with_params(requests_mock, token="111", edu_id="100", num=3)
+
+        intent = AliceIntent("what_lesson_num")
+
+        num = AliceEntity().number(4)
+        req_date = AliceEntity().datetime(day=1, month=1, year=2021)
+
+        test = (
+            AliceRequest()
+            .command("Какой урок 4 01.01.2021")
+            .from_scene("Welcome")
+            .access_token("111")
+            .add_to_state_user("students", students_dump)
+            .add_entity(num)
+            .add_entity(req_date)
+            .add_intent(intent)
+            .build()
+        )
+        result = AliceAnswer(main.handler(test))
+        assert (
+            "01 Январь. 4 урок:\n"
+            "Алиса - Информатика: 12:31 - 12:55\n"
+            "Дмитрий - Информатика: 12:31 - 12:55" == result.text
+        )
+
+    def test_what_lesson_one(self, students_dump, requests_mock):
+        setup_mock_schedule_with_params(requests_mock, token="111", edu_id="1", num=1)
+        setup_mock_schedule_with_params(requests_mock, token="111", edu_id="100", num=0)
+
+        intent = AliceIntent("what_lesson_num")
+
+        num = AliceEntity().number(4)
+        req_date = AliceEntity().datetime(day=1, month=1, year=2021)
+
+        test = (
+            AliceRequest()
+            .command("Какой урок четверый 01.01.2021")
+            .from_scene("Welcome")
+            .access_token("111")
+            .add_to_state_user("students", students_dump)
+            .add_entity(num)
+            .add_entity(req_date)
+            .add_intent(intent)
+            .build()
+        )
+        result = AliceAnswer(main.handler(test))
+        assert (
+            "01 Январь. 4 урок:\n"
+            "Алиса - Информатика: 12:31 - 12:55\n"
+            "Дмитрий. Нет урока." == result.text
+        )
 
 
 class TestNeedAuthForScene:
@@ -205,6 +273,7 @@ class TestIssue:
             edu_id="100",
             ask_day=datetime.datetime(2021, 1, 1),
             token="222",
+            num=1,
         )
 
         say_alice = AliceEntity().fio(first_name="Алиса").tokens(0, 1)

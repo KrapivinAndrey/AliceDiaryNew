@@ -281,7 +281,7 @@ def no_lesson(student: Student, num: int):
 
 
 def num_lesson(student: Student, lesson: PlannedLesson, num: int):
-    text = f"{student.name}. {num}. {lesson.name} {lesson.duration}"
+    text = f"{student.name} - {lesson.name}: {lesson.duration}"
     tts = (
         f"У {student.inflect['родительный']} будет {lesson.name}. "
         f"Начнется в {lesson.start_time}, закончится в {lesson.end_time}"
@@ -289,7 +289,7 @@ def num_lesson(student: Student, lesson: PlannedLesson, num: int):
     return text, tts
 
 
-locale.setlocale(locale.LC_TIME, ("RU", "UTF8"))  # the ru locale is installed
+locale.setlocale(locale.LC_TIME, "RU")  # the ru locale is installed
 
 KNOWN_DATES = {
     datetime.date.today(): "Сегодня",
