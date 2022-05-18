@@ -1,5 +1,4 @@
 from skill.alice import Request
-from skill.constants.intents import GET_SCHEDULE
 from skill.constants.states import PREVIOUS_MOVES
 from skill.loggerfactory import LoggerFactory
 from skill.scenes import DEFAULT_SCENE, SCENES, global_scene_from_request
