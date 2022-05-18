@@ -186,7 +186,7 @@ class TestSchedule:
         )
         result = AliceAnswer(main.handler(test))
         assert (
-            "01 Январь. 4 урок:\n"
+            "01 января. 4 урок:\n"
             "Алиса - Информатика: 12:31 - 12:55\n"
             "Дмитрий - Информатика: 12:31 - 12:55" == result.text
         )
@@ -213,7 +213,7 @@ class TestSchedule:
         )
         result = AliceAnswer(main.handler(test))
         assert (
-            "01 Январь. 4 урок:\n"
+            "01 января. 4 урок:\n"
             "Алиса - Информатика: 12:31 - 12:55\n"
             "Дмитрий. Нет урока." == result.text
         )
