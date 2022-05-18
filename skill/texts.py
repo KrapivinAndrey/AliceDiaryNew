@@ -289,7 +289,7 @@ def num_lesson(student: Student, lesson: PlannedLesson, num: int):
     return text, tts
 
 
-locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
+locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
 
 KNOWN_DATES = {
     datetime.date.today(): "Сегодня",

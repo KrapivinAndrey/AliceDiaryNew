@@ -2,7 +2,7 @@ from skill.alice import Request
 from skill.constants.intents import GET_SCHEDULE
 from skill.constants.states import PREVIOUS_MOVES
 from skill.loggerfactory import LoggerFactory
-from skill.scenes import global_scene_from_request, SCENES, DEFAULT_SCENE
+from skill.scenes import DEFAULT_SCENE, SCENES, global_scene_from_request
 
 
 def handler(event, context=None):
