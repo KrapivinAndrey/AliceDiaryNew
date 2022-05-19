@@ -1,6 +1,7 @@
 import datetime
 import inspect
 import sys
+from typing import List, Union
 
 import skill.dairy_api as dairy_api
 import skill.texts as texts
@@ -8,7 +9,7 @@ from skill.alice import Request, big_image, button
 from skill.constants import entities, intents, states
 from skill.constants.exceptions import NeedAuth
 from skill.constants.images import CONFUSED
-from skill.dataclasses.students import Students
+from skill.dataclasses import Students
 from skill.loggerfactory import LoggerFactory
 from skill.scenes_util import Scene
 from skill.tools.dates_transformations import (
@@ -28,7 +29,7 @@ def get_all_students_from_request(request: Request) -> Students:
     return students
 
 
-def get_date_from_request(request: Request):
+def get_date_from_request(request: Request) -> datetime.date:
     if entities.DATETIME in request.entities_list:
         ya_date = request.entity(entities.DATETIME)[0].value
         ya_date = ya_date_transform(ya_date)
@@ -44,7 +45,25 @@ def get_date_from_request(request: Request):
     return ya_date
 
 
-def get_students_from_request(request: Request, students: Students):
+def get_time_from_request(request: Request) -> datetime.time:
+    if entities.DATETIME in request.entities_list:
+        ya_date = request.entity(entities.DATETIME)[0].value
+        ya_date = ya_date_transform(ya_date)
+    elif intents.DAY in request.intents:
+        day = request.slot(intents.DAY, "Day")
+        delta = DAYS.index(day) - datetime.date.today().weekday()
+        if delta < 0:
+            delta += 7
+        ya_date = datetime.datetime.today() + datetime.timedelta(days=delta)
+    else:
+        ya_date = None
+
+    return ya_date
+
+
+def get_students_from_request(
+    request: Request, students: Students
+) -> Union[List, None]:
     result = []
     if entities.FIO in request.entities_list:
         for fio in request.entity(entities.FIO):
@@ -66,27 +85,39 @@ def get_students_from_request(request: Request, students: Students):
 # region Общие сцены
 
 
+def global_scene_from_request(request: Request):
+    if intents.HELP in request.intents:
+        next_scene = HelpMenuStart
+    elif intents.WHAT_CAN_YOU_DO in request.intents:
+        next_scene = WhatCanDo
+    elif intents.CLEAN in request.intents:
+        next_scene = ClearSettings
+    elif intents.REPEAT in request.intents:
+        next_scene = Repeat
+    # Глобальные команды
+    elif intents.GET_SCHEDULE in request.intents:
+        next_scene = GetSchedule  # type: ignore
+    elif intents.MAIN_MENU in request.intents:
+        next_scene = Welcome  # type: ignore
+    elif intents.LESSON_BY_NUM in request.intents:
+        next_scene = LessonByNum  # type: ignore
+    elif intents.LESSON_BY_DATE in request.intents:
+        next_scene = LessonByDate  # type: ignore
+    else:
+        next_scene = None
+
+    return next_scene
+
+
 class GlobalScene(Scene):
     def reply(self, request: Request):
         pass  # Здесь не нужно пока ничего делать
 
     def handle_global_intents(self, request):
-
         # Должны быть обработаны в первую очередь
-        if intents.HELP in request.intents:
-            return HelpMenuStart()
-        if intents.WHAT_CAN_YOU_DO in request.intents:
-            return WhatCanDo()
-        if intents.CLEAN in request.intents:
-            return ClearSettings()
-        if intents.REPEAT in request.intents:
-            return Repeat()
-
-        # Глобальные команды
-        if intents.GET_SCHEDULE in request.intents:
-            return GetSchedule()
-        if intents.MAIN_MENU in request.intents:
-            Welcome()
+        scene = global_scene_from_request(request)
+        if scene is not None:
+            return scene()
 
     def handle_local_intents(self, request: Request):
         pass  # Здесь не нужно пока ничего делать
@@ -175,7 +206,7 @@ class Welcome(SceneWithAuth):
         text = []
         tts = []
 
-        title_text, title_tts = texts.title("Расписание", req_date)
+        title_text, title_tts = texts.schedule_title(req_date)
         text.append(title_text)
         tts.append(title_tts)
 
@@ -284,9 +315,8 @@ class GetSchedule(SceneWithAuth):
         if auth is not None:
             return auth
 
-        req_date = get_date_from_request(request)
-        students = Students()
         if self.students is None:
+            students = Students()
             students.restore(request.user[states.STUDENTS])
         else:
             students = self.students
@@ -300,7 +330,10 @@ class GetSchedule(SceneWithAuth):
         text = []
         tts = []
 
-        title_text, title_tts = texts.title("Расписание", req_date)
+        req_date = get_date_from_request(request)
+
+        title_text, title_tts = texts.schedule_title(req_date)
+
         text.append(title_text)
         tts.append(title_tts)
 
@@ -321,6 +354,75 @@ class GetSchedule(SceneWithAuth):
             user_state={states.STUDENTS: students.dump()},
             state={states.SAVE_TEXT: result_text, states.SAVE_TTS: result_tts},
         )
+
+
+class LessonByNum(SceneWithAuth):
+    def reply(self, request: Request):
+        auth = super().reply(request)
+        if auth is not None:
+            return auth
+
+        num = request.entity(entities.NUMBER)
+
+        if not num:
+            # Странная ситуация. В запросе не пришел номер урока...
+            # Тогда вернем целиком расписание
+            return GetSchedule().reply(request)
+
+        if self.students is None:
+            students = Students()
+            students.restore(request.user[states.STUDENTS])
+        else:
+            students = self.students
+        req_students = get_students_from_request(request, students)
+
+        if req_students is None:  # нет данных для запроса. Возможно не то имя
+            text, tts = texts.unknown_student()
+            return self.make_response(
+                request, text, tts, state={states.NEED_FALLBACK: True}
+            )
+
+        number = num[0].value
+
+        text = []
+        tts = []
+
+        req_date = get_date_from_request(request)
+
+        title_text, title_tts = texts.lesson_num_title(number, req_date)
+        text.append(title_text)
+        tts.append(title_tts)
+
+        for student in req_students:
+            schedule = dairy_api.get_schedule(
+                request.access_token, student.id, req_date
+            )
+            lesson = schedule.find_by_num(number)
+            if lesson is None:
+                new_text, new_tts = texts.no_lesson(student, number)
+                text.append(new_text)
+                tts.append(new_tts)
+            else:
+                new_text, new_tts = texts.num_lesson(student, lesson, number)
+                text.append(new_text)
+                tts.append(new_tts)
+
+        result_text = "\n".join(text)
+        result_tts = "sil<[500]>".join(tts)
+        return self.make_response(
+            request,
+            result_text,
+            result_tts,
+            user_state={states.STUDENTS: students.dump()},
+            state={states.SAVE_TEXT: result_text, states.SAVE_TTS: result_tts},
+        )
+
+
+class LessonByDate(SceneWithAuth):
+    def reply(self, request: Request):
+        auth = super().reply(request)
+        if auth is not None:
+            return auth
 
 
 # endregion
@@ -357,7 +459,6 @@ def _list_scenes():
 
 
 SCENES = {scene.id(): scene for scene in _list_scenes()}
-
 DEFAULT_SCENE = Welcome
 YES_NO = [button("Да"), button("Нет")]
 HELP = [button("Помощь")]

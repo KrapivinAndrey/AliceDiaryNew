@@ -1,7 +1,7 @@
 import datetime
 import locale
 
-from skill.dataclasses import Schedule, Student
+from skill.dataclasses import PlannedLesson, Schedule, Student
 
 # region Общие сцены
 
@@ -159,7 +159,7 @@ def what_can_i_do():
 # endregion
 
 
-def hello(students):
+def hello():
     text = tts = "Здесь будет todo"
     return text, tts
 
@@ -167,7 +167,7 @@ def hello(students):
 # region Вспомогательные
 
 
-def title(start: str, req_date):
+def title_date(req_date):
     if req_date is None:
         str_date = "Сегодня"
     elif req_date.date() in KNOWN_DATES:
@@ -175,9 +175,7 @@ def title(start: str, req_date):
     else:
         str_date = datetime.date.strftime(req_date.date(), "%d %B")
 
-    text = f"{start} на {str_date}"
-
-    return text, text
+    return str_date
 
 
 def nothing_to_repeat():
@@ -220,6 +218,14 @@ def unknown_student():
     return text, tts
 
 
+def schedule_title(req_date):
+    title = title_date(req_date)
+    text = f"Расписание уроков. {title}"
+    tts = f"Расписание на {title}"
+
+    return text, tts
+
+
 def schedule_for_student(student: Student, schedule: Schedule):
     count = len(schedule.lessons)
     count_str = __how_many_lessons(count)
@@ -231,7 +237,7 @@ def schedule_for_student(student: Student, schedule: Schedule):
 
     if schedule.lessons[0].num != 1:
         tts.append(
-            f"К {ORDINAL_NUMBERS[schedule.lessons[0].num]} уроку в {schedule.lessons[0].start_time}"
+            f"К {ORDINAL_NUMBERS_DATIVE[schedule.lessons[0].num]} уроку в {schedule.lessons[0].start_time}"
         )
     else:
         tts.append(f"Уроки начинаются в {schedule.lessons[0].start_time}")
@@ -261,7 +267,29 @@ def schedule_for_student(student: Student, schedule: Schedule):
     return "\n".join(text), "sil<[100]>".join(tts)
 
 
-locale.setlocale(locale.LC_TIME, ("RU", "UTF8"))  # the ru locale is installed
+def lesson_num_title(num: int, req_date):
+    title = title_date(req_date)
+    text = f"{title}. {num} урок:"
+    tts = f"{title} {ORDINAL_NUMBERS_NOMINATIVE[num]} урок"
+    return text, tts
+
+
+def no_lesson(student: Student, num: int):
+    text = f"{student.name}. Нет урока."
+    tts = f"У {student.inflect['родительный']} нет {ORDINAL_NUMBERS_DATIVE[num]} урока."
+    return text, tts
+
+
+def num_lesson(student: Student, lesson: PlannedLesson, num: int):
+    text = f"{student.name} - {lesson.name}: {lesson.duration}"
+    tts = (
+        f"У {student.inflect['родительный']} будет {lesson.name}. "
+        f"Начнется в {lesson.start_time}, закончится в {lesson.end_time}"
+    )
+    return text, tts
+
+
+locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
 
 KNOWN_DATES = {
     datetime.date.today(): "Сегодня",
@@ -270,8 +298,8 @@ KNOWN_DATES = {
     datetime.date.today() + datetime.timedelta(days=-1): "Вчера",
     datetime.date.today() + datetime.timedelta(days=-2): "Позавчера",
 }
-
-ORDINAL_NUMBERS = [
+# Порядковые числительные. Дательный падеж
+ORDINAL_NUMBERS_DATIVE = [
     "",
     "первому",
     "второму",
@@ -283,4 +311,34 @@ ORDINAL_NUMBERS = [
     "восьмому",
     "девятому",
     "десятому",
+]
+
+# Порядковые числительные. Дательный падеж
+ORDINAL_NUMBERS_GENITIVE = [
+    "",
+    "первого",
+    "второго",
+    "третьего",
+    "четвертого",
+    "пятого",
+    "шестого",
+    "седьмого",
+    "восьмого",
+    "девятого",
+    "десятого",
+]
+
+# Порядковые числительные. Именительный падеж
+ORDINAL_NUMBERS_NOMINATIVE = [
+    "",
+    "первый",
+    "второй",
+    "третий",
+    "четвертый",
+    "пятый",
+    "шестой",
+    "седьмой",
+    "восьмой",
+    "девятый",
+    "десятый",
 ]
