@@ -226,14 +226,6 @@ def schedule_title(req_date):
     return text, tts
 
 
-def schedule_title(req_date):
-    title = title_date(req_date)
-    text = f"Расписание уроков. {title}"
-    tts = f"Расписание на {title}"
-
-    return text, tts
-
-
 def schedule_for_student(student: Student, schedule: Schedule):
     count = len(schedule.lessons)
     count_str = __how_many_lessons(count)

@@ -1,5 +1,5 @@
-from typing import List
 import os
+from typing import List
 
 
 def find_synonym(name: str) -> List[str]:

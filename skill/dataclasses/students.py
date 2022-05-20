@@ -1,8 +1,9 @@
 import locale
 from typing import Union
-from skill.tools.synonym_names import find_synonym
 
 import pymorphy2
+
+from skill.tools.synonym_names import find_synonym
 
 
 class Student:
