@@ -1,4 +1,4 @@
-import locale
+
 from typing import Union
 
 import pymorphy2
@@ -12,9 +12,6 @@ class Student:
         self.id = str(student_id)
         self.inflect = {}
         if name is not None:
-            locale.setlocale(
-                locale.LC_TIME, ("RU", "UTF8")
-            )  # the ru locale is installed
             morph = pymorphy2.MorphAnalyzer()
             parse_name = morph.parse(name)[0]
 
