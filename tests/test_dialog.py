@@ -108,7 +108,7 @@ class TestSchedule:
         setup_mock_schedule_with_params(requests_mock, token="111", edu_id="1", num=3)
         setup_mock_schedule_with_params(requests_mock, token="111", edu_id="100", num=0)
 
-        fio = AliceEntity().fio(first_name="Алиса").tokens(4, 5)
+        fio = AliceEntity().fio(first_name="алиса").tokens(4, 5)
         intent = AliceIntent("get_schedule")
         test = (
             AliceRequest()
@@ -133,7 +133,7 @@ class TestSchedule:
         setup_mock_schedule_with_params(requests_mock, token="111", edu_id="100", num=3)
         setup_mock_schedule_with_params(requests_mock, token="111", edu_id="1", num=0)
 
-        fio = AliceEntity().fio(first_name="Дима").tokens(4, 5)
+        fio = AliceEntity().fio(first_name="дима").tokens(4, 5)
         intent = AliceIntent("get_schedule")
         test = (
             AliceRequest()
@@ -245,7 +245,7 @@ class TestNeedAuthForScene:
     def test_scene_need_auth_return(self, students_dump, requests_mock):
         setup_mock_schedule_no_auth(requests_mock)
 
-        fio = AliceEntity().fio(first_name="Алиса").tokens(5, 6)
+        fio = AliceEntity().fio(first_name="алиса").tokens(5, 6)
         req_date = AliceEntity().datetime(day=1, month=1, year=2021)
         intent = AliceIntent("get_schedule")
         test = (
@@ -297,8 +297,8 @@ class TestIssue:
             num=1,
         )
 
-        say_alice = AliceEntity().fio(first_name="Алиса").tokens(0, 1)
-        fio = AliceEntity().fio(first_name="Дмитрий").tokens(4, 5)
+        say_alice = AliceEntity().fio(first_name="алиса").tokens(0, 1)
+        fio = AliceEntity().fio(first_name="дмитрий").tokens(4, 5)
         req_date = AliceEntity().datetime(day=1, month=1, year=2021)
         intent = AliceIntent("get_schedule")
         test = (
