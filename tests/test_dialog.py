@@ -207,7 +207,7 @@ class TestSchedule:
         )
         result = AliceAnswer(main.handler(test))
         assert (
-            "01 января. 4 урок:\n"
+            "1 Января. 4 урок:\n"
             "Алиса - Информатика: 12:31 - 12:55\n"
             "Дмитрий - Информатика: 12:31 - 12:55" == result.text
         )
@@ -223,7 +223,7 @@ class TestSchedule:
 
         test = (
             AliceRequest()
-            .command("Какой урок четверый 01.01.2021")
+            .command("Какой урок четвертый 01.01.2021")
             .from_scene("Welcome")
             .access_token("111")
             .add_to_state_user("students", students_dump)
@@ -234,7 +234,7 @@ class TestSchedule:
         )
         result = AliceAnswer(main.handler(test))
         assert (
-            "01 января. 4 урок:\n"
+            "1 Января. 4 урок:\n"
             "Алиса - Информатика: 12:31 - 12:55\n"
             "Дмитрий. Нет урока." == result.text
         )

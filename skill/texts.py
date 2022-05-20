@@ -1,5 +1,4 @@
 import datetime
-import locale
 
 from skill.dataclasses import PlannedLesson, Schedule, Student
 
@@ -173,7 +172,7 @@ def title_date(req_date):
     elif req_date.date() in KNOWN_DATES:
         str_date = KNOWN_DATES[req_date.date()]
     else:
-        str_date = datetime.date.strftime(req_date.date(), "%d %B")
+        str_date = f"{req_date.date().day} {MONTH_NAME[req_date.date().month]}"
 
     return str_date
 
@@ -289,8 +288,6 @@ def num_lesson(student: Student, lesson: PlannedLesson, num: int):
     return text, tts
 
 
-locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
-
 KNOWN_DATES = {
     datetime.date.today(): "Сегодня",
     datetime.date.today() + datetime.timedelta(days=1): "Завтра",
@@ -371,4 +368,20 @@ ORDINAL_NUMBERS_NOMINATIVE = [
     "восьмой",
     "девятый",
     "десятый",
+]
+
+MONTH_NAME = [
+    "",
+    "Января",
+    "Февраля",
+    "Марта",
+    "Апреля",
+    "Мая",
+    "Июня",
+    "Июля",
+    "Августа",
+    "Сентября",
+    "Октября",
+    "Ноября",
+    "Декабря",
 ]
