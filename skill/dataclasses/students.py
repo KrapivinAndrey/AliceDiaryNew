@@ -1,7 +1,8 @@
-import locale
 from typing import Union
 
 import pymorphy2
+
+from skill.tools.synonym_names import find_synonym
 
 
 class Student:
@@ -10,9 +11,6 @@ class Student:
         self.id = str(student_id)
         self.inflect = {}
         if name is not None:
-            locale.setlocale(
-                locale.LC_TIME, ("RU", "UTF8")
-            )  # the ru locale is installed
             morph = pymorphy2.MorphAnalyzer()
             parse_name = morph.parse(name)[0]
 
@@ -76,7 +74,7 @@ class Students:
 
     def by_name(self, search_name: str) -> Union[Student, None]:
         for name in self.students.values():
-            if name == search_name:
+            if name == search_name or search_name.lower() in find_synonym(name):
                 return name
 
         return None
