@@ -11,7 +11,7 @@ def find_synonym(name: str) -> List[str]:
         for line in f:
             if line.startswith(name):
                 result = [
-                    x.strip().capitalize()
+                    x.strip().lower()
                     for x in line.strip().split(" - ")[1].split(",")
                 ]
                 return result
