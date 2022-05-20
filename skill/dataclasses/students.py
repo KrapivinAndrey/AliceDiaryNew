@@ -77,7 +77,7 @@ class Students:
 
     def by_name(self, search_name: str) -> Union[Student, None]:
         for name in self.students.values():
-            if name == search_name or search_name in find_synonym(str(name)):
+            if name == search_name or search_name in find_synonym(name):
                 return name
 
         return None
