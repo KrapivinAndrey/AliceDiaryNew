@@ -105,7 +105,9 @@ class TestSchedule:
         assert result.text == texts.unknown_student()[0]
 
     def test_name_of_student(self, students_dump, requests_mock):
-        setup_mock_schedule_with_params(requests_mock, token="111", num=3)
+        setup_mock_schedule_with_params(requests_mock, token="111", edu_id="1", num=3)
+        setup_mock_schedule_with_params(requests_mock, token="111", edu_id="100", num=0)
+
         fio = AliceEntity().fio(first_name="Алиса").tokens(4, 5)
         intent = AliceIntent("get_schedule")
         test = (
@@ -127,7 +129,26 @@ class TestSchedule:
         assert "Уроки закончатся в 14:40" in result.tts
         assert "Информатика 2 урока" in result.tts
 
-    def test_all_student(self, students_dump, requests_mock):
+    def test_synonym_of_student(self, students_dump, requests_mock):
+        setup_mock_schedule_with_params(requests_mock, token="111", edu_id="100", num=3)
+        setup_mock_schedule_with_params(requests_mock, token="111", edu_id="1", num=0)
+
+        fio = AliceEntity().fio(first_name="Дима").tokens(4, 5)
+        intent = AliceIntent("get_schedule")
+        test = (
+            AliceRequest()
+                .command("Расписание уроков у Димы")
+                .from_scene("Welcome")
+                .access_token("111")
+                .add_to_state_user("students", students_dump)
+                .add_entity(fio)
+                .add_intent(intent)
+                .build()
+        )
+        result = AliceAnswer(main.handler(test))
+        assert "Дмитрий. 6 уроков" in result.text
+
+    def test_all_students(self, students_dump, requests_mock):
         setup_mock_schedule_with_params(requests_mock, token="111", num=1)
         intent = AliceIntent("get_schedule")
         test = (

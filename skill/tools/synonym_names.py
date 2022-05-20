@@ -8,7 +8,7 @@ def find_synonym(name: str) -> List[str]:
     ) as f:
         for line in f:
             if line.startswith(name):
-                result = line.strip().split(" - ")[1].split(", ")
+                result = [x.strip().capitalize() for x in line.strip().split(" - ")[1].split(",")]
                 return result
 
     return []

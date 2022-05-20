@@ -1,5 +1,6 @@
 import locale
 from typing import Union
+from skill.tools.synonym_names import find_synonym
 
 import pymorphy2
 
@@ -76,7 +77,7 @@ class Students:
 
     def by_name(self, search_name: str) -> Union[Student, None]:
         for name in self.students.values():
-            if name == search_name:
+            if name == search_name or search_name in find_synonym(str(name)):
                 return name
 
         return None
