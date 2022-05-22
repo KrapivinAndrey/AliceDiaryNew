@@ -21,12 +21,6 @@ def mistake():
     return text, tts
 
 
-def goodbye():
-    text = "Возвращайтесь в любое время. До свидания!"
-    tts = "<speaker audio='alice-sounds-game-loss-3.opus'>" + text
-    return text, tts
-
-
 def sorry_and_goodbye():
     text = (
         "Прошу прощения, я очень стараюсь вас понять.\n"

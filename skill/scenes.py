@@ -234,7 +234,13 @@ class Welcome(SceneWithAuth):
 class Goodbye(GlobalScene):
     def reply(self, request: Request):
         text, tts = texts.goodbye()
-        return self.make_response(request, "", tts=tts, card=big_image(GOODBYE, description=text), end_session=True)
+        return self.make_response(
+            request,
+            "",
+            tts=tts,
+            card=big_image(GOODBYE, description=text),
+            end_session=True,
+        )
 
 
 class HaveMistake(GlobalScene):
@@ -300,7 +306,11 @@ class Repeat(GlobalScene):
         if text is None:
             text, tts = texts.nothing_to_repeat()
             return self.make_response(
-                request, "", tts=tts, card=big_image(CONFUSED, description=text), buttons=HELP
+                request,
+                "",
+                tts=tts,
+                card=big_image(CONFUSED, description=text),
+                buttons=HELP,
             )
         else:
             return self.make_response(request, text, tts, buttons=DEFAULT_BUTTONS)
