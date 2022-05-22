@@ -1,7 +1,7 @@
 import datetime
 
 from skill.dataclasses import PlannedLesson, Schedule, Student
-
+import skill.constants.texts as text_constants
 # region Общие сцены
 
 
@@ -172,7 +172,7 @@ def title_date(req_date):
     elif req_date.date() in KNOWN_DATES:
         str_date = KNOWN_DATES[req_date.date()]
     else:
-        str_date = f"{req_date.date().day} {MONTH_NAME[req_date.date().month]}"
+        str_date = f"{req_date.date().day} {text_constants.MONTH_NAME[req_date.date().month]}"
 
     return str_date
 
@@ -234,12 +234,13 @@ def schedule_for_student(student: Student, schedule: Schedule):
     if schedule.no_lessons:
         return text[0], tts[0]
 
-    if schedule.lessons[0].num != 1:
+    first_lesson = schedule.lessons[0]
+    if first_lesson.num != 1:
         tts.append(
-            f"К {ORDINAL_NUMBERS_DATIVE[schedule.lessons[0].num]} уроку в {schedule.lessons[0].start_time}"
+            f"К {text_constants.ORDINAL_NUMBERS_DATIVE[first_lesson.num]} уроку в {first_lesson.start_time}"
         )
     else:
-        tts.append(f"Уроки начинаются в {schedule.lessons[0].start_time}")
+        tts.append(f"Уроки начинаются в {first_lesson.start_time}")
 
     # Расписание
     repeat_lessons_count = 1
@@ -269,17 +270,17 @@ def schedule_for_student(student: Student, schedule: Schedule):
 def lesson_num_title(num: int, req_date):
     title = title_date(req_date)
     text = f"{title}. {num} урок:"
-    tts = f"{title} {ORDINAL_NUMBERS_NOMINATIVE[num]} урок"
+    tts = f"{title} {text_constants.ORDINAL_NUMBERS_NOMINATIVE[num]} урок"
     return text, tts
 
 
 def no_lesson(student: Student, num: int):
     text = f"{student.name}. Нет урока."
-    tts = f"У {student.inflect['родительный']} нет {ORDINAL_NUMBERS_DATIVE[num]} урока."
+    tts = f"У {student.inflect['родительный']} нет {text_constants.ORDINAL_NUMBERS_DATIVE[num]} урока."
     return text, tts
 
 
-def num_lesson(student: Student, lesson: PlannedLesson, num: int):
+def num_lesson(student: Student, lesson: PlannedLesson):
     text = f"{student.name} - {lesson.name}: {lesson.duration}"
     tts = (
         f"У {student.inflect['родительный']} будет {lesson.name}. "
@@ -295,93 +296,3 @@ KNOWN_DATES = {
     datetime.date.today() + datetime.timedelta(days=-1): "Вчера",
     datetime.date.today() + datetime.timedelta(days=-2): "Позавчера",
 }
-# Порядковые числительные. Дательный падеж
-ORDINAL_NUMBERS_DATIVE = [
-    "",
-    "первому",
-    "второму",
-    "третьему",
-    "четвертому",
-    "пятому",
-    "шестому",
-    "седьмому",
-    "восьмому",
-    "девятому",
-    "десятому",
-]
-
-# Порядковые числительные. Дательный падеж
-ORDINAL_NUMBERS_GENITIVE = [
-    "",
-    "первого",
-    "второго",
-    "третьего",
-    "четвертого",
-    "пятого",
-    "шестого",
-    "седьмого",
-    "восьмого",
-    "девятого",
-    "десятого",
-]
-
-# Порядковые числительные. Именительный падеж
-ORDINAL_NUMBERS_NOMINATIVE = [
-    "",
-    "первый",
-    "второй",
-    "третий",
-    "четвертый",
-    "пятый",
-    "шестой",
-    "седьмой",
-    "восьмой",
-    "девятый",
-    "десятый",
-]
-
-# Порядковые числительные. Дательный падеж
-ORDINAL_NUMBERS_GENITIVE = [
-    "",
-    "первого",
-    "второго",
-    "третьего",
-    "четвертого",
-    "пятого",
-    "шестого",
-    "седьмого",
-    "восьмого",
-    "девятого",
-    "десятого",
-]
-
-# Порядковые числительные. Именительный падеж
-ORDINAL_NUMBERS_NOMINATIVE = [
-    "",
-    "первый",
-    "второй",
-    "третий",
-    "четвертый",
-    "пятый",
-    "шестой",
-    "седьмой",
-    "восьмой",
-    "девятый",
-    "десятый",
-]
-
-MONTH_NAME = [
-    "",
-    "Января",
-    "Февраля",
-    "Марта",
-    "Апреля",
-    "Мая",
-    "Июня",
-    "Июля",
-    "Августа",
-    "Сентября",
-    "Октября",
-    "Ноября",
-    "Декабря",
-]

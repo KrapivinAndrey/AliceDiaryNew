@@ -403,7 +403,7 @@ class LessonByNum(SceneWithAuth):
                 text.append(new_text)
                 tts.append(new_tts)
             else:
-                new_text, new_tts = texts.num_lesson(student, lesson, number)
+                new_text, new_tts = texts.num_lesson(student, lesson)
                 text.append(new_text)
                 tts.append(new_tts)
 
