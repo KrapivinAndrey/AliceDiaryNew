@@ -8,7 +8,7 @@ import skill.texts as texts
 from skill.alice import Request, big_image, button
 from skill.constants import entities, intents, states
 from skill.constants.exceptions import NeedAuth
-from skill.constants.images import CONFUSED
+from skill.constants.images import CONFUSED, GOODBYE
 from skill.dataclasses import Students
 from skill.loggerfactory import LoggerFactory
 from skill.scenes_util import Scene
@@ -94,6 +94,8 @@ def global_scene_from_request(request: Request):
         next_scene = ClearSettings
     elif intents.REPEAT in request.intents:
         next_scene = Repeat
+    elif intents.EXIT in request.intents:
+        next_scene = Goodbye
     # Глобальные команды
     elif intents.GET_SCHEDULE in request.intents:
         next_scene = GetSchedule  # type: ignore
@@ -231,8 +233,8 @@ class Welcome(SceneWithAuth):
 
 class Goodbye(GlobalScene):
     def reply(self, request: Request):
-        text = tts = "До свидания"
-        return self.make_response(request, text, tts, end_session=True)
+        text, tts = texts.goodbye()
+        return self.make_response(request, tts=tts, card=big_image(GOODBYE, description=text), end_session=True)
 
 
 class HaveMistake(GlobalScene):
@@ -298,7 +300,7 @@ class Repeat(GlobalScene):
         if text is None:
             text, tts = texts.nothing_to_repeat()
             return self.make_response(
-                request, tts, card=big_image(CONFUSED, description=text), buttons=HELP
+                request, tts=tts, card=big_image(CONFUSED, description=text), buttons=HELP
             )
         else:
             return self.make_response(request, text, tts, buttons=DEFAULT_BUTTONS)
