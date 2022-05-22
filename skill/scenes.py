@@ -45,7 +45,7 @@ def get_date_from_request(request: Request) -> datetime.date:
     return ya_date
 
 
-def get_time_from_request(request: Request) -> datetime.time:
+def get_time_from_request(request: Request) -> Union[None, datetime.time]:
     if entities.DATETIME in request.entities_list:
         ya_date = request.entity(entities.DATETIME)[0].value
         ya_date = ya_date_transform(ya_date)
@@ -56,9 +56,9 @@ def get_time_from_request(request: Request) -> datetime.time:
             delta += 7
         ya_date = datetime.datetime.today() + datetime.timedelta(days=delta)
     else:
-        ya_date = None
+        return None
 
-    return ya_date
+    return ya_date.time()
 
 
 def get_students_from_request(
@@ -165,6 +165,7 @@ class SceneWithAuth(GlobalScene):
                 request.restore_entities(request.session.get(states.ENTITIES, {}))
                 request.restore_intents(request.session.get(states.INTENTS, {}))
             except NeedAuth as e:
+                logger.warning("Failed to get students %s", e)
                 auth = True
                 save_entities = {
                     states.ENTITIES: request.session.get(states.ENTITIES, {}),
