@@ -29,6 +29,22 @@ class TestHello:
         assert result.user_state["students"] == students_dump
 
 
+class Goodbye:
+    @pytest.mark.parametrize("scene_id", SCENES)
+    def test_goodbye(self, scene_id):
+        intent = AliceIntent("exit")
+        test = (
+            AliceRequest()
+            .command("До свидания")
+            .from_scene(scene_id)
+            .add_intent(intent)
+            .build()
+        )
+        result = AliceAnswer(main.handler(test))
+        assert result.text == texts.goodbye()[0]
+        assert result.is_end_of_session
+
+
 class TestFallback:
     # Реакция на неизвестные/ошибочные команды
     @pytest.mark.parametrize("scene_id", SCENES)
@@ -137,13 +153,13 @@ class TestSchedule:
         intent = AliceIntent("get_schedule")
         test = (
             AliceRequest()
-                .command("Расписание уроков у Димы")
-                .from_scene("Welcome")
-                .access_token("111")
-                .add_to_state_user("students", students_dump)
-                .add_entity(fio)
-                .add_intent(intent)
-                .build()
+            .command("Расписание уроков у Димы")
+            .from_scene("Welcome")
+            .access_token("111")
+            .add_to_state_user("students", students_dump)
+            .add_entity(fio)
+            .add_intent(intent)
+            .build()
         )
         result = AliceAnswer(main.handler(test))
         assert "Дмитрий. 6 уроков" in result.text
