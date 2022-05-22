@@ -17,5 +17,5 @@ LESSON_BY_NUM = "what_lesson_num"
 LESSON_BY_DATE = "what_lesson_time"
 CLEAN = "reset_settings"
 MAIN_MENU = "main_menu"
-
+EXIT = "exit"
 DAY = "day_of_week"

@@ -1,7 +1,8 @@
 import datetime
 
-from skill.dataclasses import PlannedLesson, Schedule, Student
 import skill.constants.texts as text_constants
+from skill.dataclasses import PlannedLesson, Schedule, Student
+
 # region Общие сцены
 
 
@@ -17,12 +18,6 @@ def mistake():
         "sil<[200]> Мы её обязательно исправим. Возвращайтесь чуть позже."
     )
 
-    return text, tts
-
-
-def goodbye():
-    text = "Возвращайтесь в любое время. До свидания!"
-    tts = "<speaker audio='alice-sounds-game-loss-3.opus'>" + text
     return text, tts
 
 
@@ -163,6 +158,12 @@ def hello():
     return text, tts
 
 
+def goodbye():
+    text = "До свидания.\n Возвращайтесь в любое время."
+    tts = "До свидания! sil<[100]> Возвращайтесь скорее."
+    return text, tts
+
+
 # region Вспомогательные
 
 
@@ -172,7 +173,9 @@ def title_date(req_date):
     elif req_date.date() in KNOWN_DATES:
         str_date = KNOWN_DATES[req_date.date()]
     else:
-        str_date = f"{req_date.date().day} {text_constants.MONTH_NAME[req_date.date().month]}"
+        str_date = (
+            f"{req_date.date().day} {text_constants.MONTH_NAME[req_date.date().month]}"
+        )
 
     return str_date
 
