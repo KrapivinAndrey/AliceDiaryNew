@@ -1,6 +1,6 @@
 from requests_mock import Mocker
 from datetime import datetime
-from skill.dairy_api import schedule_url, students_url
+from skill.dairy_api import schedule_url, students_url, journal_url
 
 true = True
 false = False
@@ -246,6 +246,187 @@ def json_schedule_empty():
     }
 
 
+def json_journal():
+    return {
+        "data": {
+            "items": [
+                {
+                    "identity": {"id": 105078234, "uid": null},
+                    "number": 7,
+                    "datetime_from": "11.04.2022 14:20:00",
+                    "datetime_to": "11.04.2022 15:05:00",
+                    "subject_id": 76413,
+                    "subject_name": "Иностранный язык (английский)",
+                    "content_name": "УУД и речевые умения",
+                    "content_description": null,
+                    "content_additional_material": null,
+                    "tasks": [
+                        {
+                            "task_name": "с.100 у.1,2.",
+                            "task_code": null,
+                            "task_kind_code": "homework",
+                            "task_kind_name": "Домашнее задание",
+                            "files": [],
+                        }
+                    ],
+                    "estimates": [],
+                    "action_payload": {"can_add_homework": true},
+                },
+                {
+                    "identity": {"id": 105078251, "uid": null},
+                    "number": 6,
+                    "datetime_from": "11.04.2022 13:25:00",
+                    "datetime_to": "11.04.2022 14:10:00",
+                    "subject_id": 76414,
+                    "subject_name": "Второй иностранный язык (испанский)",
+                    "content_name": "Вводное аудирование и первичное закрепление лексики.",
+                    "content_description": null,
+                    "content_additional_material": null,
+                    "tasks": [
+                        {
+                            "task_name": "РНО (письмо), стр. 65 - читать, работа со словарем",
+                            "task_code": null,
+                            "task_kind_code": "homework",
+                            "task_kind_name": "Домашнее задание",
+                            "files": [],
+                        }
+                    ],
+                    "estimates": [],
+                    "action_payload": {"can_add_homework": true},
+                },
+                {
+                    "identity": {"id": 105054251, "uid": null},
+                    "number": 5,
+                    "datetime_from": "11.04.2022 12:30:00",
+                    "datetime_to": "11.04.2022 13:15:00",
+                    "subject_id": 75262,
+                    "subject_name": "Изобразительное искусство",
+                    "content_name": "Мода, культура и ты. Композиционно-конструктивные принципы дизайна одежды.",
+                    "content_description": null,
+                    "content_additional_material": null,
+                    "tasks": [],
+                    "estimates": [
+                        {
+                            "estimate_type_code": "1058",
+                            "estimate_type_name": "Работа на уроке",
+                            "estimate_value_code": "5/5",
+                            "estimate_value_name": "5",
+                            "estimate_comment": null,
+                        }
+                    ],
+                    "action_payload": {"can_add_homework": true},
+                },
+                {
+                    "identity": {"id": 105101864, "uid": null},
+                    "number": 4,
+                    "datetime_from": "11.04.2022 11:29:00",
+                    "datetime_to": "11.04.2022 12:20:00",
+                    "subject_id": 75249,
+                    "subject_name": "Литература",
+                    "content_name": "Д.С. Лихачев. Главы из книги «Земля родная» как духовное напутствие молодежи.",
+                    "content_description": null,
+                    "content_additional_material": null,
+                    "tasks": [
+                        {
+                            "task_name": "Прочитать с.186-201, вопросы на с.201 (устно), рассказ о Яшке (подобрать цитаты).",
+                            "task_code": null,
+                            "task_kind_code": "homework",
+                            "task_kind_name": "Домашнее задание",
+                            "files": [],
+                        }
+                    ],
+                    "estimates": [
+                        {
+                            "estimate_type_code": "1065",
+                            "estimate_type_name": "Самостоятельная работа",
+                            "estimate_value_code": "4/5",
+                            "estimate_value_name": "4",
+                            "estimate_comment": null,
+                        }
+                    ],
+                    "action_payload": {"can_add_homework": true},
+                },
+                {
+                    "identity": {"id": 105098782, "uid": null},
+                    "number": 3,
+                    "datetime_from": "11.04.2022 10:30:00",
+                    "datetime_to": "11.04.2022 11:15:00",
+                    "subject_id": 75247,
+                    "subject_name": "Русский язык",
+                    "content_name": "Подчинительные союзы.",
+                    "content_description": null,
+                    "content_additional_material": null,
+                    "tasks": [
+                        {
+                            "task_name": "Упр. 382 (№1, 3: морфологический разбор союзов).",
+                            "task_code": null,
+                            "task_kind_code": "homework",
+                            "task_kind_name": "Домашнее задание",
+                            "files": [],
+                        }
+                    ],
+                    "estimates": [
+                        {
+                            "estimate_type_code": "1058",
+                            "estimate_type_name": "Работа на уроке",
+                            "estimate_value_code": "4/5",
+                            "estimate_value_name": "4",
+                            "estimate_comment": null,
+                        }
+                    ],
+                    "action_payload": {"can_add_homework": true},
+                },
+                {
+                    "identity": {"id": 105078243, "uid": null},
+                    "number": 2,
+                    "datetime_from": "11.04.2022 09:25:00",
+                    "datetime_to": "11.04.2022 10:10:00",
+                    "subject_id": 75239,
+                    "subject_name": "Алгебра",
+                    "content_name": "Линейная функция и ее график.  Проверочная  работа.",
+                    "content_description": null,
+                    "content_additional_material": null,
+                    "tasks": [
+                        {
+                            "task_name": "№627",
+                            "task_code": null,
+                            "task_kind_code": "homework",
+                            "task_kind_name": "Домашнее задание",
+                            "files": [],
+                        }
+                    ],
+                    "estimates": [
+                        {
+                            "estimate_type_code": "30000",
+                            "estimate_type_name": "Посещаемость",
+                            "estimate_value_code": "496",
+                            "estimate_value_name": "по болезни",
+                            "estimate_comment": null,
+                        },
+                        {
+                            "estimate_type_code": "1058",
+                            "estimate_type_name": "Работа на уроке",
+                            "estimate_value_code": "5/5",
+                            "estimate_value_name": "5",
+                            "estimate_comment": null,
+                        },
+                    ],
+                    "action_payload": {"can_add_homework": true},
+                },
+            ],
+            "before": 1,
+            "current": 1,
+            "last": 1,
+            "next": 1,
+            "total_pages": 1,
+            "total_items": 6,
+        },
+        "validations": [],
+        "messages": [],
+        "debug": [],
+    }
+
+
 def setup_mock_children(m: Mocker):
     m.get(f"{students_url()}", json=json_students())
 
@@ -294,6 +475,14 @@ def setup_mock_schedule_with_params(
     m.get(
         url,
         request_headers=headers,
+        json=json,
+        status_code=200,
+    )
+
+
+def setup_mock_journal(m: Mocker):
+    m.get(
+        f"{journal_url()}",
         json=json,
         status_code=200,
     )

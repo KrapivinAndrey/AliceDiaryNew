@@ -26,6 +26,10 @@ def students_url():
     return f"{base_url()}/person/related-child-list"
 
 
+def journal_url():
+    return f"{base_url()}/lesson/list-by-education"
+
+
 # endregion
 
 
