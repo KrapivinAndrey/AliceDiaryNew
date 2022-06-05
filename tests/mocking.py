@@ -483,6 +483,6 @@ def setup_mock_schedule_with_params(
 def setup_mock_journal(m: Mocker):
     m.get(
         f"{journal_url()}",
-        json=json,
+        json=json_journal(),
         status_code=200,
     )
