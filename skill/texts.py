@@ -1,7 +1,7 @@
 import datetime
 
 import skill.constants.texts as text_constants
-from skill.dataclasses import PlannedLesson, Schedule, Student, Journal
+from skill.dataclasses import Journal, PlannedLesson, Schedule, Student
 
 # region Общие сцены
 
