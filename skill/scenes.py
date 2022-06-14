@@ -214,7 +214,7 @@ class Welcome(SceneWithAuth):
         tts.append(title_tts)
 
         for student in students.to_list():
-            journal = dairy_api.test_get_journal(
+            journal = dairy_api.get_marks(
                 request.access_token, student.id, req_date
             )
             if journal.len:
