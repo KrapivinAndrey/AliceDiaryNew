@@ -322,7 +322,17 @@ def marks_for_student(student: Student, journal: Journal):
     tts.append(f"У {student.inflect['родительный']}")
 
     for lesson, records in journal.records:
-        text_record = lesson
+        text_record = [lesson + "."]
+        tts_record = [lesson]
+        for rec in records:
+            if not rec.is_legal_skip:
+                text_record.append(str(rec))
+                tts_record.append(str(rec))
+        if len(text_record) > 1:
+            text.append(" ".join(text_record))
+            tts.append(" ".join(tts_record))
+
+    return "\n".join(text), " sil<[200]>".join(tts)
 
 
 # endregion

@@ -8,8 +8,8 @@ class Record:
         comment=None,
     ):
         self.is_late = type_code == "30000" and not value_code
-        self.is_legal_skip = type_code == "30000" and value_code != "493"
-        self.is_illegal_skip = type_code == "30000" and value_code == "493"
+        self.is_legal_skip = type_code == "30000" and value_code in ("494", "496")
+        self.is_illegal_skip = type_code == "30000" and value_code not in ("494", "496")
 
         self.work = type_name
         self.mark = value_name
