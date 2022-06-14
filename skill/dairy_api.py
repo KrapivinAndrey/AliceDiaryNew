@@ -99,3 +99,6 @@ def get_schedule(token: str, student_id: str, day=None) -> Schedule:
 
     result.lessons.sort()
     return result
+
+def get_marks(token: str, student_id: str, day=None):
+    pass
