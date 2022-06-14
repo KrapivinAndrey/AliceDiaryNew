@@ -209,15 +209,18 @@ class Welcome(SceneWithAuth):
         text = []
         tts = []
 
-        title_text, title_tts = texts.schedule_title(req_date)
+        title_text, title_tts = texts.journal_title(req_date)
         text.append(title_text)
         tts.append(title_tts)
 
         for student in students.to_list():
-            schedule = dairy_api.get_schedule(
+            journal = dairy_api.test_get_journal(
                 request.access_token, student.id, req_date
             )
-            new_text, new_tts = texts.schedule_for_student(student, schedule)
+            if journal.len:
+                new_text, new_tts = texts.marks_for_student(student, journal)
+            else:
+                new_text, new_tts = texts.no_marks(student)
             text.append(new_text)
             tts.append(new_tts)
 
