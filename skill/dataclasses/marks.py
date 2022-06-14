@@ -55,7 +55,7 @@ class Journal:
         for lesson, records in self.__journal.items():
             result.append(f"{lesson}: {', '.join([str(x) for x in records])}")
 
-        return '\n'.join(result)
+        return "\n".join(result)
 
     def __repr__(self):
         return str(self)

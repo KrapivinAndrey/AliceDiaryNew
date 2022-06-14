@@ -313,6 +313,7 @@ def no_marks(student: Student):
     tts = f"По {student.inflect['дательный']} нет записей в журнале"
     return text, tts
 
+
 def marks_for_student(student: Student, journal: Journal):
     text = []
     tts = []
@@ -322,6 +323,7 @@ def marks_for_student(student: Student, journal: Journal):
 
     for lesson, records in journal.records:
         text_record = lesson
+
 
 # endregion
 
