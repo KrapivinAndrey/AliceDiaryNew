@@ -445,6 +445,7 @@ class LessonByDate(SceneWithAuth):
 
 # region Оценки
 
+
 class Marks(SceneWithAuth):
     def reply(self, request: Request):
         auth = super().reply(request)
