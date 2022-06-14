@@ -1,5 +1,9 @@
 import skill.dairy_api as dairy_api
-from tests.mocking import setup_mock_children, setup_mock_schedule_with_params
+from tests.mocking import (
+    setup_mock_children,
+    setup_mock_schedule_with_params,
+    setup_mock_journal,
+)
 
 
 def test_get_url():
@@ -18,3 +22,10 @@ def test_get_schedule(requests_mock):
 
     assert len(schedule.lessons) == 6
     assert str(schedule.lessons[0]) == "Алгебра"
+
+
+def test_get_journal(requests_mock):
+    setup_mock_journal(requests_mock)
+    journal = dairy_api.get_marks("111", "111")
+
+    assert journal.len == 4

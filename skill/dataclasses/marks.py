@@ -46,6 +46,10 @@ class Journal:
     def len(self):
         return len(self.__journal)
 
+    @property
+    def records(self):
+        return self.__journal.items()
+
     def __str__(self):
         result = []
         for lesson, records in self.__journal.items():

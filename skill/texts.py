@@ -1,7 +1,7 @@
 import datetime
 
 import skill.constants.texts as text_constants
-from skill.dataclasses import PlannedLesson, Schedule, Student
+from skill.dataclasses import PlannedLesson, Schedule, Student, Journal
 
 # region Общие сцены
 
@@ -220,6 +220,9 @@ def unknown_student():
     return text, tts
 
 
+# region Расписание уроков
+
+
 def schedule_title(req_date):
     title = title_date(req_date)
     text = f"Расписание уроков. {title}"
@@ -290,6 +293,37 @@ def num_lesson(student: Student, lesson: PlannedLesson):
         f"Начнется в {lesson.start_time}, закончится в {lesson.end_time}"
     )
     return text, tts
+
+
+# endregion
+
+# region Записи в журнале
+
+
+def journal_title(req_date):
+    title = title_date(req_date)
+    text = f"Записи в журнале. {title}"
+    tts = f"Записи в журнале на {title}"
+
+    return text, tts
+
+
+def no_marks(student: Student):
+    text = f"{student.name}. Нет записей"
+    tts = f"По {student.inflect['дательный']} нет записей в журнале"
+    return text, tts
+
+def marks_for_student(student: Student, journal: Journal):
+    text = []
+    tts = []
+
+    text.append(student.name)
+    tts.append(f"У {student.inflect['родительный']}")
+
+    for lesson, records in journal.records:
+        text_record = lesson
+
+# endregion
 
 
 KNOWN_DATES = {
