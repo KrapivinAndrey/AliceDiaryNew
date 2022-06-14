@@ -10,6 +10,15 @@ entity schedule:
             уроки
             занятия
             расписание
+            расписание уроков
+
+entity marks:
+    values:
+        marks:
+            оценки
+            записи в журнале
+            записи
+            журнале
 entity SchoolSubject:
     lemma: true
     values:
