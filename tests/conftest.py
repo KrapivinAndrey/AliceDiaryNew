@@ -5,6 +5,7 @@ from pytest import fixture
 
 from skill.dataclasses.lessons import PlannedLesson, Schedule
 from skill.dataclasses.students import Student, Students
+from skill.dataclasses.marks import Record, Journal
 
 # region Студенты
 
@@ -108,6 +109,59 @@ def schedule_short(russian, geometry):
     result.lessons.sort()
 
     return result
+
+
+# endregion
+
+# region Оценки и журнал
+
+
+@fixture
+def narration4():
+    return Record("123", "Изложение", "4/5", "4")
+
+
+@fixture
+def narration2():
+    return Record("123", "Изложение", "2/5", "2")
+
+
+@fixture
+def lesson3():
+    return Record("123", "Работа на уроке", "3/5", "3")
+
+
+@fixture
+def late():
+    return Record("30000", "Опоздал", "", "")
+
+
+@fixture
+def missing():
+    return Record("30000", "Не был на уроке", "493", "")
+
+
+@fixture
+def sport():
+    return Record("30000", "Участие в олимпиаде", "494", "")
+
+
+@fixture
+def full_journal(narration2, narration4, lesson3, late, missing, sport):
+    journal = Journal()
+    journal.add("Русский язык", narration2)
+    journal.add("Русский язык", narration4)
+    journal.add("Математика", lesson3)
+    journal.add("Математика", late)
+    journal.add("Физкультура", sport)
+    journal.add("Химия", missing)
+    return journal
+
+
+@fixture
+def empty_journal():
+    journal = Journal()
+    return journal
 
 
 # endregion

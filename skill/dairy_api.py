@@ -4,7 +4,14 @@ from datetime import date, datetime, time
 import requests
 
 from skill.constants.exceptions import NeedAuth
-from skill.dataclasses import PlannedLesson, Schedule, Student, Students
+from skill.dataclasses import (
+    Journal,
+    PlannedLesson,
+    Record,
+    Schedule,
+    Student,
+    Students,
+)
 from skill.loggerfactory import LoggerFactory
 
 logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
@@ -24,6 +31,10 @@ def schedule_url():
 
 def students_url():
     return f"{base_url()}/person/related-child-list"
+
+
+def journal_url():
+    return f"{base_url()}/lesson/list-by-education"
 
 
 # endregion
@@ -94,4 +105,48 @@ def get_schedule(token: str, student_id: str, day=None) -> Schedule:
         )
 
     result.lessons.sort()
+    return result
+
+
+def get_marks(token: str, student_id: str, day=None):
+    if day is None:
+        day = date.today()
+    start_time = datetime.combine(day, time.min)
+    finish_time = datetime.combine(day, time.max)
+
+    response = requests.get(
+        journal_url(),
+        params={
+            "p_educations[]": student_id,
+            "p_datetime_from": datetime.strftime(start_time, "%d.%m.%Y %H:%M:%S"),
+            "p_datetime_to": datetime.strftime(finish_time, "%d.%m.%Y %H:%M:%S"),
+        },
+        cookies={"X-JWT-Token": token},
+        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
+    )
+
+    if response.status_code == 401:
+        raise NeedAuth()
+
+    result = Journal()
+
+    try:
+        api_journal = response.json().get("data", {}).get("items", [])
+    except (Exception,):
+        logger.exception(
+            f"Не удалось разобрать тело ответа", extra={"body": response.text}
+        )
+        raise
+
+    for item in api_journal:
+        for rec in item.get("estimates", []):
+            record = Record(
+                rec.get("estimate_type_code"),
+                rec.get("estimate_type_name"),
+                rec.get("estimate_value_code"),
+                rec.get("estimate_value_name"),
+                rec.get("estimate_comment"),
+            )
+            result.add(item.get("subject_name"), record)
+
     return result

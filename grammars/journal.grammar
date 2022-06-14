@@ -1,0 +1,10 @@
+filler:
+    что|за|по|на|какие|какая|какое|надо|и|пожалуйста
+root:
+    %lemma
+    .* $marks .*
+    скажи .* $marks .*
+$When:
+    $YANDEX.DATETIME
+$Who:
+    $YANDEX.FIO

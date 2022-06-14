@@ -105,6 +105,8 @@ def global_scene_from_request(request: Request):
         next_scene = LessonByNum  # type: ignore
     elif intents.LESSON_BY_DATE in request.intents:
         next_scene = LessonByDate  # type: ignore
+    elif intents.MARKS in request.intents:
+        next_scene = Marks  # type: ignore
     else:
         next_scene = None
 
@@ -209,15 +211,16 @@ class Welcome(SceneWithAuth):
         text = []
         tts = []
 
-        title_text, title_tts = texts.schedule_title(req_date)
+        title_text, title_tts = texts.journal_title(req_date)
         text.append(title_text)
         tts.append(title_tts)
 
         for student in students.to_list():
-            schedule = dairy_api.get_schedule(
-                request.access_token, student.id, req_date
-            )
-            new_text, new_tts = texts.schedule_for_student(student, schedule)
+            journal = dairy_api.get_marks(request.access_token, student.id, req_date)
+            if journal.len:
+                new_text, new_tts = texts.marks_for_student(student, journal)
+            else:
+                new_text, new_tts = texts.no_marks(student)
             text.append(new_text)
             tts.append(new_tts)
 
@@ -436,6 +439,56 @@ class LessonByDate(SceneWithAuth):
         auth = super().reply(request)
         if auth is not None:
             return auth
+
+
+# endregion
+
+# region Оценки
+
+
+class Marks(SceneWithAuth):
+    def reply(self, request: Request):
+        auth = super().reply(request)
+        if auth is not None:
+            return auth
+
+        if self.students is None:
+            students = Students()
+            students.restore(request.user[states.STUDENTS])
+        else:
+            students = self.students
+        req_students = get_students_from_request(request, students)
+
+        if req_students is None:  # нет данных для запроса. Возможно не то имя
+            text, tts = texts.unknown_student()
+            return self.make_response(
+                request, text, tts, state={states.NEED_FALLBACK: True}
+            )
+
+        text = []
+        tts = []
+
+        req_date = get_date_from_request(request)
+
+        title_text, title_tts = texts.journal_title(req_date)
+        text.append(title_text)
+        tts.append(title_tts)
+
+        for student in students.to_list():
+            journal = dairy_api.get_marks(request.access_token, student.id, req_date)
+            if journal.len:
+                new_text, new_tts = texts.marks_for_student(student, journal)
+            else:
+                new_text, new_tts = texts.no_marks(student)
+            text.append(new_text)
+            tts.append(new_tts)
+
+        return self.make_response(
+            request,
+            "\n".join(text),
+            "sil<[500]>".join(tts),
+            user_state={states.STUDENTS: students.dump()},
+        )
 
 
 # endregion

@@ -1,7 +1,7 @@
 import datetime
 
 import skill.constants.texts as text_constants
-from skill.dataclasses import PlannedLesson, Schedule, Student
+from skill.dataclasses import Journal, PlannedLesson, Schedule, Student
 
 # region Общие сцены
 
@@ -220,6 +220,9 @@ def unknown_student():
     return text, tts
 
 
+# region Расписание уроков
+
+
 def schedule_title(req_date):
     title = title_date(req_date)
     text = f"Расписание уроков. {title}"
@@ -290,6 +293,49 @@ def num_lesson(student: Student, lesson: PlannedLesson):
         f"Начнется в {lesson.start_time}, закончится в {lesson.end_time}"
     )
     return text, tts
+
+
+# endregion
+
+# region Записи в журнале
+
+
+def journal_title(req_date):
+    title = title_date(req_date)
+    text = f"Записи в журнале. {title}"
+    tts = f"Записи в журнале на {title}"
+
+    return text, tts
+
+
+def no_marks(student: Student):
+    text = f"{student.name}. Нет записей"
+    tts = f"По {student.inflect['дательный']} нет записей в журнале"
+    return text, tts
+
+
+def marks_for_student(student: Student, journal: Journal):
+    text = []
+    tts = []
+
+    text.append(student.name)
+    tts.append(f"У {student.inflect['родительный']}")
+
+    for lesson, records in journal.records:
+        text_record = [lesson + "."]
+        tts_record = [lesson]
+        for rec in records:
+            if not rec.is_legal_skip:
+                text_record.append(str(rec))
+                tts_record.append(str(rec))
+        if len(text_record) > 1:
+            text.append(" ".join(text_record))
+            tts.append(" ".join(tts_record))
+
+    return "\n".join(text), " sil<[200]>".join(tts)
+
+
+# endregion
 
 
 KNOWN_DATES = {

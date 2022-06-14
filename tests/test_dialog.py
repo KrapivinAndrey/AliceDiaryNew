@@ -11,6 +11,7 @@ from tests.mocking import (
     setup_mock_schedule_no_auth,
     setup_mock_schedule_auth,
     setup_mock_schedule_with_params,
+    setup_mock_journal,
 )
 
 
@@ -22,10 +23,9 @@ class TestHello:
 
     def test_start_dialog_auth(self, start_skill_auth, students_dump, requests_mock):
         setup_mock_children(requests_mock)
-        setup_mock_schedule_with_params(requests_mock, token="111", num=1)
+        setup_mock_journal(requests_mock)
         result = AliceAnswer(main.handler(start_skill_auth))
-        assert "Алиса. 6 уроков" in result.text
-        assert "Дмитрий. 6 уроков" in result.text
+        assert "Изобразительное искусство. Работа на уроке 5" in result.text
         assert result.user_state["students"] == students_dump
 
 
