@@ -4,7 +4,14 @@ from datetime import date, datetime, time
 import requests
 
 from skill.constants.exceptions import NeedAuth
-from skill.dataclasses import Journal, PlannedLesson, Record, Schedule, Student, Students
+from skill.dataclasses import (
+    Journal,
+    PlannedLesson,
+    Record,
+    Schedule,
+    Student,
+    Students,
+)
 from skill.loggerfactory import LoggerFactory
 
 logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
