@@ -14,7 +14,7 @@ class Record:
         self.work = type_name
         self.mark = value_name
         self.mark_type = value_code
-        self.comment = comment
+        self.comment = "" if comment is None else comment
 
     def __str__(self):
         if self.is_late:
@@ -28,7 +28,7 @@ class Record:
 
         result = [self.work, self.mark, self.comment]
 
-        return " ".join(result)
+        return " ".join(result).strip()
 
     def __repr__(self):
         return str(self)
@@ -42,10 +42,14 @@ class Journal:
     def add(self, lesson: str, rec: Record):
         self.__journal.setdefault(lesson, []).append(rec)
 
+    @property
+    def len(self):
+        return len(self.__journal)
+
     def __str__(self):
         result = []
-        for lesson, record in self.__journal.values():
-            result.append(f"{lesson} {str(record)}")
+        for lesson, records in self.__journal.items():
+            result.append(f"{lesson}: {', '.join([str(x) for x in records])}")
 
         return '\n'.join(result)
 
