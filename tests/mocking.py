@@ -229,7 +229,7 @@ def json_schedule_from_third_lesson():
     }
 
 
-def json_schedule_empty():
+def json_empty():
     return {
         "data": {
             "items": [],
@@ -454,10 +454,10 @@ def setup_mock_schedule_auth(m: Mocker):
 
 
 def setup_mock_schedule_with_params(
-    m: Mocker, *, edu_id="", ask_day=None, token: str, num: int
+    m: Mocker, *, edu_id=None, ask_day=None, token: str, num: int
 ):
     if num == 0:
-        json = json_schedule_empty()
+        json = json_empty()
     elif num == 1:
         json = json_schedule_from_first_lesson()
     elif num == 3:
@@ -467,7 +467,7 @@ def setup_mock_schedule_with_params(
     if token:
         headers = {"Cookie": f"X-JWT-Token={token}"}
     url = schedule_url()
-    if edu_id:
+    if edu_id is not None:
         url += f"?p_educations%5B%5D={edu_id}"
     if ask_day is not None:
         url += f"&p_datetime_from={datetime.strftime(ask_day, '%d.%m.%Y')}+00%3A00%3A00&p_datetime_to={datetime.strftime(ask_day, '%d.%m.%Y')}+23%3A59%3A59"
@@ -481,8 +481,25 @@ def setup_mock_schedule_with_params(
 
 
 def setup_mock_journal(m: Mocker):
+    setup_mock_journal_with_params(m, token="")
+
+
+def setup_mock_journal_with_params(
+    m: Mocker, *, edu_id=None, ask_day=None, token: str, empty=False
+):
+    headers = {}
+    if token:
+        headers = {"Cookie": f"X-JWT-Token={token}"}
+    url = journal_url()
+    json = json_journal() if not empty else json_empty()
+    if edu_id is not None:
+        url += f"?p_educations%5B%5D={edu_id}"
+    if ask_day is not None:
+        url += f"&p_datetime_from={datetime.strftime(ask_day, '%d.%m.%Y')}+00%3A00%3A00&p_datetime_to={datetime.strftime(ask_day, '%d.%m.%Y')}+23%3A59%3A59"
+
     m.get(
-        f"{journal_url()}",
-        json=json_journal(),
+        url,
+        request_headers=headers,
+        json=json,
         status_code=200,
     )

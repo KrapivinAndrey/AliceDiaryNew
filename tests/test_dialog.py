@@ -12,6 +12,7 @@ from tests.mocking import (
     setup_mock_schedule_auth,
     setup_mock_schedule_with_params,
     setup_mock_journal,
+    setup_mock_journal_with_params,
 )
 
 
@@ -331,3 +332,23 @@ class TestIssue:
 
         result = AliceAnswer(main.handler(test))
         assert "Дмитрий. 6 уроков" in result.text
+
+
+class TestMarks:
+    @pytest.mark.parametrize("scene_id", SCENES)
+    def test_wrong_student(self, scene_id, students_dump, requests_mock):
+        setup_mock_journal_with_params(requests_mock, token="111")
+        fio = AliceEntity().fio(first_name="Георгий")
+        intent = AliceIntent("get_journal")
+        test = (
+            AliceRequest()
+            .command("Какие оценки у Гоши")
+            .from_scene(scene_id)
+            .access_token("111")
+            .add_to_state_user("students", students_dump)
+            .add_entity(fio)
+            .add_intent(intent)
+            .build()
+        )
+        result = AliceAnswer(main.handler(test))
+        assert result.text == texts.unknown_student()[0]
