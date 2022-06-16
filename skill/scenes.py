@@ -211,7 +211,7 @@ class Welcome(SceneWithAuth):
         text = []
         tts = []
 
-        title_text, title_tts = texts.journal_title(req_date)
+        title_text, title_tts = texts.welcome_start()
         text.append(title_text)
         tts.append(title_tts)
 
@@ -224,15 +224,23 @@ class Welcome(SceneWithAuth):
             text.append(new_text)
             tts.append(new_tts)
 
+        buttons = [button("Расписание уровков"), button("Уроки завтра")]
+
+        finish_text, finish_tts = texts.welcome_end()
+        text.append(finish_text)
+        tts.append(finish_tts)
+
         return self.make_response(
             request,
             "\n".join(text),
             "sil<[500]>".join(tts),
+            buttons=buttons,
             user_state={states.STUDENTS: students.dump()},
         )
 
     def handle_local_intents(self, request: Request):
-        pass
+        if request.is_intent(intents.CONFIRM):
+            return GetSchedule()
 
 
 class Goodbye(GlobalScene):
@@ -261,6 +269,18 @@ class HaveMistake(GlobalScene):
 class HelpMenuStart(GlobalScene):
     def reply(self, request: Request):
         text, tts = texts.help_menu_start()
+        return self.make_response(request, text, tts, buttons=YES_NO)
+
+    def handle_local_intents(self, request: Request):
+        if request.is_intent(intents.CONFIRM):
+            return HelpMenuMarks()
+        if request.is_intent(intents.REJECT):
+            return Welcome()
+
+
+class HelpMenuMarks(GlobalScene):
+    def reply(self, request: Request):
+        text, tts = texts.help_menu_marks()
         return self.make_response(request, text, tts, buttons=YES_NO)
 
     def handle_local_intents(self, request: Request):
