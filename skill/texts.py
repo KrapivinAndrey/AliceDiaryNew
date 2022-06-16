@@ -1,4 +1,5 @@
 import datetime
+from typing import Dict, List
 
 import skill.constants.texts as text_constants
 from skill.dataclasses import Journal, PlannedLesson, Schedule, Student
@@ -324,7 +325,7 @@ def marks_for_student(student: Student, journal: Journal):
     for lesson, records in journal.records:
         text_record = [lesson]
         tts_record = [lesson]
-        all_works = {}
+        all_works: Dict[str, List[str]] = {}
         for rec in records:
             if rec.is_legal_skip:
                 pass
@@ -334,9 +335,14 @@ def marks_for_student(student: Student, journal: Journal):
             else:
                 all_works.setdefault(rec.work, []).append(rec.mark)
         if all_works:
-            temp = "; ".join([work + " " + ", ".join(marks) for work, marks in all_works.items()])
-            text_record.append(temp)
-            tts_record.append(temp)
+            temp_text = "; ".join(
+                [work + " " + ", ".join(marks) for work, marks in all_works.items()]
+            )
+            temp_tts = "sil<[200]> ".join(
+                [work + " " + " и ".join(marks) for work, marks in all_works.items()]
+            )
+            text_record.append(temp_text)
+            tts_record.append(temp_tts)
         if len(text_record) > 1:
             text.append(". ".join(text_record))
             tts.append(". ".join(tts_record))
