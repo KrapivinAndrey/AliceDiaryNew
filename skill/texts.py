@@ -136,7 +136,6 @@ def help_menu_marks():
     return text, tts
 
 
-
 def help_menu_spec():
     text = (
         "У меня есть несколько режимов запуска:\n"
