@@ -1,4 +1,5 @@
 import datetime
+from typing import Dict, List
 
 import skill.constants.texts as text_constants
 from skill.dataclasses import Journal, PlannedLesson, Schedule, Student
@@ -87,7 +88,7 @@ def help_menu_start():
         "Если есть несколько учеников, добавьте имя:\n"
         '"Какое расписание у Миши послезавтра?"\n'
         "Теперь вы знаете как узнать расписание учеников."
-        "Хотите расскажу о моих специальных возможностях?"
+        "Хотите расскажу как узнать какие были оценки?"
     )
 
     tts = (
@@ -99,7 +100,37 @@ def help_menu_start():
         "Если есть несколько учеников, добавьте имя:\n"
         'sil<[100]>"Какое расписание у Миши послезавтра?"\n'
         "Теперь вы знаете как узнать расписание учеников."
-        "Хотите расскажу о моих специальных возможностях?"
+        "Хотите расскажу как узнать какие были оценки?"
+    )
+
+    return text, tts
+
+
+def help_menu_marks():
+    text = (
+        "Так же можно узнать оценки или замечания.\n"
+        "Оценки за сегодня выводятся при запуске навыка.\n"
+        "Но можно узнать в любой момент.\n"
+        "Скажите\n"
+        '"Какие сегодня оценки?"\n'
+        "Или"
+        '"Какие записи в журнале были у Миши вчера?"\n'
+        "Тогда я скажу какие оценки были по предметам. И были ли замечания\n"
+        "А еще у меня есть специальные возможности.\n"
+        "Хотите расскажу?"
+    )
+
+    tts = (
+        "Так же можно узнать оценки или замечания.\n"
+        "Оценки за сегодня выводятся при запуске навыка.\n"
+        "Но можно узнать в любой момент.\n"
+        "Скажите\n"
+        'sil<[100]>"Какие сегодня оценки?"\n'
+        "Или"
+        'sil<[100]>"Какие записи в журнале были у Миши вчера?"\n'
+        "Тогда я скажу какие оценки были по предметам. И были ли замечания\n"
+        "А еще у меня есть специальные возможности.\n"
+        "Хотите расскажу?"
     )
 
     return text, tts
@@ -153,8 +184,16 @@ def what_can_i_do():
 # endregion
 
 
-def hello():
-    text = tts = "Здесь будет todo"
+def welcome_start():
+    text = "Дневник ученика Петербурга"
+    tts = "Привет! Это дневник ученика Петербурга! Давайте заглянем в журнал."
+    return text, tts
+
+
+def welcome_end():
+    text = ""
+    tts = "Хотите узнать расписание уроков?"
+
     return text, tts
 
 
@@ -322,15 +361,29 @@ def marks_for_student(student: Student, journal: Journal):
     tts.append(f"У {student.inflect['родительный']}")
 
     for lesson, records in journal.records:
-        text_record = [lesson + "."]
+        text_record = [lesson]
         tts_record = [lesson]
+        all_works: Dict[str, List[str]] = {}
         for rec in records:
-            if not rec.is_legal_skip:
+            if rec.is_legal_skip:
+                pass
+            elif rec.is_illegal_skip or rec.is_late:
                 text_record.append(str(rec))
                 tts_record.append(str(rec))
+            else:
+                all_works.setdefault(rec.work, []).append(rec.mark)
+        if all_works:
+            temp_text = "; ".join(
+                [work + " " + ", ".join(marks) for work, marks in all_works.items()]
+            )
+            temp_tts = "sil<[200]> ".join(
+                [work + " " + " и ".join(marks) for work, marks in all_works.items()]
+            )
+            text_record.append(temp_text)
+            tts_record.append(temp_tts)
         if len(text_record) > 1:
-            text.append(" ".join(text_record))
-            tts.append(" ".join(tts_record))
+            text.append(". ".join(text_record))
+            tts.append(". ".join(tts_record))
 
     return "\n".join(text), " sil<[200]>".join(tts)
 

@@ -12,6 +12,7 @@ from tests.mocking import (
     setup_mock_schedule_auth,
     setup_mock_schedule_with_params,
     setup_mock_journal,
+    setup_mock_journal_with_params,
 )
 
 
@@ -331,3 +332,88 @@ class TestIssue:
 
         result = AliceAnswer(main.handler(test))
         assert "Дмитрий. 6 уроков" in result.text
+
+
+class TestMarks:
+    @pytest.mark.parametrize("scene_id", SCENES)
+    def test_wrong_student(self, scene_id, students_dump, requests_mock):
+        setup_mock_journal_with_params(requests_mock, token="111")
+        fio = AliceEntity().fio(first_name="Георгий")
+        intent = AliceIntent("get_journal")
+        test = (
+            AliceRequest()
+            .command("Какие оценки у Гоши")
+            .from_scene(scene_id)
+            .access_token("111")
+            .add_to_state_user("students", students_dump)
+            .add_entity(fio)
+            .add_intent(intent)
+            .build()
+        )
+        result = AliceAnswer(main.handler(test))
+        assert result.text == texts.unknown_student()[0]
+
+    def test_name_of_student(self, students_dump, requests_mock):
+        setup_mock_journal_with_params(
+            requests_mock, token="111", edu_id="1", empty=False
+        )
+        setup_mock_journal_with_params(
+            requests_mock, token="111", edu_id="100", empty=True
+        )
+
+        fio = AliceEntity().fio(first_name="алиса").tokens(4, 5)
+        intent = AliceIntent("get_journal")
+        test = (
+            AliceRequest()
+            .command("Какие оценки у Алисы")
+            .from_scene("Welcome")
+            .access_token("111")
+            .add_to_state_user("students", students_dump)
+            .add_entity(fio)
+            .add_intent(intent)
+            .build()
+        )
+        result = AliceAnswer(main.handler(test))
+        assert "Записи в журнале" in result.text
+        assert "Алиса" in result.text
+        assert "Дмитрий" not in result.text
+
+    def test_synonym_of_student(self, students_dump, requests_mock):
+        setup_mock_journal_with_params(requests_mock, token="111", edu_id="1")
+        setup_mock_journal_with_params(requests_mock, token="111", edu_id="100")
+
+        fio = AliceEntity().fio(first_name="дима").tokens(4, 5)
+        intent = AliceIntent("get_journal")
+        test = (
+            AliceRequest()
+            .command("Какие оценки у Димы")
+            .from_scene("Welcome")
+            .access_token("111")
+            .add_to_state_user("students", students_dump)
+            .add_entity(fio)
+            .add_intent(intent)
+            .build()
+        )
+        result = AliceAnswer(main.handler(test))
+        assert "Записи в журнале" in result.text
+        assert "Алиса" not in result.text
+        assert "Дмитрий" in result.text
+
+    def test_all_students(self, students_dump, requests_mock):
+        setup_mock_journal_with_params(requests_mock, token="111", edu_id="1")
+        setup_mock_journal_with_params(requests_mock, token="111", edu_id="100")
+
+        intent = AliceIntent("get_journal")
+        test = (
+            AliceRequest()
+            .command("Какие оценки у ребят")
+            .from_scene("Welcome")
+            .access_token("111")
+            .add_to_state_user("students", students_dump)
+            .add_intent(intent)
+            .build()
+        )
+        result = AliceAnswer(main.handler(test))
+        assert "Записи в журнале" in result.text
+        assert "Алиса" in result.text
+        assert "Дмитрий" in result.text
