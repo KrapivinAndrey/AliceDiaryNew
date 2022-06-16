@@ -474,7 +474,7 @@ class Marks(SceneWithAuth):
         text.append(title_text)
         tts.append(title_tts)
 
-        for student in students.to_list():
+        for student in req_students:
             journal = dairy_api.get_marks(request.access_token, student.id, req_date)
             if journal.len:
                 new_text, new_tts = texts.marks_for_student(student, journal)
