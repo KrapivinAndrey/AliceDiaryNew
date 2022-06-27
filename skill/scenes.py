@@ -80,6 +80,17 @@ def get_students_from_request(
     return result
 
 
+def get_token(request: Request):
+    if request.access_token:
+        token = request.access_token
+    elif request.user.get("token"):
+        token = request.user.get("token")
+    else:
+        token = None
+
+    return token
+
+
 # endregion
 
 # region Общие сцены
@@ -155,7 +166,7 @@ class SceneWithAuth(GlobalScene):
 
     def reply(self, request: Request):
         auth = False
-        if request.access_token is None:
+        if get_token(request) is None:
             save_entities = {
                 states.ENTITIES: request.entities,
                 states.INTENTS: request.intents,
@@ -375,7 +386,7 @@ class GetSchedule(SceneWithAuth):
 
         for student in req_students:
             schedule = dairy_api.get_schedule(
-                request.access_token, student.id, req_date
+                get_token(request), student.id, req_date
             )
             new_text, new_tts = texts.schedule_for_student(student, schedule)
             text.append(new_text)
@@ -431,7 +442,7 @@ class LessonByNum(SceneWithAuth):
 
         for student in req_students:
             schedule = dairy_api.get_schedule(
-                request.access_token, student.id, req_date
+                get_token(request), student.id, req_date
             )
             lesson = schedule.find_by_num(number)
             if lesson is None:
@@ -495,7 +506,7 @@ class Marks(SceneWithAuth):
         tts.append(title_tts)
 
         for student in req_students:
-            journal = dairy_api.get_marks(request.access_token, student.id, req_date)
+            journal = dairy_api.get_marks(get_token(request), student.id, req_date)
             if journal.len:
                 new_text, new_tts = texts.marks_for_student(student, journal)
             else:
