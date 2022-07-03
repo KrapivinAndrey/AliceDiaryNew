@@ -15,6 +15,9 @@ PREVIOUS_MOVES = "prev_moves"
 # Если снова не разобрали - выходим
 NEED_FALLBACK = "fallback"
 
+# Сохраняем токен авторизации для автообновления
+AUTH_TOKEN = "auth_token"
+
 # Сохраняем сущности для авторизации
 ENTITIES = "save_entities"
 INTENTS = "save_intents"

@@ -12,9 +12,7 @@ from skill.constants.images import CONFUSED, GOODBYE
 from skill.dataclasses import Students
 from skill.loggerfactory import LoggerFactory
 from skill.scenes_util import Scene
-from skill.tools.dates_transformations import (
-    transform_yandex_datetime_value_to_datetime as ya_date_transform,
-)
+from skill.tools.dates_transformations import transform_yandex_datetime_value_to_datetime as ya_date_transform
 
 logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
 # region Выделение данных для запроса
@@ -159,30 +157,31 @@ class GlobalScene(Scene):
 
 
 class SceneWithAuth(GlobalScene):
-    def __init__(self, students=None, saved_entities={}, saved_intents={}):
+    def __init__(self, students=None, saved_entities=None, saved_intents=None):
         self.students = students
-        self.token = None
-        self.entities = saved_entities
-        self.intents = saved_intents
+        self.entities = saved_entities if saved_entities is not None else {}
+        self.intents = saved_intents if saved_intents is not None else {}
 
     def reply(self, request: Request):
+        save_states = {}
         auth = False
         if get_token(request) is None:
-            save_entities = {
+            # Нет вообще токена
+            save_states = {
                 states.ENTITIES: request.entities,
                 states.INTENTS: request.intents,
             }
             auth = True
         elif request.authorization_complete:
+            # Завершение авторизации
             try:
                 self.students = dairy_api.get_students(request.access_token)
-                self.token = request.access_token
                 request.restore_entities(request.session.get(states.ENTITIES, {}))
                 request.restore_intents(request.session.get(states.INTENTS, {}))
             except NeedAuth as e:
                 logger.warning("Failed to get students %s", e)
                 auth = True
-                save_entities = {
+                save_states = {
                     states.ENTITIES: request.session.get(states.ENTITIES, {}),
                     states.INTENTS: request.session.get(states.INTENTS, {}),
                 }
@@ -191,7 +190,7 @@ class SceneWithAuth(GlobalScene):
                 self.students = get_all_students_from_request(request)
             except Exception as e:
                 logger.warning("Old format for students %s", e)
-                self.students = dairy_api.get_students(request.access_token)
+                self.students = dairy_api.get_students(get_token(request))
         if auth:
             logger.info("Need authentication for %s", self.id())
             text, tts = texts.need_auth(self.id())
@@ -204,7 +203,7 @@ class SceneWithAuth(GlobalScene):
                 tts,
                 buttons=buttons,
                 directives={"start_account_linking": {}},
-                state=save_entities,
+                state=save_states,
                 user_state=None,
             )
 
@@ -220,6 +219,8 @@ class Welcome(SceneWithAuth):
             students.restore(request.user[states.STUDENTS])
         else:
             students = self.students
+
+        token = get_token(request)
         req_date = datetime.datetime.today()
         text = []
         tts = []
@@ -229,7 +230,14 @@ class Welcome(SceneWithAuth):
         tts.append(title_tts)
 
         for student in students.to_list():
-            journal = dairy_api.get_marks(request.access_token, student.id, req_date)
+            try:
+
+                journal = dairy_api.get_marks(token, student.id, req_date)
+
+            except NeedAuth:
+                token = dairy_api.refresh_token(token)
+                journal = dairy_api.get_marks(token, student.id, req_date)
+
             if journal.len:
                 new_text, new_tts = texts.marks_for_student(student, journal)
             else:
@@ -237,7 +245,7 @@ class Welcome(SceneWithAuth):
             text.append(new_text)
             tts.append(new_tts)
 
-        buttons = [button("Расписание уровков"), button("Уроки завтра")]
+        buttons = [button("Расписание уроков"), button("Уроки завтра")]
 
         finish_text, finish_tts = texts.welcome_end()
         text.append(finish_text)
@@ -248,7 +256,7 @@ class Welcome(SceneWithAuth):
             "\n".join(text),
             "sil<[500]>".join(tts),
             buttons=buttons,
-            user_state={states.STUDENTS: students.dump()},
+            user_state={states.STUDENTS: students.dump(), states.AUTH_TOKEN: token},
         )
 
     def handle_local_intents(self, request: Request):
@@ -376,20 +384,23 @@ class GetSchedule(SceneWithAuth):
             return self.make_response(
                 request, text, tts, state={states.NEED_FALLBACK: True}
             )
+
+        token = get_token(request)
+        req_date = get_date_from_request(request)
         text = []
         tts = []
 
-        req_date = get_date_from_request(request)
-
         title_text, title_tts = texts.schedule_title(req_date)
-
         text.append(title_text)
         tts.append(title_tts)
 
         for student in req_students:
-            schedule = dairy_api.get_schedule(
-                get_token(request), student.id, req_date
-            )
+            try:
+                schedule = dairy_api.get_schedule(token, student.id, req_date)
+            except NeedAuth:
+                token = dairy_api.refresh_token(token)
+                schedule = dairy_api.get_schedule(token, student.id, req_date)
+
             new_text, new_tts = texts.schedule_for_student(student, schedule)
             text.append(new_text)
             tts.append(new_tts)
@@ -400,7 +411,10 @@ class GetSchedule(SceneWithAuth):
             request,
             result_text,
             result_tts,
-            user_state={states.STUDENTS: students.dump()},
+            user_state={
+                states.STUDENTS: students.dump(),
+                states.AUTH_TOKEN: token,
+            },
             state={states.SAVE_TEXT: result_text, states.SAVE_TTS: result_tts},
         )
 
@@ -433,19 +447,25 @@ class LessonByNum(SceneWithAuth):
 
         number = num[0].value
 
+        token = get_token(request)
+        req_date = get_date_from_request(request)
         text = []
         tts = []
-
-        req_date = get_date_from_request(request)
 
         title_text, title_tts = texts.lesson_num_title(number, req_date)
         text.append(title_text)
         tts.append(title_tts)
 
         for student in req_students:
-            schedule = dairy_api.get_schedule(
-                get_token(request), student.id, req_date
-            )
+            try:
+                schedule = dairy_api.get_schedule(
+                    get_token(request), student.id, req_date
+                )
+            except NeedAuth:
+                token = dairy_api.refresh_token(token)
+                schedule = dairy_api.get_schedule(
+                    get_token(request), student.id, req_date
+                )
             lesson = schedule.find_by_num(number)
             if lesson is None:
                 new_text, new_tts = texts.no_lesson(student, number)
@@ -462,7 +482,10 @@ class LessonByNum(SceneWithAuth):
             request,
             result_text,
             result_tts,
-            user_state={states.STUDENTS: students.dump()},
+            user_state={
+                states.STUDENTS: students.dump(),
+                states.AUTH_TOKEN: token,
+            },
             state={states.SAVE_TEXT: result_text, states.SAVE_TTS: result_tts},
         )
 
@@ -498,17 +521,24 @@ class Marks(SceneWithAuth):
                 request, text, tts, state={states.NEED_FALLBACK: True}
             )
 
+        token = get_token(request)
+        req_date = get_date_from_request(request)
         text = []
         tts = []
-
-        req_date = get_date_from_request(request)
 
         title_text, title_tts = texts.journal_title(req_date)
         text.append(title_text)
         tts.append(title_tts)
 
         for student in req_students:
-            journal = dairy_api.get_marks(get_token(request), student.id, req_date)
+            try:
+
+                journal = dairy_api.get_marks(token, student.id, req_date)
+
+            except NeedAuth:
+                token = dairy_api.refresh_token(token)
+                journal = dairy_api.get_marks(token, student.id, req_date)
+
             if journal.len:
                 new_text, new_tts = texts.marks_for_student(student, journal)
             else:
@@ -520,7 +550,10 @@ class Marks(SceneWithAuth):
             request,
             "\n".join(text),
             "sil<[500]>".join(tts),
-            user_state={states.STUDENTS: students.dump()},
+            user_state={
+                states.STUDENTS: students.dump(),
+                states.AUTH_TOKEN: token,
+            },
         )
 
 
