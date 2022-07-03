@@ -4,14 +4,7 @@ from datetime import date, datetime, time
 import requests
 
 from skill.constants.exceptions import NeedAuth
-from skill.dataclasses import (
-    Journal,
-    PlannedLesson,
-    Record,
-    Schedule,
-    Student,
-    Students,
-)
+from skill.dataclasses import Journal, PlannedLesson, Record, Schedule, Student, Students
 from skill.loggerfactory import LoggerFactory
 
 logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
@@ -160,10 +153,7 @@ def refresh_token(token: str):
     response = requests.post(
         refresh_url(),
         params={},
-        data={
-            "grant_type": "refresh_token",
-            "refresh_token": token
-        },
+        data={"grant_type": "refresh_token", "refresh_token": token},
         cookies={"X-JWT-Token": token},
         headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
     )
