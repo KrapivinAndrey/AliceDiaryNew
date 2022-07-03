@@ -37,6 +37,10 @@ def journal_url():
     return f"{base_url()}/lesson/list-by-education"
 
 
+def refresh_url():
+    return f"{base_url()}/user/token-refresh"
+
+
 # endregion
 
 
@@ -150,3 +154,26 @@ def get_marks(token: str, student_id: str, day=None):
             result.add(item.get("subject_name"), record)
 
     return result
+
+
+def refresh_token(token: str):
+    response = requests.post(
+        refresh_url(),
+        params={},
+        data={"grant_type": "refresh_token", "refresh_token": token},
+        cookies={"X-JWT-Token": token},
+        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
+    )
+
+    if response.status_code == 401:
+        raise NeedAuth()
+
+    try:
+        api_refresh = response.json().get["refresh_token"]
+    except (Exception,):
+        logger.exception(
+            f"Не удалось разобрать тело ответа", extra={"body": response.text}
+        )
+        raise
+
+    return api_refresh
