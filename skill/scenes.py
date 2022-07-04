@@ -81,14 +81,8 @@ def get_students_from_request(
 
 
 def get_token(request: Request):
-    if request.access_token:
-        token = request.access_token
-    elif request.user.get(states.AUTH_TOKEN):
-        token = request.user.get(states.AUTH_TOKEN)
-    else:
-        token = None
-
-    return token
+    return request.access_token
+    # else request.user.get(states.AUTH_TOKEN):
 
 
 # endregion
