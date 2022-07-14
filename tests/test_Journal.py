@@ -1,11 +1,10 @@
 from skill.dataclasses.marks import Record, Journal
-from pytest import fixture
 
 
 class TestRecord:
-    def test_create(self):
-        rec = Record("123", "Взятка", "5/5", "5", "Хороший коньяк")
-        assert str(rec) == "Взятка 5 Хороший коньяк"
+    def test_mark(self):
+        rec = Record("123", "Оценка", "5/5", "5", "Работа на уроке")
+        assert str(rec) == "Оценка 5 Работа на уроке"
 
     def test_is_late(self):
         rec = Record("30000", "Опоздал", "", "")
@@ -18,7 +17,7 @@ class TestRecord:
         assert str(rec) == "Пропуск"
 
     def test_is_illegal(self):
-        rec = Record("30000", "Курил за гаражом", "493", "")
+        rec = Record("30000", "Отсутствие на уроке", "493", "")
         assert rec.is_illegal_skip
         assert str(rec) == "Прогул"
 
