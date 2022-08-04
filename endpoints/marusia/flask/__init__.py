@@ -1,9 +1,6 @@
 from flask import Flask, request
-from pydantic import ValidationError
 
-from .request_model import Model as RequestModel
-from .response_model import Model as ResponseModel
-
+from ..models import RequestModel, ResponseModel, ValidationError
 
 app = Flask(__name__)
 
