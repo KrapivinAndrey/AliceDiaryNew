@@ -7,3 +7,4 @@ pyaspeller
 fluentcheck
 alicefluentcheck
 requests-mock
+datamodel-code-generator
