@@ -11,8 +11,8 @@ from pydantic import BaseModel
 
 class Button(BaseModel):
     title: str
-    payload: Dict[str, Any]
-    url: str
+    payload: Dict[str, Any] = None
+    url: str = None
 
 
 class Response(BaseModel):

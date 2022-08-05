@@ -1,25 +1,32 @@
 from flask import Flask, request
+from flask_cors import CORS
+
 
 from ..models import RequestModel, ResponseModel, ValidationError
+from ..adapter import MarusiaAdapter
+from skill.main import handler
 
 app = Flask(__name__)
-
+CORS(app)
 
 @app.route("/")
 def hello_marusia():
     return "<p>Hello, Marusia!</p>"
 
 
-@app.route("/marusia/202208", methods=["POST"])
-def marusia_202208():
+@app.route("/marusia", methods=["POST"])
+def marusia_202208() -> ResponseModel:
 
     try:
-        request_data = RequestModel.parse_raw(request.data)
+        marusia_request = RequestModel.parse_raw(request.data)
     except ValidationError as e:
         print(e.json())
         return e.json(), 400
 
-    response_data = ResponseModel(session=request_data.session)
-    response_data.response.text = "понг"
+    adapter = MarusiaAdapter()
 
-    return response_data.json(), 200
+    event = adapter.event(marusia_request)
+    event_result = handler(event)
+
+    marusia_response = adapter.response(event_result)
+    return marusia_response.json(exclude_none=True), 200
