@@ -24,6 +24,7 @@ class MarusiaAdapter:
     def event(self, data: RequestModel):
 
         self._last_request = data
+        event = data.dict(exclude_none=True)
 
         # auth
 
@@ -37,11 +38,12 @@ class MarusiaAdapter:
         if auth_token is None:
             self._auth.need = True
         else:
+            event["session"]["user"].setdefault("access_token", auth_token)
+            event.setdefault("account_linking_complete_event", "")  # хз чё это
             self._auth.need = False
 
         # event
 
-        event = data.dict(exclude_none=True)
         return event
 
     def response(self, data) -> ResponseModel:
@@ -53,46 +55,12 @@ class MarusiaAdapter:
         resp.response.tts = data["response"]["tts"]
 
         if self._auth.need:
-            resp.response.text = "Привет"
+            resp.response.text = "Привет, нажмите на кнопку чтобы войти в дневник"
             resp.response.tts = None
-            button = ResponseButton(title="Войти", url="https://mail.ru")
-            button2 = ResponseButton(title="Войти2", url="vk.com")
-            # resp.response.buttons.append(button)
-            # resp.response.buttons.append(button2)
-
-            cmd1 = ResponseCommandWidget(
-                layout_name="universal_internal",
-                payload={
-                    "items": [
-                        {
-                            "title": {"value": "Я заголовок"},
-                            "description": {"value": "Я описание"},
-                            "image": {
-                                "type": "inline",
-                                "items": [
-                                    {"image_id": 451939019, "height": 30, "width": 30}
-                                ],
-                            },
-                            "action": {"type": "open_url", "url": "https://vk.com"},
-                        },
-                        {
-                            "title": {"value": "Заголовок2"},
-                            "description": {"value": "Описание2"},
-                            "image": {
-                                "type": "inline",
-                                "items": [
-                                    {"image_id": 451937223, "height": 40, "width": 40}
-                                ],
-                            },
-                            "action": {"type": "open_url", "url": "https://mail.ru"},
-                        },
-                    ]
-                },
+            button = ResponseButton(
+                title="Войти", url=self._auth.build_login_uri(self.user_id())
             )
-            cmd2 = ResponseCommandText()
-            # resp.response.buttons.append(button)
-            # resp.response.commands.append(cmd2)
-            resp.response.commands.append(cmd1)
+            resp.response.buttons.append(button)
         elif self._auth.error:
             button = ResponseButton(title="Все сломалось")
             resp.response.buttons.append(button)
@@ -109,6 +77,11 @@ class MarusiaAdapter:
         # TODO сессии
 
         resp.session.new = False
+
+        #
+        user_state_update = data.get("user_state_update", None)
+        if user_state_update is not None:
+            resp.user_state_update = user_state_update
 
         self._last_response = resp
         return resp

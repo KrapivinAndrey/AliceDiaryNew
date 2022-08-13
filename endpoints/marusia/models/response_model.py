@@ -42,6 +42,8 @@ class Response(BaseModel):
 
 class User(BaseModel):
     user_id: str
+    auth_token: Any
+    students: Any
 
 
 class Application(BaseModel):
@@ -63,3 +65,4 @@ class Model(BaseModel):
     response: Response = Response()
     session: Session
     version: str = "1.0"
+    user_state_update: Dict = {}
