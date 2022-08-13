@@ -9,6 +9,7 @@ from skill.main import handler
 app = Flask(__name__)
 CORS(app)
 
+
 @app.route("/")
 def hello_marusia():
     return "<p>Hello, Marusia!</p>"

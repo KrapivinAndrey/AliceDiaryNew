@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from pydantic import BaseModel
 
@@ -15,10 +15,28 @@ class Button(BaseModel):
     url: str = None
 
 
+class CommandWidget(BaseModel):
+    type: str = "Widget"
+    payload: Dict[str, Any]
+    layout_name: str
+
+
+class CommandText(BaseModel):
+    type: str = "Text"
+    text: str = "Тут текст сообщения."
+
+
+class Push(BaseModel):
+    push_text: str
+    payload: Dict[str, Any] = None
+
+
 class Response(BaseModel):
     text: str = ""
     tts: str = ""
     buttons: List[Button] = []
+    commands: List[Union[CommandWidget, CommandText]] = []
+    push: Union[Push, None] = None
     end_session: bool = True
 
 

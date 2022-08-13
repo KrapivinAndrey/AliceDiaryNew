@@ -19,7 +19,7 @@ logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
 
 
 def base_url():
-    url = os.environ.get("DIARY_URL", "https://journal.bpo.edu.n3demo.ru/api/journal")
+    url = os.environ.get("DIARY_URL", "https://dnevnik2.petersburgedu.ru/api/journal")
     assert url, "Не заполнен url для запросов"
 
     return url
