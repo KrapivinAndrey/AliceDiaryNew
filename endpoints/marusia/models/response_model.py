@@ -4,9 +4,11 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from pydantic import BaseModel
+
+from . import common_model
 
 
 class Button(BaseModel):
@@ -15,15 +17,41 @@ class Button(BaseModel):
     url: str = None
 
 
+class CommandWidget(BaseModel):
+    type: str = "Widget"
+    payload: Dict[str, Any]
+    layout_name: str
+
+
+class CommandText(BaseModel):
+    type: str = "Text"
+    text: str = "Тут текст сообщения."
+
+
+class Push(BaseModel):
+    push_text: str
+    payload: Dict[str, Any] = None
+
+
 class Response(BaseModel):
     text: str = ""
     tts: str = ""
     buttons: List[Button] = []
+    commands: List[Union[CommandWidget, CommandText]] = []
+    push: Union[Push, None] = None
     end_session: bool = True
 
 
 class User(BaseModel):
     user_id: str
+
+
+class UserStateUpdate(common_model.UserState):
+    pass
+
+
+class SessionStateUpdate(common_model.SessionState):
+    pass
 
 
 class Application(BaseModel):
@@ -34,14 +62,12 @@ class Application(BaseModel):
 class Session(BaseModel):
     session_id: str
     user_id: str
-    skill_id: str
-    new: bool
     message_id: int
-    user: User = None
-    application: Application
 
 
 class Model(BaseModel):
-    response: Response = Response()
-    session: Session
+    response: Response
+    session: Session = None
     version: str = "1.0"
+    user_state_update: Union[UserStateUpdate, None] = None
+    session_state: Union[SessionStateUpdate, None] = None

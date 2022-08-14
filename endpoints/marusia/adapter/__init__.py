@@ -1,23 +1,164 @@
-from ..models import RequestModel, ResponseModel, ResponseButton
+import urllib.parse
+import uuid
+from typing import Union
+
+import requests
+
+from skill.constants import intents as skill_intents
+
+from ..models import request_model, response_model
+from . import request_parser, response_parser
 
 
 class MarusiaAdapter:
     def __init__(self) -> None:
-        self._last_request = None
-        self._last_response = None
-        pass
+        self._last_request: Union[request_model.Model, None] = None
+        self._last_response: Union[response_model.Model, None] = None
+        self._auth: "AuthAdapter" = AuthAdapter()
 
-    def event(self, data: RequestModel):
-        self._last_request = data
-        return {}
+    # public
 
-    def response(self, data) -> ResponseModel:
-        resp = ResponseModel(session=self._last_request.session)
-        resp.response.text = data["response"]["text"]
-        resp.response.tts = data["response"]["tts"]
-        for button_data in data["response"]["buttons"]:
-            button = ResponseButton(title=button_data["title"])
-            resp.response.buttons.append(button)
-        # TODO сессии
+    def parse_request(self, request: request_model.Model) -> dict:
+
+        self._last_request = request
+        self._set_auth_token(request)
+
+        # event
+
+        result = request_parser.parse(request)
+
+        self._set_intents(result)
+
+        return result
+
+    def parse_response(self, data) -> response_model.Model:
+
+        # response
+
+        if self._auth.need:
+            resp = self._auth_dialog()
+        elif self._auth.error:
+            resp = self._auth_dialog_error()
+        else:
+            resp = response_parser.parse(data)
+
+        # session
+
+        resp.session = response_model.Session(
+            session_id=self._last_request.session.session_id,
+            message_id=self._last_request.session.message_id,
+            user_id=self._last_request.session.user_id,
+        )
+
         self._last_response = resp
-        return self._last_response
+        return resp
+
+    # internal
+
+    def _set_intents(self, event: dict) -> None:
+
+        # TODO тут нужно дохера написать, нужен отдельный класс
+
+        # GET_SCHEDULE = "get_schedule"
+        # GET_HOMEWORK = "get_homework"
+        # LESSON_BY_NUM = "what_lesson_num"
+        # LESSON_BY_DATE = "what_lesson_time"
+        # MARKS = "get_journal"
+        # CLEAN = "reset_settings"
+        # MAIN_MENU = "main_menu"
+        # EXIT = "exit"
+        # DAY = "day_of_week"
+
+        intents = {}
+        request = self._last_request.request
+        if request.command.lower() == "расписание уроков":
+            intents.setdefault(skill_intents.GET_SCHEDULE, {})
+        if request.command.lower() == "помощь":
+            intents.setdefault(skill_intents.HELP, {})
+        if request.command.lower() == "уроки завтра":
+            # TODO тут наверно надо что-то в контент накидать
+            intents.setdefault(skill_intents.GET_HOMEWORK, {})
+
+        if len(intents):
+            event["request"].setdefault("nlu", {})
+            event["request"]["nlu"].setdefault("intents", intents)
+
+    def _set_auth_token(self, request: request_model.Model):
+
+        auth_token, error = self._refresh_token(request)
+        self._auth.need = error is True or auth_token is None
+        self._auth.error = error is True
+
+        request.state.user.auth_token = auth_token
+
+    def _user_thumbprint(self, request):
+        if request.session.user:
+            # отпечаток авторизованного юзера
+            user_thumbprint = request.session.user.user_id
+        else:
+            # отпечаток анонима
+            user_thumbprint = request.session.application.application_id
+        return user_thumbprint
+
+    def _refresh_token(self, request: request_model.Model):
+        error = False
+        if request.state.user.auth_token:
+            # TODO check token
+            auth_token = request.state.user.auth_token
+        else:
+            try:
+                user_thumbprint = self._user_thumbprint(request)
+                auth_token = self._auth.get_token(user_thumbprint)
+            except Exception as e:
+                error = True
+                auth_token = None
+
+        return auth_token, error
+
+    def _auth_dialog(self) -> response_model.Model:
+        response = response_model.Response()
+        response.text = "Привет, нажмите на кнопку чтобы войти в дневник"
+        user_thumbprint = self._user_thumbprint(self._last_request)
+        button = response_model.Button(
+            title="Войти", url=self._auth.build_login_uri(user_thumbprint)
+        )
+        response.buttons.append(button)
+        return response_model.Model(response=response)
+
+    def _auth_dialog_error(self):
+        response = response_model.Response()
+        response.text = "Все сломалось, ничего не сделать"
+        return response_model.Model(response=response)
+
+
+class AuthAdapter:
+    def __init__(self) -> None:
+        self._re = requests.session()
+        self._back = "https://functions.yandexcloud.net/d4er5fg80dbecq63tf12"
+        self._front = "https://dnevnik2.petersburgedu.ru/api/journal/user/yandex-login"
+        self.need = False
+        self.error = False
+
+    def get_token(self, user_id):
+        resp = self._re.get(
+            f"{self._back}",
+            params={"state": user_id},
+            headers={"X-Method": "get-jwt"},
+        )
+        if resp.status_code == 200:
+            return resp.text
+        elif resp.status_code == 404:
+            return None
+        else:
+            resp.raise_for_status()
+
+    def build_login_uri(self, user_id):
+        args = {
+            "scope": "read",
+            "state": user_id,
+            "redirect_uri": self._back,
+            "response_type": "code",
+            "client_id": str(uuid.uuid4()),
+        }
+        args_string = urllib.parse.urlencode(args)
+        return f"{self._front}?{args_string}"
