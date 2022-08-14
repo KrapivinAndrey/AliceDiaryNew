@@ -8,6 +8,8 @@ from typing import Any, Dict, List, Union
 
 from pydantic import BaseModel
 
+from . import common_model
+
 
 class Button(BaseModel):
     title: str
@@ -42,8 +44,14 @@ class Response(BaseModel):
 
 class User(BaseModel):
     user_id: str
-    auth_token: Any
-    students: Any
+
+
+class UserStateUpdate(common_model.UserState):
+    pass
+
+
+class SessionStateUpdate(common_model.SessionState):
+    pass
 
 
 class Application(BaseModel):
@@ -54,15 +62,12 @@ class Application(BaseModel):
 class Session(BaseModel):
     session_id: str
     user_id: str
-    skill_id: str
-    new: bool
     message_id: int
-    user: User = None
-    application: Application
 
 
 class Model(BaseModel):
-    response: Response = Response()
-    session: Session
+    response: Response
+    session: Session = None
     version: str = "1.0"
-    user_state_update: Dict = {}
+    user_state_update: Union[UserStateUpdate, None] = None
+    session_state: Union[SessionStateUpdate, None] = None

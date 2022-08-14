@@ -4,9 +4,11 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from pydantic import BaseModel
+
+from . import common_model
 
 
 class Interfaces(BaseModel):
@@ -51,8 +53,22 @@ class Session(BaseModel):
     application: Application
 
 
+class UserState(common_model.UserState):
+    pass
+
+
+class SessionState(common_model.SessionState):
+    pass
+
+
+class State(BaseModel):
+    session: SessionState
+    user: UserState
+
+
 class Model(BaseModel):
     meta: Meta
     request: Request
     session: Session
-    version: str
+    version: str = "1.0"
+    state: Union[State, None] = None

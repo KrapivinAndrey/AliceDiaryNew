@@ -1,19 +1,6 @@
 from pydantic import ValidationError
 
-from .request_model import Model as RequestModel
-from .response_model import Model as ResponseModel
-from .response_model import Button as ResponseButton
-from .response_model import Push as ResponsePush
-from .response_model import CommandText as ResponseCommandText
-from .response_model import CommandWidget as ResponseCommandWidget
+from . import request_model as request_model
+from . import response_model as response_model
 
-
-
-__all__ = [
-    "ValidationError",
-    "RequestModel",
-    "ResponseModel",
-    "ResponseButton",
-    "ResponsePush",
-    "ResponseCommand",
-]
+__all__ = ["ValidationError", "request_model", "response_model"]
