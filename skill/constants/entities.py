@@ -137,3 +137,11 @@ image_ids = {
     "nativeLanguage": "213044/1ac5d3f9ebe9babf8f6b",
     "default": "1030494/da413e2fa4dd571dd852",
 }
+
+relative_dates = {
+    "завтра": 1,
+    "послезавтра": 2,
+    "вчера": -1,
+    "позавчера": -2,
+    "сегодня": 0,
+}

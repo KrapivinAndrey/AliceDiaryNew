@@ -1,5 +1,7 @@
 # region Base of yandex
 
+from skill.dairy_api import get_schedule
+
 CONFIRM = "YANDEX.CONFIRM"
 REJECT = "YANDEX.REJECT"
 HELP = "YANDEX.HELP"
@@ -20,3 +22,36 @@ CLEAN = "reset_settings"
 MAIN_MENU = "main_menu"
 EXIT = "exit"
 DAY = "day_of_week"
+
+help_word_list = ["помощь", "подсказка", "подскажи"]
+main_menu_word_list = ["главное", "основное", "меню"]
+clear_settings_word_list = ["очистить", "сбросить", "настройки", "аккаунт", "удалить"]
+get_schedule_word_list = [
+    "какие",
+    "завтра",
+    "уроки",
+    "что",
+    "послезавтра",
+    "вчера",
+    "сегодня",
+]
+name_word_list = ["василий", "василия", "василию"]
+exit_word_list = [
+    "выход",
+    "выйти",
+    "закончить",
+    "закончиться",
+    "прекратить",
+    "достаточно",
+    "остановить",
+    "надоело",
+    "перерыв",
+    "пауза",
+    "устал",
+    "стоп",
+    "стой",
+    "остановись",
+    "хватит",
+    "до",
+    "свидания",
+]
