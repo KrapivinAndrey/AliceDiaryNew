@@ -3,6 +3,7 @@ import uuid
 from typing import Union
 
 import requests
+import xmltodict
 
 from skill.constants import intents as skill_intents
 
@@ -41,6 +42,12 @@ class MarusiaAdapter:
             resp = self._auth_dialog_error()
         else:
             resp = response_parser.parse(data)
+
+        ssml = self._ssml_from_tts(resp.response.tts)
+        if ssml:
+            resp.response.tts_type = "ssml"
+            resp.response.tts = None
+            resp.response.ssml = ssml
 
         # session
 
@@ -90,6 +97,25 @@ class MarusiaAdapter:
         self._auth.error = error is True
 
         request.state.user.auth_token = auth_token
+
+    def _ssml_from_tts(self, tts: str) -> str:
+
+        if not tts:
+            return ""
+
+        # sil <[500]> -> <break time="500ms"/>
+
+        text = tts.replace("sil<[", '<break time="').replace("]>", '"/>')
+        text = text.replace("<speaker audio='alice-sounds-game-loss-3.opus'>", "")
+        text = text.replace('<speaker audio="alice-sounds-human-crowd-2.opus">', "")
+        ssml = f'<?xml version ="1.0" encoding="UTF-8"?><speak>{text}</speak>'
+        try:
+            xmltodict.parse(ssml)
+        except:
+            # TODO лог
+            return ""
+
+        return ssml
 
     def _user_thumbprint(self, request):
         if request.session.user:
