@@ -2,6 +2,7 @@ import datetime
 import inspect
 import sys
 from typing import List, Union
+from unittest import result
 
 import skill.dairy_api as dairy_api
 import skill.texts as texts
@@ -91,9 +92,9 @@ def get_token(request: Request):
 
 
 def global_scene_from_request(request: Request):
-    if intents.HELP in request.intents:
+    if isIntentHelp(request.tokens):
         next_scene = HelpMenuStart
-    elif intents.WHAT_CAN_YOU_DO in request.intents:
+    elif isIntentWhatCanYouDo(request.tokens):
         next_scene = WhatCanDo
     elif intents.CLEAN in request.intents:
         next_scene = ClearSettings
@@ -595,3 +596,35 @@ DEFAULT_BUTTONS = [
     button("Главное меню"),
 ]
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+# region СпискиНамерений
+
+def helpIntentList():
+    result = ['помощь', 'помоги']
+    return result
+
+def WharCanYouDoIntentList():
+    result = ["что", 'умеешь', 'можешь']
+    return result
+
+# endregion
+
+def listIntersection(List2, List1):
+    result = []
+    for i in List2:
+        if i in result:
+            continue
+        for j in List1:
+            if i == j:
+                result.append(i)
+                break
+    return result
+
+def isIntentHelp(intentList):
+    result = len(listIntersection(intentList, helpIntentList())) > (len(intentList) - 2)
+    return result
+def isIntentWhatCanYouDo(intentList):
+    result = len(listIntersection(intentList, WharCanYouDoIntentList())) > (len(intentList) - 2)
+    return result
+        
+
