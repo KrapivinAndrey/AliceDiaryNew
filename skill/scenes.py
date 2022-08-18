@@ -1,8 +1,11 @@
 import datetime
 import inspect
+from lib2to3.pgen2 import grammar
 import sys
 from typing import List, Union
 from unittest import result
+
+from grammars import gr
 
 import skill.dairy_api as dairy_api
 import skill.texts as texts
@@ -96,7 +99,7 @@ def global_scene_from_request(request: Request):
         next_scene = HelpMenuStart
     elif isIntentWhatCanYouDo(request.tokens):
         next_scene = WhatCanDo
-    elif intents.CLEAN in request.intents:
+    elif isIntentClean(request.tokens):                    
         next_scene = ClearSettings
     elif intents.REPEAT in request.intents:
         next_scene = Repeat
@@ -597,34 +600,40 @@ DEFAULT_BUTTONS = [
 ]
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
-# region СпискиНамерений
-
-def helpIntentList():
-    result = ['помощь', 'помоги']
-    return result
-
-def WharCanYouDoIntentList():
-    result = ["что", 'умеешь', 'можешь']
-    return result
-
-# endregion
-
 def listIntersection(List2, List1):
     result = []
     for i in List2:
         if i in result:
             continue
         for j in List1:
+            if type(j) == list and wordInList(i, j):
+                result.append(i)
+                break
             if i == j:
                 result.append(i)
                 break
     return result
 
+def wordInList(word, List):
+    for line in List:
+        if type(line) == list:
+            return wordInList(word, line)
+        elif line.find(word) > -1:
+            return True
+    return False
+
 def isIntentHelp(intentList):
-    result = len(listIntersection(intentList, helpIntentList())) > (len(intentList) - 2)
+    helpIntentList_ = gr.help()
+    result = len(listIntersection(intentList, helpIntentList_)) > (len(helpIntentList_) - 1)
     return result
+
 def isIntentWhatCanYouDo(intentList):
-    result = len(listIntersection(intentList, WharCanYouDoIntentList())) > (len(intentList) - 2)
+    whatCanYouDoIntentList_ = gr.whatCanYouDo()
+    result = len(listIntersection(intentList, whatCanYouDoIntentList_)) > (len(whatCanYouDoIntentList_) - 1)
+    return result
+
+def isIntentClean(intentList):
+    IntentCleanList = gr.reset_settings()
+    result = len(listIntersection(intentList, IntentCleanList)) > (len(IntentCleanList) - 1)
     return result
         
-
