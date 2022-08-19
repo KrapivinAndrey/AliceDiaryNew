@@ -46,6 +46,29 @@ def get_date_from_request(request: Request) -> datetime.date:
     else:
         ya_date = None
 
+    if ya_date is None and not request.entities_list:
+        ya_date = date_from_tokens(request)
+
+    return ya_date
+
+
+def date_from_tokens(request: Request):
+    ya_date = None
+    rel_day = list(set(list(entities.relative_dates.keys())) & set(request.tokens))
+    if rel_day:
+        ya_date = datetime.datetime.today() + datetime.timedelta(
+            days=entities.relative_dates[rel_day[0]]
+        )
+
+    if ya_date is None:
+        days_of_weak = list(set(DAYS_RU) & set(request.tokens))
+        if len(days_of_weak) > 0:
+            day = days_of_weak[0]
+            delta = DAYS_RU.index(day) - datetime.date.today().weekday()
+            if delta < 0:
+                delta += 7
+            ya_date = datetime.datetime.today() + datetime.timedelta(days=delta)
+
     return ya_date
 
 
@@ -95,20 +118,23 @@ def get_token(request: Request):
 
 
 def global_scene_from_request(request: Request):
-    if isIntentHelp(request.tokens):
+    if len(intersection_list(intents.help_word_list, request.tokens)) > 0:
         next_scene = HelpMenuStart
     elif isIntentWhatCanYouDo(request.tokens):
         next_scene = WhatCanDo
-    elif isIntentClean(request.tokens):                    
+    elif len(list(set(intents.clear_settings_word_list) & set(request.tokens))) > 0:                    
         next_scene = ClearSettings
     elif isIntentRepeat(request.tokens):
         next_scene = Repeat
-    elif intents.EXIT in request.intents:
+    elif len(intersection_list(intents.exit_word_list, request.tokens)) > 0:
         next_scene = Goodbye
     # Глобальные команды
-    elif intents.GET_SCHEDULE in request.intents:
+    elif (
+        len(intersection_list(intents.get_schedule_word_list + DAYS_RU, request.tokens))
+        > 0
+    ):
         next_scene = GetSchedule  # type: ignore
-    elif intents.MAIN_MENU in request.intents:
+    elif len(intersection_list(intents.main_menu_word_list, request.tokens)) > 0:
         next_scene = Welcome  # type: ignore
     elif intents.LESSON_BY_NUM in request.intents:
         next_scene = LessonByNum  # type: ignore
@@ -120,6 +146,10 @@ def global_scene_from_request(request: Request):
         next_scene = None
 
     return next_scene
+
+
+def intersection_list(list1, list2):
+    return list(set(list1) & set(list2))
 
 
 class GlobalScene(Scene):
@@ -589,17 +619,6 @@ def _list_scenes():
     scenes.remove(Scene)
     return scenes
 
-
-SCENES = {scene.id(): scene for scene in _list_scenes()}
-DEFAULT_SCENE = Welcome
-YES_NO = [button("Да"), button("Нет")]
-HELP = [button("Помощь")]
-DEFAULT_BUTTONS = [
-    button("Расписание на завтра"),
-    button("Главное меню"),
-]
-DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-
 def listIntersection(List2, List1):
     result = []
     for i in List2:
@@ -665,3 +684,23 @@ def isIntentMakrs(intentList):
     ListKey = listKeyLessonMarks()
     result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
     return result
+
+
+SCENES = {scene.id(): scene for scene in _list_scenes()}
+DEFAULT_SCENE = Welcome
+YES_NO = [button("Да"), button("Нет")]
+HELP = [button("Помощь")]
+DEFAULT_BUTTONS = [
+    button("Расписание на завтра"),
+    button("Главное меню"),
+]
+DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+DAYS_RU = [
+    "понедельник",
+    "вторник",
+    "среда",
+    "четверг",
+    "пятница",
+    "суббота",
+    "воскресенье",
+]
