@@ -1,7 +1,11 @@
 import datetime
 import inspect
+from lib2to3.pgen2 import grammar
 import sys
 from typing import List, Union
+from unittest import result
+
+from grammars import gr
 
 import skill.dairy_api as dairy_api
 import skill.texts as texts
@@ -116,43 +120,30 @@ def get_token(request: Request):
 def global_scene_from_request(request: Request):
     if len(intersection_list(intents.help_word_list, request.tokens)) > 0:
         next_scene = HelpMenuStart
-    elif len(intersection_list(intents.main_menu_word_list, request.tokens)) > 0:
-        next_scene = Welcome
-    elif len(intersection_list(intents.exit_word_list, request.tokens)) > 0:
-        next_scene = Goodbye
-    elif (
-        len(intersection_list(intents.get_schedule_word_list + DAYS_RU, request.tokens))
-        > 0
-    ):
-        next_scene = GetSchedule
+    elif isIntentWhatCanYouDo(request.tokens):
+        next_scene = WhatCanDo
     elif len(list(set(intents.clear_settings_word_list) & set(request.tokens))) > 0:
         next_scene = ClearSettings
-    else:
-        next_scene = None
-
-    """if intents.HELP in request.intents:
-        next_scene = HelpMenuStart
-    elif intents.WHAT_CAN_YOU_DO in request.intents:
-        next_scene = WhatCanDo
-    elif intents.CLEAN in request.intents:
-        next_scene = ClearSettings
-    elif intents.REPEAT in request.intents:
+    elif isIntentRepeat(request.tokens):
         next_scene = Repeat
-    elif intents.EXIT in request.intents:
+    elif len(intersection_list(intents.exit_word_list, request.tokens)) > 0:
         next_scene = Goodbye
     # Глобальные команды
-    elif intents.GET_SCHEDULE in request.intents:
+    elif (
+        len(intersection_list(intents.get_schedule_word_list, request.tokens))
+        > 0
+    ):
         next_scene = GetSchedule  # type: ignore
-    elif intents.MAIN_MENU in request.intents:
+    elif len(intersection_list(intents.main_menu_word_list, request.tokens)) > 0:
         next_scene = Welcome  # type: ignore
     elif intents.LESSON_BY_NUM in request.intents:
         next_scene = LessonByNum  # type: ignore
-    elif intents.LESSON_BY_DATE in request.intents:
+    elif isIntentLessonByDate(request.tokens):
         next_scene = LessonByDate  # type: ignore
-    elif intents.MARKS in request.intents:
+    elif isIntentMakrs(request.tokens):
         next_scene = Marks  # type: ignore
     else:
-        next_scene = None"""
+        next_scene = None
 
     return next_scene
 
@@ -627,6 +618,100 @@ def _list_scenes():
     scenes.remove(GlobalScene)
     scenes.remove(Scene)
     return scenes
+
+
+def listIntersection(List2, List1):
+    result = []
+    for i in List2:
+        if i in result:
+            continue
+        for j in List1:
+            if type(j) == list and wordInList(i, j):
+                result.append(i)
+                break
+            if i == j:
+                result.append(i)
+                break
+    return result
+
+
+def wordInList(word, List):
+    for line in List:
+        if type(line) == list:
+            return wordInList(word, line)
+        elif line.find(word) > -1:
+            return True
+    return False
+
+
+# region listKey
+
+
+def listKeyLessonByDate():
+    return [
+        ["уроки", "предметы", "занятия"],
+        ["вчера", "сегодня", "завтра", "послезавтра"],
+        [
+            "понедельник",
+            "вторник",
+            "среду",
+            "четверг",
+            "пятницу",
+        ],
+    ]
+
+
+def listKeyLessonRepeat():
+    return ["повтори"]
+
+
+def listKeyLessonMarks():
+    return ["оценки"]
+
+
+# endregion
+
+
+def isIntentHelp(intentList):
+    helpIntentList_ = gr.help()
+    result = len(listIntersection(intentList, helpIntentList_)) > (
+        len(helpIntentList_) - 1
+    )
+    return result
+
+
+def isIntentWhatCanYouDo(intentList):
+    whatCanYouDoIntentList_ = gr.whatCanYouDo()
+    result = len(listIntersection(intentList, whatCanYouDoIntentList_)) > (
+        len(whatCanYouDoIntentList_) - 1
+    )
+    return result
+
+
+def isIntentClean(intentList):
+    IntentCleanList = gr.reset_settings()
+    result = len(listIntersection(intentList, IntentCleanList)) > (
+        len(IntentCleanList) - 1
+    )
+    return result
+
+
+def isIntentLessonByDate(intentList):
+    ListKey = listKeyLessonByDate()
+    result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
+    return result
+
+
+def isIntentRepeat(intentList):
+    ListKey = listKeyLessonRepeat()
+    result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
+    return result
+
+
+def isIntentMakrs(intentList):
+    ListKey = listKeyLessonMarks()
+    result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
+    return result
 
 
 SCENES = {scene.id(): scene for scene in _list_scenes()}
