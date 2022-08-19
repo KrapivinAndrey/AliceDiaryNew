@@ -42,6 +42,29 @@ def get_date_from_request(request: Request) -> datetime.date:
     else:
         ya_date = None
 
+    if ya_date is None and not request.entities_list:
+        ya_date = date_from_tokens(request)
+
+    return ya_date
+
+
+def date_from_tokens(request: Request):
+    ya_date = None
+    rel_day = list(set(list(entities.relative_dates.keys())) & set(request.tokens))
+    if rel_day:
+        ya_date = datetime.datetime.today() + datetime.timedelta(
+            days=entities.relative_dates[rel_day[0]]
+        )
+
+    if ya_date is None:
+        days_of_weak = list(set(DAYS_RU) & set(request.tokens))
+        if len(days_of_weak) > 0:
+            day = days_of_weak[0]
+            delta = DAYS_RU.index(day) - datetime.date.today().weekday()
+            if delta < 0:
+                delta += 7
+            ya_date = datetime.datetime.today() + datetime.timedelta(days=delta)
+
     return ya_date
 
 
@@ -91,7 +114,23 @@ def get_token(request: Request):
 
 
 def global_scene_from_request(request: Request):
-    if intents.HELP in request.intents:
+    if len(intersection_list(intents.help_word_list, request.tokens)) > 0:
+        next_scene = HelpMenuStart
+    elif len(intersection_list(intents.main_menu_word_list, request.tokens)) > 0:
+        next_scene = Welcome
+    elif len(intersection_list(intents.exit_word_list, request.tokens)) > 0:
+        next_scene = Goodbye
+    elif (
+        len(intersection_list(intents.get_schedule_word_list + DAYS_RU, request.tokens))
+        > 0
+    ):
+        next_scene = GetSchedule
+    elif len(list(set(intents.clear_settings_word_list) & set(request.tokens))) > 0:
+        next_scene = ClearSettings
+    else:
+        next_scene = None
+
+    """if intents.HELP in request.intents:
         next_scene = HelpMenuStart
     elif intents.WHAT_CAN_YOU_DO in request.intents:
         next_scene = WhatCanDo
@@ -113,9 +152,13 @@ def global_scene_from_request(request: Request):
     elif intents.MARKS in request.intents:
         next_scene = Marks  # type: ignore
     else:
-        next_scene = None
+        next_scene = None"""
 
     return next_scene
+
+
+def intersection_list(list1, list2):
+    return list(set(list1) & set(list2))
 
 
 class GlobalScene(Scene):
@@ -595,3 +638,12 @@ DEFAULT_BUTTONS = [
     button("Главное меню"),
 ]
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+DAYS_RU = [
+    "понедельник",
+    "вторник",
+    "среда",
+    "четверг",
+    "пятница",
+    "суббота",
+    "воскресенье",
+]
