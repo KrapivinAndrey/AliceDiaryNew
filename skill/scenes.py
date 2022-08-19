@@ -101,7 +101,7 @@ def global_scene_from_request(request: Request):
         next_scene = WhatCanDo
     elif isIntentClean(request.tokens):                    
         next_scene = ClearSettings
-    elif intents.REPEAT in request.intents:
+    elif isIntentRepeat(request.tokens):
         next_scene = Repeat
     elif intents.EXIT in request.intents:
         next_scene = Goodbye
@@ -112,9 +112,9 @@ def global_scene_from_request(request: Request):
         next_scene = Welcome  # type: ignore
     elif intents.LESSON_BY_NUM in request.intents:
         next_scene = LessonByNum  # type: ignore
-    elif intents.LESSON_BY_DATE in request.intents:
+    elif isIntentLessonByDate(request.tokens):
         next_scene = LessonByDate  # type: ignore
-    elif intents.MARKS in request.intents:
+    elif isIntentMakrs(request.tokens):
         next_scene = Marks  # type: ignore
     else:
         next_scene = None
@@ -622,6 +622,20 @@ def wordInList(word, List):
             return True
     return False
 
+# region listKey
+
+def listKeyLessonByDate():
+    return [['уроки', 'предметы', 'занятия'], ['вчера', 'сегодня', 'завтра', 'послезавтра'], ['понедельник', 'вторник', 'среду', 'четверг', 'пятницу',]]
+
+def listKeyLessonRepeat():
+    return  ['повтори'] 
+
+def listKeyLessonMarks():
+    return ['оценки']
+
+# endregion
+
+
 def isIntentHelp(intentList):
     helpIntentList_ = gr.help()
     result = len(listIntersection(intentList, helpIntentList_)) > (len(helpIntentList_) - 1)
@@ -637,3 +651,17 @@ def isIntentClean(intentList):
     result = len(listIntersection(intentList, IntentCleanList)) > (len(IntentCleanList) - 1)
     return result
         
+def isIntentLessonByDate(intentList):
+    ListKey = listKeyLessonByDate()
+    result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
+    return result
+
+def isIntentRepeat(intentList):
+    ListKey = listKeyLessonRepeat()
+    result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
+    return result
+
+def isIntentMakrs(intentList):
+    ListKey = listKeyLessonMarks()
+    result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
+    return result
