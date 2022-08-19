@@ -130,7 +130,7 @@ def global_scene_from_request(request: Request):
         next_scene = Goodbye
     # Глобальные команды
     elif (
-        len(intersection_list(intents.get_schedule_word_list + DAYS_RU, request.tokens))
+        len(intersection_list(intents.get_schedule_word_list, request.tokens))
         > 0
     ):
         next_scene = GetSchedule  # type: ignore

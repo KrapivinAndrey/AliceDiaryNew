@@ -6,6 +6,7 @@ import requests
 import xmltodict
 
 from skill.constants import intents as skill_intents
+from skill.dairy_api import get_students, NeedAuth
 
 from ..models import request_model, response_model
 from . import request_parser, response_parser
@@ -131,6 +132,11 @@ class MarusiaAdapter:
         if request.state.user.auth_token:
             # TODO check token
             auth_token = request.state.user.auth_token
+            #try:
+            #    get_students(auth_token)
+            #except NeedAuth:
+            #    user_thumbprint = self._user_thumbprint(request)
+            #    auth_token = self._auth.get_token(user_thumbprint)    
         else:
             try:
                 user_thumbprint = self._user_thumbprint(request)
