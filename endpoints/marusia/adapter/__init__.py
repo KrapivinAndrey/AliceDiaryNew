@@ -6,7 +6,7 @@ import requests
 import xmltodict
 
 from skill.constants import intents as skill_intents
-from skill.dairy_api import get_students, NeedAuth
+from skill.dairy_api import NeedAuth, get_students
 
 from ..models import request_model, response_model
 from . import request_parser, response_parser
@@ -30,6 +30,7 @@ class MarusiaAdapter:
         result = request_parser.parse(request)
 
         self._set_intents(result)
+        self._set_entities(result)
 
         return result
 
@@ -91,6 +92,9 @@ class MarusiaAdapter:
             event["request"].setdefault("nlu", {})
             event["request"]["nlu"].setdefault("intents", intents)
 
+    def _set_entities(self, event: dict) -> None:
+        pass
+
     def _set_auth_token(self, request: request_model.Model):
 
         auth_token, error = self._refresh_token(request)
@@ -132,11 +136,11 @@ class MarusiaAdapter:
         if request.state.user.auth_token:
             # TODO check token
             auth_token = request.state.user.auth_token
-            #try:
+            # try:
             #    get_students(auth_token)
-            #except NeedAuth:
+            # except NeedAuth:
             #    user_thumbprint = self._user_thumbprint(request)
-            #    auth_token = self._auth.get_token(user_thumbprint)    
+            #    auth_token = self._auth.get_token(user_thumbprint)
         else:
             try:
                 user_thumbprint = self._user_thumbprint(request)
