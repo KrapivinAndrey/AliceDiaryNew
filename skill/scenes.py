@@ -122,7 +122,7 @@ def global_scene_from_request(request: Request):
         next_scene = HelpMenuStart
     elif isIntentWhatCanYouDo(request.tokens):
         next_scene = WhatCanDo
-    elif len(list(set(intents.clear_settings_word_list) & set(request.tokens))) > 0:                    
+    elif len(list(set(intents.clear_settings_word_list) & set(request.tokens))) > 0:
         next_scene = ClearSettings
     elif isIntentRepeat(request.tokens):
         next_scene = Repeat
@@ -619,6 +619,7 @@ def _list_scenes():
     scenes.remove(Scene)
     return scenes
 
+
 def listIntersection(List2, List1):
     result = []
     for i in List2:
@@ -633,6 +634,7 @@ def listIntersection(List2, List1):
                 break
     return result
 
+
 def wordInList(word, List):
     for line in List:
         if type(line) == list:
@@ -641,44 +643,70 @@ def wordInList(word, List):
             return True
     return False
 
+
 # region listKey
 
+
 def listKeyLessonByDate():
-    return [['уроки', 'предметы', 'занятия'], ['вчера', 'сегодня', 'завтра', 'послезавтра'], ['понедельник', 'вторник', 'среду', 'четверг', 'пятницу',]]
+    return [
+        ["уроки", "предметы", "занятия"],
+        ["вчера", "сегодня", "завтра", "послезавтра"],
+        [
+            "понедельник",
+            "вторник",
+            "среду",
+            "четверг",
+            "пятницу",
+        ],
+    ]
+
 
 def listKeyLessonRepeat():
-    return  ['повтори'] 
+    return ["повтори"]
+
 
 def listKeyLessonMarks():
-    return ['оценки']
+    return ["оценки"]
+
 
 # endregion
 
 
 def isIntentHelp(intentList):
     helpIntentList_ = gr.help()
-    result = len(listIntersection(intentList, helpIntentList_)) > (len(helpIntentList_) - 1)
+    result = len(listIntersection(intentList, helpIntentList_)) > (
+        len(helpIntentList_) - 1
+    )
     return result
+
 
 def isIntentWhatCanYouDo(intentList):
     whatCanYouDoIntentList_ = gr.whatCanYouDo()
-    result = len(listIntersection(intentList, whatCanYouDoIntentList_)) > (len(whatCanYouDoIntentList_) - 1)
+    result = len(listIntersection(intentList, whatCanYouDoIntentList_)) > (
+        len(whatCanYouDoIntentList_) - 1
+    )
     return result
+
 
 def isIntentClean(intentList):
     IntentCleanList = gr.reset_settings()
-    result = len(listIntersection(intentList, IntentCleanList)) > (len(IntentCleanList) - 1)
+    result = len(listIntersection(intentList, IntentCleanList)) > (
+        len(IntentCleanList) - 1
+    )
     return result
-        
+
+
 def isIntentLessonByDate(intentList):
     ListKey = listKeyLessonByDate()
     result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
     return result
 
+
 def isIntentRepeat(intentList):
     ListKey = listKeyLessonRepeat()
     result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
     return result
+
 
 def isIntentMakrs(intentList):
     ListKey = listKeyLessonMarks()
