@@ -1,13 +1,10 @@
 import datetime
 import inspect
 import sys
-from lib2to3.pgen2 import grammar
 from typing import List, Union
-from unittest import result
 
 import skill.dairy_api as dairy_api
 import skill.texts as texts
-from grammars import gr
 from skill.alice import Request, big_image, button
 from skill.constants import entities, intents, states
 from skill.constants.exceptions import NeedAuth
@@ -18,6 +15,8 @@ from skill.scenes_util import Scene
 from skill.tools.dates_transformations import (
     transform_yandex_datetime_value_to_datetime as ya_date_transform,
 )
+
+from . import gr
 
 logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
 # region Выделение данных для запроса
@@ -116,17 +115,30 @@ def get_token(request: Request):
 # region Общие сцены
 
 
-def global_scene_from_request(request: Request):
+def global_scene_from_request(
+    request: Request,
+) -> Union[
+    None,
+    "HelpMenuStart",
+    "WhatCanDo",
+    "ClearSettings",
+    "Repeat",
+    "Goodbye",
+    "GetSchedule",
+    "Welcome",
+    "LessonByNum",
+    "Marks",
+]:
     if len(intersection_list(intents.help_word_list, request.tokens)) > 0:
-        next_scene = HelpMenuStart
+        next_scene = HelpMenuStart  # type: ignore
     elif isIntentWhatCanYouDo(request.tokens):
-        next_scene = WhatCanDo
+        next_scene = WhatCanDo  # type: ignore
     elif len(list(set(intents.clear_settings_word_list) & set(request.tokens))) > 0:
-        next_scene = ClearSettings
+        next_scene = ClearSettings  # type: ignore
     elif isIntentRepeat(request.tokens):
-        next_scene = Repeat
+        next_scene = Repeat  # type: ignore
     elif len(intersection_list(intents.exit_word_list, request.tokens)) > 0:
-        next_scene = Goodbye
+        next_scene = Goodbye  # type: ignore
     # Глобальные команды
     elif len(intersection_list(intents.get_schedule_word_list, request.tokens)) > 0:
         next_scene = GetSchedule  # type: ignore
@@ -141,7 +153,7 @@ def global_scene_from_request(request: Request):
     else:
         next_scene = None
 
-    return next_scene
+    return next_scene  # type: ignore
 
 
 def intersection_list(list1, list2):
@@ -257,13 +269,10 @@ class Welcome(SceneWithAuth):
 
         for student in students.to_list():
             try:
-
                 journal = dairy_api.get_marks(token, student.id, req_date)
-
             except NeedAuth:
                 token = dairy_api.refresh_token(token)
                 journal = dairy_api.get_marks(token, student.id, req_date)
-
             if journal.len:
                 new_text, new_tts = texts.marks_for_student(student, journal)
             else:
@@ -622,7 +631,7 @@ def listIntersection(List2, List1):
         if i in result:
             continue
         for j in List1:
-            if type(j) == list and wordInList(i, j):
+            if isinstance(j, list) and wordInList(i, j):
                 result.append(i)
                 break
             if i == j:
@@ -635,7 +644,7 @@ def wordInList(word, List):
     for line in List:
         if type(line) == list:
             return wordInList(word, line)
-        elif line.find(word) > -1:
+        elif line.lower() == word.lower():
             return True
     return False
 

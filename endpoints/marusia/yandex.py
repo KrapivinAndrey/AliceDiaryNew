@@ -1,6 +1,6 @@
 import base64
 
-from skill.main import handler as alice_handler
+from skill.main import handler as alice_handler, set_config
 
 from .adapter import MarusiaAdapter
 from .models import request_model, ValidationError
@@ -21,6 +21,7 @@ def handler(event, context=None):
         return e.json(), 400
 
     adapter = MarusiaAdapter()
+    set_config({"auth_service": adapter})
 
     event_alice = adapter.parse_request(marusia_request)
     alice_result = alice_handler(event_alice)

@@ -8,7 +8,7 @@ import xmltodict
 
 from skill.constants import entities as skill_entities
 from skill.constants import intents as skill_intents
-from skill.dairy_api import NeedAuth, get_students
+from skill.dairy_api import NeedAuth, get_permissions
 from skill.scenes import DAYS, DAYS_RU
 
 from ..models import request_model, response_model
@@ -65,22 +65,23 @@ class MarusiaAdapter:
         self._last_response = resp
         return resp
 
+    # auth_service
+
+    def refresh_token(self):
+        """
+        Реактивное обновление токена
+        """
+        # TODO можно поставить галочку и принудительно толкнуть новый токен в стейт
+        # т.к. скил этого не сделает, скорее всего
+        user_thumbprint = self._user_thumbprint(self._last_request)
+        return self._auth.get_token(user_thumbprint)
+
     # internal
 
     def _set_intents(self, event: dict) -> None:
         self._set_day_of_weak(event)
 
-        # TODO тут нужно дохера написать, нужен отдельный класс
-
-        # GET_SCHEDULE = "get_schedule"
-        # GET_HOMEWORK = "get_homework"
-        # LESSON_BY_NUM = "what_lesson_num"
-        # LESSON_BY_DATE = "what_lesson_time"
-        # MARKS = "get_journal"
-        # CLEAN = "reset_settings"
-        # MAIN_MENU = "main_menu"
-        # EXIT = "exit"
-        # DAY = "day_of_week"
+        # TODO устарело, удалить
 
         intents = {}
         request = self._last_request.request
@@ -185,19 +186,27 @@ class MarusiaAdapter:
 
     def _refresh_token(self, request: request_model.Model):
         error = False
+        user_thumbprint = self._user_thumbprint(request)
+        auth_token = None
+        # from state
         if request.state.user.auth_token:
-            # TODO check token
             auth_token = request.state.user.auth_token
-            # try:
-            #    get_students(auth_token)
-            # except NeedAuth:
-            #    user_thumbprint = self._user_thumbprint(request)
-            #    auth_token = self._auth.get_token(user_thumbprint)
-        else:
+        # Проактивное обновление токена
+        # TODO включить, чтобы обновлять токен проактивно
+        always_check = False
+        if auth_token and always_check:
             try:
-                user_thumbprint = self._user_thumbprint(request)
+                get_permissions(auth_token)
+            except NeedAuth:
+                auth_token = None
+            except:
+                error = True
+                auth_token = None
+        # refresh
+        if not auth_token:
+            try:
                 auth_token = self._auth.get_token(user_thumbprint)
-            except Exception as e:
+            except:
                 error = True
                 auth_token = None
 
