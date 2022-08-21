@@ -44,7 +44,7 @@ class Scene(ABC):
     def make_response(
         self,
         request: Request,
-        text,
+        text: str,
         tts=None,
         card=None,
         state=None,

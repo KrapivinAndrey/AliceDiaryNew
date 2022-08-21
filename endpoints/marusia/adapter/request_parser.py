@@ -47,6 +47,7 @@ def parse_session(data: Model) -> dict:
     result = data.session.dict(exclude_none=True)
     if data.state.user.auth_token:
         # закидываем auth_token из состояния в access_token сессии
-        if result.get("user") is not None:
-            result["user"].setdefault("access_token", data.state.user.auth_token)
+        if result.get("user") is None:
+            result["user"] = {}
+        result["user"].setdefault("access_token", data.state.user.auth_token)
     return result

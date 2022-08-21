@@ -1,7 +1,7 @@
 from datetime import time
 from typing import Union
 
-from skill.constants.entities import image_ids, subjects
+from ..constants import image_ids, subjects
 
 
 class PlannedLesson:
