@@ -1,7 +1,5 @@
 # region Base of yandex
 
-from skill.dairy_api import get_schedule
-
 CONFIRM = "YANDEX.CONFIRM"
 REJECT = "YANDEX.REJECT"
 HELP = "YANDEX.HELP"
