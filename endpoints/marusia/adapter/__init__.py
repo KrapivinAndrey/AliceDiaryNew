@@ -62,21 +62,22 @@ class MarusiaAdapter:
         self._last_response = resp
         return resp
 
+    # auth_service
+
+    def refresh_token(self):
+        """
+        Реактивное обновление токена
+        """
+        # TODO можно поставить галочку и принудительно толкнуть новый токен в стейт
+        # т.к. скил этого не сделает, скорее всего
+        user_thumbprint = self._user_thumbprint(self._last_request)
+        return self._auth.get_token(user_thumbprint)
+
     # internal
 
     def _set_intents(self, event: dict) -> None:
 
-        # TODO тут нужно дохера написать, нужен отдельный класс
-
-        # GET_SCHEDULE = "get_schedule"
-        # GET_HOMEWORK = "get_homework"
-        # LESSON_BY_NUM = "what_lesson_num"
-        # LESSON_BY_DATE = "what_lesson_time"
-        # MARKS = "get_journal"
-        # CLEAN = "reset_settings"
-        # MAIN_MENU = "main_menu"
-        # EXIT = "exit"
-        # DAY = "day_of_week"
+        # TODO устарело, удалить
 
         intents = {}
         request = self._last_request.request
@@ -134,11 +135,13 @@ class MarusiaAdapter:
     def _refresh_token(self, request: request_model.Model):
         error = False
         user_thumbprint = self._user_thumbprint(request)
+        auth_token = None
         # from state
         if request.state.user.auth_token:
             auth_token = request.state.user.auth_token
-        # check
-        always_check = True
+        # Проактивное обновление токена
+        # TODO включить, чтобы обновлять токен проактивно
+        always_check = False
         if auth_token and always_check:
             try:
                 get_permissions(auth_token)

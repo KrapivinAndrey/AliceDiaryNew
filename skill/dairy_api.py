@@ -13,6 +13,7 @@ from skill.dataclasses import (
     Students,
 )
 from skill.loggerfactory import LoggerFactory
+from . import context as app_context
 
 logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
 # region URLs
@@ -173,6 +174,10 @@ def get_permissions(token: str) -> None:
 
 
 def refresh_token(token: str):
+
+    if app_context.auth_service is not None:
+        return app_context.auth_service.refresh_token()
+
     response = requests.post(
         refresh_url(),
         params={},
