@@ -1,11 +1,7 @@
 import datetime
 import inspect
-from lib2to3.pgen2 import grammar
 import sys
 from typing import List, Union
-from unittest import result
-
-from grammars import gr
 
 import skill.dairy_api as dairy_api
 import skill.texts as texts
@@ -19,6 +15,8 @@ from skill.scenes_util import Scene
 from skill.tools.dates_transformations import (
     transform_yandex_datetime_value_to_datetime as ya_date_transform,
 )
+
+from . import gr
 
 logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
 # region Выделение данных для запроса
@@ -129,10 +127,7 @@ def global_scene_from_request(request: Request):
     elif len(intersection_list(intents.exit_word_list, request.tokens)) > 0:
         next_scene = Goodbye
     # Глобальные команды
-    elif (
-        len(intersection_list(intents.get_schedule_word_list, request.tokens))
-        > 0
-    ):
+    elif len(intersection_list(intents.get_schedule_word_list, request.tokens)) > 0:
         next_scene = GetSchedule  # type: ignore
     elif len(intersection_list(intents.main_menu_word_list, request.tokens)) > 0:
         next_scene = Welcome  # type: ignore
