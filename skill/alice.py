@@ -69,10 +69,7 @@ class Request:
 
     @property
     def authorization_complete(self):
-        return (
-            self.access_token is not None
-            or self.request_body.get("account_linking_complete_event") is not None
-        )
+        return self.request_body.get("account_linking_complete_event") is not None
 
     def slots(self, intent: str):
         return (

@@ -256,13 +256,10 @@ class Welcome(SceneWithAuth):
 
         for student in students.to_list():
             try:
-
                 journal = dairy_api.get_marks(token, student.id, req_date)
-
             except NeedAuth:
                 token = dairy_api.refresh_token(token)
                 journal = dairy_api.get_marks(token, student.id, req_date)
-
             if journal.len:
                 new_text, new_tts = texts.marks_for_student(student, journal)
             else:
