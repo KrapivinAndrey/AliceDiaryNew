@@ -21,10 +21,10 @@ MAIN_MENU = "main_menu"
 EXIT = "exit"
 DAY = "day_of_week"
 
-help_word_list = ["помощь", "подсказка", "подскажи"]
+help_word_list = ["помощь", "подсказка", "подскажи", "па-ма-ги-тееее!"]
 main_menu_word_list = ["главное", "основное", "меню"]
 clear_settings_word_list = ["очистить", "сбросить", "настройки", "аккаунт", "удалить"]
-get_schedule_word_list = ["уроки", "расписание"]
+get_schedule_word_list = ["уроки", "расписание", "занятия"]
 name_word_list = ["василий", "василия", "василию"]
 exit_word_list = [
     "выход",

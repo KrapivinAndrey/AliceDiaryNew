@@ -621,7 +621,7 @@ def listIntersection(List2, List1):
         if i in result:
             continue
         for j in List1:
-            if type(j) == list and wordInList(i, j):
+            if isinstance(j, list) and wordInList(i, j):
                 result.append(i)
                 break
             if i == j:
@@ -634,7 +634,7 @@ def wordInList(word, List):
     for line in List:
         if type(line) == list:
             return wordInList(word, line)
-        elif line.find(word) > -1:
+        elif line.lower() == word.lower():
             return True
     return False
 

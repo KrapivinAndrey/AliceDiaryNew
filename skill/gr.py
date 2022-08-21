@@ -28,7 +28,8 @@ def parseGrammar(data):
     for word in root:
         for i in range(len(data)):
             if data[i].find(word) > -1:
-                result.append(data[i + 2].split("|"))
+                word_list = [x.strip() for x in data[i + 2].split("|")]
+                result.append(word_list)
                 break
     return result
 
