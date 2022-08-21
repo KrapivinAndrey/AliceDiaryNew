@@ -1,3 +1,4 @@
+import datetime
 import urllib.parse
 import uuid
 from typing import Union
@@ -5,8 +6,10 @@ from typing import Union
 import requests
 import xmltodict
 
+from skill.constants import entities as skill_entities
 from skill.constants import intents as skill_intents
 from skill.dairy_api import NeedAuth, get_students
+from skill.scenes import DAYS, DAYS_RU
 
 from ..models import request_model, response_model
 from . import request_parser, response_parser
@@ -65,6 +68,7 @@ class MarusiaAdapter:
     # internal
 
     def _set_intents(self, event: dict) -> None:
+        self._set_day_of_weak(event)
 
         # TODO тут нужно дохера написать, нужен отдельный класс
 
@@ -93,7 +97,52 @@ class MarusiaAdapter:
             event["request"]["nlu"].setdefault("intents", intents)
 
     def _set_entities(self, event: dict) -> None:
-        pass
+        self._set_relative_date(event)
+
+    def _set_relative_date(self, event: dict) -> None:
+        date_index = self._get_relative_date_from_tokens(event)
+        if date_index:
+            event["request"]["nlu"]["entities"].append(
+                {
+                    "type": "YANDEX.DATETIME",
+                    "value": {"day": date_index, "day_is_relative": True},
+                }
+            )
+
+    def _get_relative_date_from_tokens(self, event: dict) -> None:
+        request = self._last_request.request
+        rel_day = list(
+            set(list(skill_entities.relative_dates.keys())) & set(request.tokens)
+        )
+        if rel_day:
+            return skill_entities.relative_dates[rel_day[0]]
+        return None
+
+    def _set_day_of_weak(self, event: dict) -> None:
+        days_of_weak = self._get_dys_of_weak_from_tokens(self._last_request)
+        if days_of_weak:
+            event["request"]["nlu"]["intents"].append(
+                {
+                    "day_of_week": {
+                        "slots": {
+                            "Day": {
+                                "type": "DayOfWeek",
+                                "value": days_of_weak,
+                            }
+                        }
+                    }
+                }
+            )
+
+    def _get_dys_of_weak_from_tokens(self, event: dict) -> None:
+        request = self._last_request.request
+        days_of_weak = list(set(DAYS_RU) & set(request.tokens))
+        if len(days_of_weak) > 0:
+            day = days_of_weak[0]
+            index_date = DAYS_RU.index(day)
+            days_en = DAYS[index_date]
+            return days_en
+        return None
 
     def _set_auth_token(self, request: request_model.Model):
 

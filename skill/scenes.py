@@ -1,14 +1,13 @@
 import datetime
 import inspect
-from lib2to3.pgen2 import grammar
 import sys
+from lib2to3.pgen2 import grammar
 from typing import List, Union
 from unittest import result
 
-from grammars import gr
-
 import skill.dairy_api as dairy_api
 import skill.texts as texts
+from grammars import gr
 from skill.alice import Request, big_image, button
 from skill.constants import entities, intents, states
 from skill.constants.exceptions import NeedAuth
@@ -129,10 +128,7 @@ def global_scene_from_request(request: Request):
     elif len(intersection_list(intents.exit_word_list, request.tokens)) > 0:
         next_scene = Goodbye
     # Глобальные команды
-    elif (
-        len(intersection_list(intents.get_schedule_word_list, request.tokens))
-        > 0
-    ):
+    elif len(intersection_list(intents.get_schedule_word_list, request.tokens)) > 0:
         next_scene = GetSchedule  # type: ignore
     elif len(intersection_list(intents.main_menu_word_list, request.tokens)) > 0:
         next_scene = Welcome  # type: ignore
@@ -726,9 +722,9 @@ DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sun
 DAYS_RU = [
     "понедельник",
     "вторник",
-    "среда",
+    "среду",
     "четверг",
-    "пятница",
-    "суббота",
+    "пятницу",
+    "субботу",
     "воскресенье",
 ]
