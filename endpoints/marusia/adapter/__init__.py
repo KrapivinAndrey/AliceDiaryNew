@@ -102,9 +102,11 @@ class MarusiaAdapter:
     def _set_relative_date(self, event: dict) -> None:
         date_index = self._get_relative_date_from_tokens(event)
         if date_index:
+            event["request"]["nlu"].setdefault("entities", [])
             event["request"]["nlu"]["entities"].append(
                 {
                     "type": "YANDEX.DATETIME",
+                    "tokens": {"start": 0, "end": 0},
                     "value": {"day": date_index, "day_is_relative": True},
                 }
             )
@@ -112,7 +114,7 @@ class MarusiaAdapter:
     def _get_relative_date_from_tokens(self, event: dict) -> None:
         request = self._last_request.request
         rel_day = list(
-            set(list(skill_entities.relative_dates.keys())) & set(request.tokens)
+            set(list(skill_entities.relative_dates.keys())) & set(request.nlu.tokens)
         )
         if rel_day:
             return skill_entities.relative_dates[rel_day[0]]
@@ -121,22 +123,23 @@ class MarusiaAdapter:
     def _set_day_of_weak(self, event: dict) -> None:
         days_of_weak = self._get_dys_of_weak_from_tokens(self._last_request)
         if days_of_weak:
-            event["request"]["nlu"]["intents"].append(
+            event["request"]["nlu"].setdefault("intents", {})
+            event["request"]["nlu"]["intents"].setdefault(
+                "day_of_week",
                 {
-                    "day_of_week": {
-                        "slots": {
-                            "Day": {
-                                "type": "DayOfWeek",
-                                "value": days_of_weak,
-                            }
+                    "slots": {
+                        "Day": {
+                            "type": "DayOfWeek",
+                            "tokens": {"start": 0, "end": 0},
+                            "value": days_of_weak,
                         }
                     }
-                }
+                },
             )
 
     def _get_dys_of_weak_from_tokens(self, event: dict) -> None:
         request = self._last_request.request
-        days_of_weak = list(set(DAYS_RU) & set(request.tokens))
+        days_of_weak = list(set(DAYS_RU) & set(request.nlu.tokens))
         if len(days_of_weak) > 0:
             day = days_of_weak[0]
             index_date = DAYS_RU.index(day)
