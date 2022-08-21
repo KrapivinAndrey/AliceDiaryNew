@@ -41,6 +41,10 @@ def refresh_url():
     return f"{base_url()}/user/token-refresh"
 
 
+def permissions_url():
+    return f"{base_url()}/user/permission/get"
+
+
 # endregion
 
 
@@ -154,6 +158,18 @@ def get_marks(token: str, student_id: str, day=None):
             result.add(item.get("subject_name"), record)
 
     return result
+
+
+def get_permissions(token: str) -> None:
+    response = requests.get(
+        permissions_url(),
+        cookies={"X-JWT-Token": token},
+        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
+    )
+
+    if response.status_code == 401:
+        raise NeedAuth()
+    return None
 
 
 def refresh_token(token: str):
