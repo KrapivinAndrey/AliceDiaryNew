@@ -1,3 +1,5 @@
+# mypy: ignore-errors
+
 import os
 from datetime import date, datetime, time
 
@@ -14,7 +16,7 @@ from skill.dataclasses import (
 )
 from skill.loggerfactory import LoggerFactory
 
-from . import context as app_context
+from . import context as app_context  # type: ignore
 
 logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
 # region URLs

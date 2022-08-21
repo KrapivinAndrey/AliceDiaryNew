@@ -115,17 +115,30 @@ def get_token(request: Request):
 # region Общие сцены
 
 
-def global_scene_from_request(request: Request):
+def global_scene_from_request(
+    request: Request,
+) -> Union[
+    None,
+    "HelpMenuStart",
+    "WhatCanDo",
+    "ClearSettings",
+    "Repeat",
+    "Goodbye",
+    "GetSchedule",
+    "Welcome",
+    "LessonByNum",
+    "Marks",
+]:
     if len(intersection_list(intents.help_word_list, request.tokens)) > 0:
-        next_scene = HelpMenuStart
+        next_scene = HelpMenuStart  # type: ignore
     elif isIntentWhatCanYouDo(request.tokens):
-        next_scene = WhatCanDo
+        next_scene = WhatCanDo  # type: ignore
     elif len(list(set(intents.clear_settings_word_list) & set(request.tokens))) > 0:
-        next_scene = ClearSettings
+        next_scene = ClearSettings  # type: ignore
     elif isIntentRepeat(request.tokens):
-        next_scene = Repeat
+        next_scene = Repeat  # type: ignore
     elif len(intersection_list(intents.exit_word_list, request.tokens)) > 0:
-        next_scene = Goodbye
+        next_scene = Goodbye  # type: ignore
     # Глобальные команды
     elif len(intersection_list(intents.get_schedule_word_list, request.tokens)) > 0:
         next_scene = GetSchedule  # type: ignore
@@ -140,7 +153,7 @@ def global_scene_from_request(request: Request):
     else:
         next_scene = None
 
-    return next_scene
+    return next_scene  # type: ignore
 
 
 def intersection_list(list1, list2):
