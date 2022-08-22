@@ -1,6 +1,7 @@
 import datetime
 import urllib.parse
 import uuid
+import pymorphy2
 from typing import Union
 
 import requests
@@ -99,6 +100,7 @@ class MarusiaAdapter:
 
     def _set_entities(self, event: dict) -> None:
         self._set_relative_date(event)
+        self._set_fio(event)
 
     def _set_relative_date(self, event: dict) -> None:
         date_index = self._get_relative_date_from_tokens(event)
@@ -147,6 +149,33 @@ class MarusiaAdapter:
             days_en = DAYS[index_date]
             return days_en
         return None
+
+    def _set_fio(self, event):
+        morph = pymorphy2.MorphAnalyzer()
+        list_word = event['request']['nlu']['tokens']
+        name = ''
+        patronymic = ''
+        last_name = ''
+        for word in list_word:
+            parse_word = morph.parse(word)[0]
+            if 'Name' in parse_word.tag:
+                name = parse_word[2]
+            if 'Patr' in parse_word.tag:
+                patronymic = parse_word[2]
+            if 'Surn' in parse_word.tag:
+                last_name = parse_word[2]
+        if name != '' or last_name != '':
+            value = {
+                        "type": 'FIO',
+                        "first_name": {name},
+                        "patronymic_name": {patronymic},
+                        "last_name": {last_name}
+                    }
+            self._add_intents(event, value)
+
+    def _add_intents(self, event, value):
+        event["request"]["nlu"].setdefault("entities", {})
+        event["request"]["nlu"]["entities"].append(value)
 
     def _set_auth_token(self, request: request_model.Model):
 
