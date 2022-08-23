@@ -30,7 +30,7 @@ def marusia_202208():
     event = adapter.parse_request(marusia_request)
     event_result = handler(event)
 
-    get_perfmon().print_report()
-
     marusia_response = adapter.parse_response(event_result)
+
+    get_perfmon().print_report()
     return marusia_response.json(exclude_none=True), 200

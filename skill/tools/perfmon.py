@@ -14,12 +14,17 @@ class PerfMonitor:
         )
 
     def print_report(self):
-        print(f"===PERF=REPORT========")
+        report = []
+        report_total = 0
         for method, measures in self.measures.items():
-            total_delta = 0
+            method_total = 0
             for m in measures:
-                total_delta += m.delta
-            print(f"method={method}; total={total_delta}")
+                method_total += m.delta
+            report_total += method_total
+            report.append(f"method={method}; total={method_total}")
+        report.insert(0, f"REPORT; total={report_total}")
+        for r in report:
+            print(r)
 
 
 @dataclass(frozen=True)
