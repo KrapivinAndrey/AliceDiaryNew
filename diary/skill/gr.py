@@ -1,18 +1,18 @@
 def reset_settings():
 
-    with open("grammars/reset_settings.grammar", "r", encoding="utf-8") as f:
+    with open("diary/skill/files/grammars/reset_settings.grammar", "r", encoding="utf-8") as f:
         data = f.readlines()
     return parseGrammar(data)
 
 
 def help():
-    with open("grammars/help.grammar", "r", encoding="utf-8") as f:
+    with open("diary/skill/files/grammars/help.grammar", "r", encoding="utf-8") as f:
         data = f.readlines()
     return parseGrammar(data)
 
 
 def whatCanYouDo():
-    with open("grammars/what_can_you_do.grammar", "r", encoding="utf-8") as f:
+    with open("diary/skill/files/grammars/what_can_you_do.grammar", "r", encoding="utf-8") as f:
         data = f.readlines()
     return parseGrammar(data)
 

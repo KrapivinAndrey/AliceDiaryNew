@@ -1,7 +1,7 @@
 import json
 import os
 
-import skill.main as main
+from diary.skill import main
 
 true = True
 false = False

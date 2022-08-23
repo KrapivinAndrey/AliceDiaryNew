@@ -3,20 +3,17 @@ import inspect
 import sys
 from typing import List, Union
 
-import skill.dairy_api as dairy_api
-import skill.texts as texts
-from skill.alice import Request, big_image, button
-from skill.constants import entities, intents, states
-from skill.constants.exceptions import NeedAuth
-from skill.constants.images import CONFUSED, GOODBYE
-from skill.dataclasses import Students
-from skill.loggerfactory import LoggerFactory
-from skill.scenes_util import Scene
-from skill.tools.dates_transformations import (
+from . import dairy_api, gr, texts
+from .alice import Request, big_image, button
+from .constants import entities, intents, states
+from .constants.exceptions import NeedAuth
+from .constants.images import CONFUSED, GOODBYE
+from .dataclasses import Students
+from .logger_factory import LoggerFactory
+from .scenes_util import Scene
+from .tools.dates_transformations import (
     transform_yandex_datetime_value_to_datetime as ya_date_transform,
 )
-
-from . import gr
 
 logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
 # region Выделение данных для запроса

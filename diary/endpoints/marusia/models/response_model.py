@@ -13,8 +13,8 @@ from . import common_model
 
 class Button(BaseModel):
     title: str
-    payload: Dict[str, Any] = None
-    url: str = None
+    payload: Union[Dict[str, Any], None] = None
+    url: Union[str, None] = None
 
 
 class CommandWidget(BaseModel):
@@ -30,7 +30,7 @@ class CommandText(BaseModel):
 
 class Push(BaseModel):
     push_text: str
-    payload: Dict[str, Any] = None
+    payload: Union[Dict[str, Any], None] = None
 
 
 class Response(BaseModel):
@@ -69,7 +69,7 @@ class Session(BaseModel):
 
 class Model(BaseModel):
     response: Response
-    session: Session = None
+    session: Union[Session, None] = None
     version: str = "1.0"
     user_state_update: Union[UserStateUpdate, None] = None
     session_state: Union[SessionStateUpdate, None] = None

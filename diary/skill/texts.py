@@ -1,8 +1,8 @@
 import datetime
 from typing import Dict, List
 
-import skill.constants.texts as text_constants
-from skill.dataclasses import Journal, PlannedLesson, Schedule, Student
+from .constants import texts as text_constants
+from .dataclasses import Journal, PlannedLesson, Schedule, Student
 
 # region Общие сцены
 

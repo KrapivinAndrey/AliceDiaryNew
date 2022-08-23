@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel
 
@@ -12,7 +12,7 @@ from . import common_model
 
 
 class Interfaces(BaseModel):
-    screen: Dict[str, Any] = None
+    screen: Union[Dict[str, Any], None] = None
 
 
 class Meta(BaseModel):
@@ -30,7 +30,7 @@ class Request(BaseModel):
     command: str
     original_utterance: str
     type: str
-    payload: Dict[str, Any] = None
+    payload: Union[Dict[str, Any], None] = None
     nlu: Nlu
 
 
@@ -49,7 +49,7 @@ class Session(BaseModel):
     skill_id: str
     new: bool
     message_id: int
-    user: User = None
+    user: Union[User, None] = None
     application: Application
 
 
@@ -70,5 +70,5 @@ class Model(BaseModel):
     meta: Meta
     request: Request
     session: Session
+    state: Optional[State]
     version: str = "1.0"
-    state: Union[State, None] = None

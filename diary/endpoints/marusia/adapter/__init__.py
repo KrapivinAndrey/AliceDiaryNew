@@ -1,16 +1,17 @@
 import urllib.parse
 import uuid
 import pymorphy2
-from typing import Union
+from typing import Dict, Optional, Union
 
 import requests
 import xmltodict
 
-from skill.constants import entities as skill_entities
-from skill.constants import intents as skill_intents
-from skill.dairy_api import NeedAuth, get_permissions
-from skill.main import app_context
-from skill.scenes import DAYS, DAYS_RU
+
+from ....skill.constants import entities as skill_entities
+from ....skill.constants import intents as skill_intents
+from ....skill.dairy_api import NeedAuth, get_permissions
+from ....skill.main import app_context
+from ....skill.scenes import DAYS, DAYS_RU
 
 from ..models import request_model, response_model
 from . import request_parser, response_parser
@@ -18,9 +19,19 @@ from . import request_parser, response_parser
 
 class MarusiaAdapter:
     def __init__(self) -> None:
-        self._last_request: Union[request_model.Model, None] = None
-        self._last_response: Union[response_model.Model, None] = None
+        self._last_request: request_model.Model = None  # type: ignore
+        self._last_response: response_model.Model = None  # type: ignore
         self._auth: "AuthAdapter" = AuthAdapter()
+
+    # @property
+    # def last_request(self) -> request_model.Model:
+    #    assert isinstance(self.last_request, request_model.Model)
+    #    return self.last_request
+    #
+    # @property
+    # def last_response(self) -> response_model.Model:
+    #    assert isinstance(self._last_response, response_model.Model)
+    #    return self._last_response
 
     # public
 
@@ -41,6 +52,8 @@ class MarusiaAdapter:
 
     @app_context.perfmon
     def parse_response(self, data) -> response_model.Model:
+
+        assert isinstance(self._last_request, request_model.Model)
 
         # response
 
@@ -87,7 +100,7 @@ class MarusiaAdapter:
 
         # TODO устарело, удалить
 
-        intents = {}
+        intents: Dict[str, dict] = {}
         request = self._last_request.request
         if request.command.lower() == "расписание уроков":
             intents.setdefault(skill_intents.GET_SCHEDULE, {})
@@ -117,7 +130,7 @@ class MarusiaAdapter:
                 }
             )
 
-    def _get_relative_date_from_tokens(self, event: dict) -> None:
+    def _get_relative_date_from_tokens(self, event: dict) -> Union[None, int]:
         request = self._last_request.request
         rel_day = list(
             set(list(skill_entities.relative_dates.keys())) & set(request.nlu.tokens)
@@ -127,7 +140,7 @@ class MarusiaAdapter:
         return None
 
     def _set_day_of_weak(self, event: dict) -> None:
-        days_of_weak = self._get_dys_of_weak_from_tokens(self._last_request)
+        days_of_weak = self._get_dys_of_weak_from_tokens()
         if days_of_weak:
             event["request"]["nlu"].setdefault("intents", {})
             event["request"]["nlu"]["intents"].setdefault(
@@ -143,7 +156,7 @@ class MarusiaAdapter:
                 },
             )
 
-    def _get_dys_of_weak_from_tokens(self, event: dict) -> None:
+    def _get_dys_of_weak_from_tokens(self) -> Union[None, str]:
         request = self._last_request.request
         days_of_weak = list(set(DAYS_RU) & set(request.nlu.tokens))
         if len(days_of_weak) > 0:
@@ -155,25 +168,25 @@ class MarusiaAdapter:
 
     def _set_fio(self, event):
         morph = pymorphy2.MorphAnalyzer()
-        list_word = event['request']['nlu']['tokens']
-        name = ''
-        patronymic = ''
-        last_name = ''
+        list_word = event["request"]["nlu"]["tokens"]
+        name = ""
+        patronymic = ""
+        last_name = ""
         for word in list_word:
             parse_word = morph.parse(word)[0]
-            if 'Name' in parse_word.tag:
+            if "Name" in parse_word.tag:
                 name = parse_word[2]
-            if 'Patr' in parse_word.tag:
+            if "Patr" in parse_word.tag:
                 patronymic = parse_word[2]
-            if 'Surn' in parse_word.tag:
+            if "Surn" in parse_word.tag:
                 last_name = parse_word[2]
-        if name != '' or last_name != '':
+        if name != "" or last_name != "":
             value = {
-                        "type": 'FIO',
-                        "first_name": {name},
-                        "patronymic_name": {patronymic},
-                        "last_name": {last_name}
-                    }
+                "type": "FIO",
+                "first_name": {name},
+                "patronymic_name": {patronymic},
+                "last_name": {last_name},
+            }
             self._add_intents(event, value)
 
     def _add_intents(self, event, value):
@@ -186,9 +199,12 @@ class MarusiaAdapter:
         self._auth.need = error is True or auth_token is None
         self._auth.error = error is True
 
+        assert request.state
+        assert request.state.user
+
         request.state.user.auth_token = auth_token
 
-    def _ssml_from_tts(self, tts: str) -> str:
+    def _ssml_from_tts(self, tts: Optional[str]) -> str:
 
         if not tts:
             return ""
@@ -221,6 +237,7 @@ class MarusiaAdapter:
         user_thumbprint = self._user_thumbprint(request)
         auth_token = None
         # from state
+        assert request.state
         if request.state.user.auth_token:
             auth_token = request.state.user.auth_token
         # Проактивное обновление токена

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from ..models.response_model import (
     Button,
     Model,
@@ -42,7 +44,7 @@ def parse_response(event: dict) -> Response:
     return result
 
 
-def parse_user_state_update(event: dict) -> UserStateUpdate:
+def parse_user_state_update(event: dict) -> Optional[UserStateUpdate]:
     value = event.get("user_state_update", None)
     if value is not None:
         user_state_update = UserStateUpdate.parse_obj(value)
@@ -51,7 +53,7 @@ def parse_user_state_update(event: dict) -> UserStateUpdate:
     return user_state_update
 
 
-def parse_session_state(event: dict) -> SessionStateUpdate:
+def parse_session_state(event: dict) -> Optional[SessionStateUpdate]:
     value = event.get("session_state", None)
     if value is not None:
         session_state = SessionStateUpdate.parse_obj(value)

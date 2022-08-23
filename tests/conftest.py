@@ -3,7 +3,8 @@ from datetime import time
 from alicefluentcheck import AliceEntity, AliceIntent, AliceIntentSlot, AliceRequest
 from pytest import fixture
 
-from skill.dataclasses import (
+
+from diary.skill.dataclasses import (
     PlannedLesson,
     Schedule,
     Student,

@@ -5,18 +5,10 @@ from datetime import date, datetime, time
 
 import requests
 
-from skill.constants.exceptions import NeedAuth
-from skill.dataclasses import (
-    Journal,
-    PlannedLesson,
-    Record,
-    Schedule,
-    Student,
-    Students,
-)
-from skill.loggerfactory import LoggerFactory
-
 from . import context as app_context  # type: ignore
+from .constants.exceptions import NeedAuth
+from .dataclasses import Journal, PlannedLesson, Record, Schedule, Student, Students
+from .logger_factory import LoggerFactory
 
 logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
 # region URLs

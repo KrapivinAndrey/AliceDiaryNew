@@ -30,6 +30,7 @@ def parse_meta(data: Model) -> dict:
 
 def parse_state(data: Model) -> dict:
     # TODO если если есть особенности
+    assert data.state
     result = data.state.dict(exclude_none=True)
     result.setdefault("session", {})
     result.setdefault("user", {})
@@ -45,6 +46,7 @@ def parse_request(data: Model) -> dict:
 
 def parse_session(data: Model) -> dict:
     result = data.session.dict(exclude_none=True)
+    assert data.state
     if data.state.user.auth_token:
         # закидываем auth_token из состояния в access_token сессии
         if result.get("user") is None:

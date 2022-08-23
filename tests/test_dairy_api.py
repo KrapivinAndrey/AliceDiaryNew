@@ -1,4 +1,4 @@
-import skill.dairy_api as dairy_api
+from diary.skill import dairy_api
 from tests.mocking import (
     setup_mock_children,
     setup_mock_schedule_with_params,

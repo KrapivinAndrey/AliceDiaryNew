@@ -2,9 +2,9 @@ import json
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from skill.alice import Request
-from skill.constants.states import PERMANENT_VALUES, PREVIOUS_MOVES, StateResponseKey
-from skill.loggerfactory import LoggerFactory
+from ..skill.alice import Request
+from ..skill.constants.states import PERMANENT_VALUES, PREVIOUS_MOVES, StateResponseKey
+from .logger_factory import LoggerFactory
 
 
 class Scene(ABC):
