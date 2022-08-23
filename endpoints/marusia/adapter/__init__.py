@@ -1,4 +1,3 @@
-import datetime
 import urllib.parse
 import uuid
 from typing import Union
@@ -9,8 +8,8 @@ import xmltodict
 from skill.constants import entities as skill_entities
 from skill.constants import intents as skill_intents
 from skill.dairy_api import NeedAuth, get_permissions
-from skill.scenes import DAYS, DAYS_RU
 from skill.main import app_context
+from skill.scenes import DAYS, DAYS_RU
 
 from ..models import request_model, response_model
 from . import request_parser, response_parser
