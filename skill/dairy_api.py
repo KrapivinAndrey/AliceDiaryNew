@@ -1,5 +1,3 @@
-# mypy: ignore-errors
-
 import os
 from datetime import date, datetime, time
 
@@ -15,8 +13,6 @@ from skill.dataclasses import (
     Students,
 )
 from skill.loggerfactory import LoggerFactory
-
-from . import context as app_context  # type: ignore
 
 logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
 # region URLs
@@ -43,10 +39,6 @@ def journal_url():
 
 def refresh_url():
     return f"{base_url()}/user/token-refresh"
-
-
-def permissions_url():
-    return f"{base_url()}/user/permission/get"
 
 
 # endregion
@@ -164,23 +156,7 @@ def get_marks(token: str, student_id: str, day=None):
     return result
 
 
-def get_permissions(token: str) -> None:
-    response = requests.get(
-        permissions_url(),
-        cookies={"X-JWT-Token": token},
-        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
-    )
-
-    if response.status_code == 401:
-        raise NeedAuth()
-    return None
-
-
 def refresh_token(token: str):
-
-    if app_context.auth_service is not None:
-        return app_context.auth_service.refresh_token()
-
     response = requests.post(
         refresh_url(),
         params={},

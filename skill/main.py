@@ -3,8 +3,6 @@ from skill.constants.states import PREVIOUS_MOVES
 from skill.loggerfactory import LoggerFactory
 from skill.scenes import DEFAULT_SCENE, SCENES, global_scene_from_request
 
-from . import context as app_context
-
 
 def handler(event, context=None):
 
@@ -51,7 +49,3 @@ def get_id_scene(request: Request):
             return res.id()
 
     return res
-
-
-def set_config(config):
-    app_context.auth_service = config.get("auth_service")

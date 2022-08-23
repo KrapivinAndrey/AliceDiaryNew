@@ -1,16 +1,10 @@
-import datetime
 import urllib.parse
 import uuid
-import pymorphy2
 from typing import Union
 
 import requests
-import xmltodict
 
-from skill.constants import entities as skill_entities
 from skill.constants import intents as skill_intents
-from skill.dairy_api import NeedAuth, get_permissions
-from skill.scenes import DAYS, DAYS_RU
 
 from ..models import request_model, response_model
 from . import request_parser, response_parser
@@ -34,7 +28,6 @@ class MarusiaAdapter:
         result = request_parser.parse(request)
 
         self._set_intents(result)
-        self._set_entities(result)
 
         return result
 
@@ -49,12 +42,6 @@ class MarusiaAdapter:
         else:
             resp = response_parser.parse(data)
 
-        ssml = self._ssml_from_tts(resp.response.tts)
-        if ssml:
-            resp.response.tts_type = "ssml"
-            resp.response.tts = None
-            resp.response.ssml = ssml
-
         # session
 
         resp.session = response_model.Session(
@@ -66,23 +53,21 @@ class MarusiaAdapter:
         self._last_response = resp
         return resp
 
-    # auth_service
-
-    def refresh_token(self):
-        """
-        Реактивное обновление токена
-        """
-        # TODO можно поставить галочку и принудительно толкнуть новый токен в стейт
-        # т.к. скил этого не сделает, скорее всего
-        user_thumbprint = self._user_thumbprint(self._last_request)
-        return self._auth.get_token(user_thumbprint)
-
     # internal
 
     def _set_intents(self, event: dict) -> None:
-        self._set_day_of_weak(event)
 
-        # TODO устарело, удалить
+        # TODO тут нужно дохера написать, нужен отдельный класс
+
+        # GET_SCHEDULE = "get_schedule"
+        # GET_HOMEWORK = "get_homework"
+        # LESSON_BY_NUM = "what_lesson_num"
+        # LESSON_BY_DATE = "what_lesson_time"
+        # MARKS = "get_journal"
+        # CLEAN = "reset_settings"
+        # MAIN_MENU = "main_menu"
+        # EXIT = "exit"
+        # DAY = "day_of_week"
 
         intents = {}
         request = self._last_request.request
@@ -98,85 +83,6 @@ class MarusiaAdapter:
             event["request"].setdefault("nlu", {})
             event["request"]["nlu"].setdefault("intents", intents)
 
-    def _set_entities(self, event: dict) -> None:
-        self._set_relative_date(event)
-        self._set_fio(event)
-
-    def _set_relative_date(self, event: dict) -> None:
-        date_index = self._get_relative_date_from_tokens(event)
-        if date_index:
-            event["request"]["nlu"].setdefault("entities", [])
-            event["request"]["nlu"]["entities"].append(
-                {
-                    "type": "YANDEX.DATETIME",
-                    "tokens": {"start": 0, "end": 0},
-                    "value": {"day": date_index, "day_is_relative": True},
-                }
-            )
-
-    def _get_relative_date_from_tokens(self, event: dict) -> None:
-        request = self._last_request.request
-        rel_day = list(
-            set(list(skill_entities.relative_dates.keys())) & set(request.nlu.tokens)
-        )
-        if rel_day:
-            return skill_entities.relative_dates[rel_day[0]]
-        return None
-
-    def _set_day_of_weak(self, event: dict) -> None:
-        days_of_weak = self._get_dys_of_weak_from_tokens(self._last_request)
-        if days_of_weak:
-            event["request"]["nlu"].setdefault("intents", {})
-            event["request"]["nlu"]["intents"].setdefault(
-                "day_of_week",
-                {
-                    "slots": {
-                        "Day": {
-                            "type": "DayOfWeek",
-                            "tokens": {"start": 0, "end": 0},
-                            "value": days_of_weak,
-                        }
-                    }
-                },
-            )
-
-    def _get_dys_of_weak_from_tokens(self, event: dict) -> None:
-        request = self._last_request.request
-        days_of_weak = list(set(DAYS_RU) & set(request.nlu.tokens))
-        if len(days_of_weak) > 0:
-            day = days_of_weak[0]
-            index_date = DAYS_RU.index(day)
-            days_en = DAYS[index_date]
-            return days_en
-        return None
-
-    def _set_fio(self, event):
-        morph = pymorphy2.MorphAnalyzer()
-        list_word = event['request']['nlu']['tokens']
-        name = ''
-        patronymic = ''
-        last_name = ''
-        for word in list_word:
-            parse_word = morph.parse(word)[0]
-            if 'Name' in parse_word.tag:
-                name = parse_word[2]
-            if 'Patr' in parse_word.tag:
-                patronymic = parse_word[2]
-            if 'Surn' in parse_word.tag:
-                last_name = parse_word[2]
-        if name != '' or last_name != '':
-            value = {
-                        "type": 'FIO',
-                        "first_name": {name},
-                        "patronymic_name": {patronymic},
-                        "last_name": {last_name}
-                    }
-            self._add_intents(event, value)
-
-    def _add_intents(self, event, value):
-        event["request"]["nlu"].setdefault("entities", {})
-        event["request"]["nlu"]["entities"].append(value)
-
     def _set_auth_token(self, request: request_model.Model):
 
         auth_token, error = self._refresh_token(request)
@@ -184,25 +90,6 @@ class MarusiaAdapter:
         self._auth.error = error is True
 
         request.state.user.auth_token = auth_token
-
-    def _ssml_from_tts(self, tts: str) -> str:
-
-        if not tts:
-            return ""
-
-        # sil <[500]> -> <break time="500ms"/>
-
-        text = tts.replace("sil<[", '<break time="').replace("]>", '"/>')
-        text = text.replace("<speaker audio='alice-sounds-game-loss-3.opus'>", "")
-        text = text.replace('<speaker audio="alice-sounds-human-crowd-2.opus">', "")
-        ssml = f'<?xml version ="1.0" encoding="UTF-8"?><speak>{text}</speak>'
-        try:
-            xmltodict.parse(ssml)
-        except:
-            # TODO лог
-            return ""
-
-        return ssml
 
     def _user_thumbprint(self, request):
         if request.session.user:
@@ -215,27 +102,14 @@ class MarusiaAdapter:
 
     def _refresh_token(self, request: request_model.Model):
         error = False
-        user_thumbprint = self._user_thumbprint(request)
-        auth_token = None
-        # from state
         if request.state.user.auth_token:
+            # TODO check token
             auth_token = request.state.user.auth_token
-        # Проактивное обновление токена
-        # TODO включить, чтобы обновлять токен проактивно
-        always_check = False
-        if auth_token and always_check:
+        else:
             try:
-                get_permissions(auth_token)
-            except NeedAuth:
-                auth_token = None
-            except:
-                error = True
-                auth_token = None
-        # refresh
-        if not auth_token:
-            try:
+                user_thumbprint = self._user_thumbprint(request)
                 auth_token = self._auth.get_token(user_thumbprint)
-            except:
+            except Exception as e:
                 error = True
                 auth_token = None
 

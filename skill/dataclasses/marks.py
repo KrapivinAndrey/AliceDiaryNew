@@ -1,4 +1,4 @@
-from typing import ItemsView, List
+from typing import Dict, List
 
 
 class Record:
@@ -61,7 +61,7 @@ class Journal:
         return len(self.__journal)
 
     @property
-    def records(self) -> ItemsView[str, List[Record]]:
+    def records(self) -> Dict[str, List[Record]]:
         return self.__journal.items()
 
     def __str__(self) -> str:
