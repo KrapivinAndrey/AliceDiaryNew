@@ -155,25 +155,25 @@ class MarusiaAdapter:
 
     def _set_fio(self, event):
         morph = pymorphy2.MorphAnalyzer()
-        list_word = event['request']['nlu']['tokens']
-        name = ''
-        patronymic = ''
-        last_name = ''
+        list_word = event["request"]["nlu"]["tokens"]
+        name = ""
+        patronymic = ""
+        last_name = ""
         for word in list_word:
             parse_word = morph.parse(word)[0]
-            if 'Name' in parse_word.tag:
+            if "Name" in parse_word.tag:
                 name = parse_word[2]
-            if 'Patr' in parse_word.tag:
+            if "Patr" in parse_word.tag:
                 patronymic = parse_word[2]
-            if 'Surn' in parse_word.tag:
+            if "Surn" in parse_word.tag:
                 last_name = parse_word[2]
-        if name != '' or last_name != '':
+        if name != "" or last_name != "":
             value = {
-                        "type": 'FIO',
-                        "first_name": {name},
-                        "patronymic_name": {patronymic},
-                        "last_name": {last_name}
-                    }
+                "type": "FIO",
+                "first_name": {name},
+                "patronymic_name": {patronymic},
+                "last_name": {last_name},
+            }
             self._add_intents(event, value)
 
     def _add_intents(self, event, value):
