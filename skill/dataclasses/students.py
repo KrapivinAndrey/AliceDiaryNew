@@ -2,7 +2,7 @@ from typing import Union
 
 import pymorphy2
 
-from ..tools.synonym_names import find_synonym
+from skill.tools.synonym_names import find_synonym
 
 
 class Student:

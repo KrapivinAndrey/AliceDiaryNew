@@ -3,15 +3,9 @@ from datetime import time
 from alicefluentcheck import AliceEntity, AliceIntent, AliceIntentSlot, AliceRequest
 from pytest import fixture
 
-from skill.dataclasses import (
-    PlannedLesson,
-    Schedule,
-    Student,
-    Students,
-    Record,
-    Journal,
-)
-
+from skill.dataclasses.lessons import PlannedLesson, Schedule
+from skill.dataclasses.students import Student, Students
+from skill.dataclasses.marks import Record, Journal
 
 # region Студенты
 

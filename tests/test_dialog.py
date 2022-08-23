@@ -197,7 +197,7 @@ class TestSchedule:
         )
         result = AliceAnswer(main.handler(test))
         assert (
-            "Расписание уроков. Завтра\n"
+            "Расписание уроков. Сегодня\n"
             "Алиса. Нет уроков.\n"
             "Дмитрий. Нет уроков." == result.text
         )
