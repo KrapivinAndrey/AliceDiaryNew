@@ -1,9 +1,10 @@
 from dataclasses import dataclass
+from typing import Dict
 
 
 class PerfMonitor:
     def __init__(self) -> None:
-        self.measures = {}
+        self.measures: Dict[str, list] = {}
 
     def save_measure(self, method: str, start: float, stop: float):
         delta = stop - start
