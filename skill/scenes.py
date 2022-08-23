@@ -595,3 +595,12 @@ DEFAULT_BUTTONS = [
     button("Главное меню"),
 ]
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+DAYS_RU = [
+    "понедельник",
+    "вторник",
+    "среду",
+    "четверг",
+    "пятницу",
+    "субботу",
+    "воскресенье",
+]
