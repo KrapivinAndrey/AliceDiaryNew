@@ -3,7 +3,11 @@ from skill.constants.states import PREVIOUS_MOVES
 from skill.loggerfactory import LoggerFactory
 from skill.scenes import DEFAULT_SCENE, SCENES, global_scene_from_request
 
+from . import context as app_context
+from .tools.perfmon import PerfMonitor
 
+
+@app_context.perfmon
 def handler(event, context=None):
 
     logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
@@ -49,3 +53,13 @@ def get_id_scene(request: Request):
             return res.id()
 
     return res
+
+
+def set_config(config):
+    app_context.auth_service = config.get("auth_service")
+    if config.get("perfmon", False) is True:
+        app_context.perf_monitor = PerfMonitor()
+
+
+def get_perfmon():
+    return app_context.perf_monitor
