@@ -2,8 +2,8 @@ import base64
 
 from skill.main import handler as alice_handler, set_config, get_perfmon
 
-from .adapter import MarusiaAdapter
-from .models import request_model, ValidationError
+from endpoints.marusia.adapter import MarusiaAdapter
+from endpoints.marusia.models import request_model, ValidationError
 
 
 def handler(event, context=None):
