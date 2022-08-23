@@ -52,6 +52,7 @@ def permissions_url():
 # endregion
 
 
+@app_context.perfmon
 def get_students(token: str) -> Students:
     result = Students()
     response = requests.get(
@@ -79,6 +80,7 @@ def get_students(token: str) -> Students:
     return result
 
 
+@app_context.perfmon
 def get_schedule(token: str, student_id: str, day=None) -> Schedule:
     if day is None:
         day = date.today()
@@ -120,6 +122,7 @@ def get_schedule(token: str, student_id: str, day=None) -> Schedule:
     return result
 
 
+@app_context.perfmon
 def get_marks(token: str, student_id: str, day=None):
     if day is None:
         day = date.today()
@@ -164,6 +167,7 @@ def get_marks(token: str, student_id: str, day=None):
     return result
 
 
+@app_context.perfmon
 def get_permissions(token: str) -> None:
     response = requests.get(
         permissions_url(),
@@ -176,6 +180,7 @@ def get_permissions(token: str) -> None:
     return None
 
 
+@app_context.perfmon
 def refresh_token(token: str):
 
     if app_context.auth_service is not None:

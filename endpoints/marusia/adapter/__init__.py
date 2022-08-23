@@ -1,4 +1,3 @@
-import datetime
 import urllib.parse
 import uuid
 from typing import Union
@@ -9,6 +8,7 @@ import xmltodict
 from skill.constants import entities as skill_entities
 from skill.constants import intents as skill_intents
 from skill.dairy_api import NeedAuth, get_permissions
+from skill.main import app_context
 from skill.scenes import DAYS, DAYS_RU
 
 from ..models import request_model, response_model
@@ -23,6 +23,7 @@ class MarusiaAdapter:
 
     # public
 
+    @app_context.perfmon
     def parse_request(self, request: request_model.Model) -> dict:
 
         self._last_request = request
@@ -37,6 +38,7 @@ class MarusiaAdapter:
 
         return result
 
+    @app_context.perfmon
     def parse_response(self, data) -> response_model.Model:
 
         # response
@@ -67,6 +69,7 @@ class MarusiaAdapter:
 
     # auth_service
 
+    @app_context.perfmon
     def refresh_token(self):
         """
         Реактивное обновление токена
