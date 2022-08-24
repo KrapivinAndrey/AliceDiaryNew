@@ -32,5 +32,6 @@ def handler(event, context=None):
     marusia_response = adapter.parse_response(alice_result)
     return {
         "statusCode": 200,
+        "headers": {"Content-Type": "application/json"},
         "body": marusia_response.json(exclude_none=True),
     }
