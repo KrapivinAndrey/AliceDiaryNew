@@ -28,7 +28,9 @@ def handler(event, context=None):
 
     get_perfmon().print_report()
     marusia_response = adapter.parse_response(alice_result)
+    headers = {"Content-Type": "application/json"}
     return {
         "statusCode": 200,
         "body": marusia_response.json(exclude_none=True),
+        "headers": headers,
     }
