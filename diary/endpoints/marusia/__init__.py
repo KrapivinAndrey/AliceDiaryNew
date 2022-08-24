@@ -3,7 +3,6 @@ import base64
 from ...skill.main import get_perfmon
 from ...skill.main import handler as main_handler
 from ...skill.main import set_config
-
 from .adapter import MarusiaAdapter
 from .models import ValidationError, request_model
 

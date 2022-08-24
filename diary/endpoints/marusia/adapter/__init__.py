@@ -1,18 +1,16 @@
 import urllib.parse
 import uuid
-import pymorphy2
 from typing import Dict, Optional, Union
 
+import pymorphy2
 import requests
 import xmltodict
-
 
 from ....skill.constants import entities as skill_entities
 from ....skill.constants import intents as skill_intents
 from ....skill.dairy_api import NeedAuth, get_permissions
 from ....skill.main import app_context
 from ....skill.scenes import DAYS, DAYS_RU
-
 from ..models import request_model, response_model
 from . import request_parser, response_parser
 
@@ -22,16 +20,6 @@ class MarusiaAdapter:
         self._last_request: request_model.Model = None  # type: ignore
         self._last_response: response_model.Model = None  # type: ignore
         self._auth: "AuthAdapter" = AuthAdapter()
-
-    # @property
-    # def last_request(self) -> request_model.Model:
-    #    assert isinstance(self.last_request, request_model.Model)
-    #    return self.last_request
-    #
-    # @property
-    # def last_response(self) -> response_model.Model:
-    #    assert isinstance(self._last_response, response_model.Model)
-    #    return self._last_response
 
     # public
 

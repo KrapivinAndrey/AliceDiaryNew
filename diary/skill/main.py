@@ -1,8 +1,8 @@
 from ..skill.alice import Request
 from ..skill.constants.states import PREVIOUS_MOVES
-from .logger_factory import LoggerFactory
 from ..skill.scenes import DEFAULT_SCENE, SCENES, global_scene_from_request
 from . import context as app_context
+from .logger_factory import LoggerFactory
 from .tools.perfmon import PerfMonitor
 
 
