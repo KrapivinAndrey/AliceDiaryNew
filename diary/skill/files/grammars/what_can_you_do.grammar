@@ -1,6 +1,0 @@
-root:
-    $CanYouDo
-
-$CanYouDo:
-    %lemma
-    умеешь|можешь

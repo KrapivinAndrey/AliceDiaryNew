@@ -121,7 +121,7 @@ class RequestEntity:
         return str(self)
 
 
-def big_image(image_id: str, title=None, description=None) -> dict:
+def big_image(image_id: list, title=None, description=None):
     my_image = {"type": "BigImage", "image_id": image_id}
     if title:
         my_image["title"] = title

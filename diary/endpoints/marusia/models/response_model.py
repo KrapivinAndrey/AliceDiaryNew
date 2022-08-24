@@ -35,9 +35,7 @@ class Push(BaseModel):
 
 class Response(BaseModel):
     text: str = ""
-    tts: Union[str, None] = None
-    tts_type: Union[str, None] = None
-    ssml: Union[str, None] = None
+    tts: str = ""
     buttons: List[Button] = []
     commands: List[Union[CommandWidget, CommandText]] = []
     push: Union[Push, None] = None
