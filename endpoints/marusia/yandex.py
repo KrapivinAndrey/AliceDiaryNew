@@ -27,7 +27,9 @@ def handler(event, context=None):
     alice_result = alice_handler(event_alice)
 
     marusia_response = adapter.parse_response(alice_result)
+    headers = {"Content-Type": "application/json"}
     return {
         "statusCode": 200,
         "body": marusia_response.json(exclude_none=True),
+        "headers": headers,
     }
