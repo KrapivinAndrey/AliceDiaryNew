@@ -2,10 +2,11 @@ import pytest
 import datetime
 from alicefluentcheck import AliceAnswer, AliceEntity, AliceIntent, AliceRequest
 
-import skill.main as main
-import skill.texts as texts
-from skill.scenes import SCENES
-import skill.constants.states as states
+from diary.skill import main
+from diary.skill import texts
+from diary.skill.scenes import SCENES
+from diary.skill.constants import states
+
 from tests.mocking import (
     setup_mock_children,
     setup_mock_schedule_no_auth,
@@ -197,7 +198,7 @@ class TestSchedule:
         )
         result = AliceAnswer(main.handler(test))
         assert (
-            "Расписание уроков. Сегодня\n"
+            "Расписание уроков. Завтра\n"
             "Алиса. Нет уроков.\n"
             "Дмитрий. Нет уроков." == result.text
         )

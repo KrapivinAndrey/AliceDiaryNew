@@ -22,7 +22,7 @@ jobs:
           runtime: 'python39'
           memory: '128'
           environment: DIARY_URL=${{ secrets.DIARY_URL }},SENTRY_DSN=${{ secrets.SENTRY_DSN }},DEBUG=False,ENVIRONMENT=Stage
-          entrypoint: 'skill.main.handler'
+          entrypoint: 'diary.alice_handler'
           source: './'
   Production:
     environment:
@@ -47,5 +47,5 @@ jobs:
           runtime: 'python39'
           memory: '128'
           environment: DIARY_URL=${{ secrets.DIARY_URL }},SENTRY_DSN=${{ secrets.SENTRY_DSN }},DEBUG=False,ENVIRONMENT=Stage
-          entrypoint: 'endpoints.marusia.yandex.handler'
+          entrypoint: 'diary.marusia_handler'
           source: './'

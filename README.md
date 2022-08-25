@@ -13,3 +13,7 @@ zip -x "venv/*" -x ".env" -x "*.zip" -r app.zip *
 ```
 py -m mypy --config-file mypy.ini --install-types --non-interactive skill
 ```
+
+```
+flask --app diary run
+```
