@@ -1,6 +1,6 @@
 from requests_mock import Mocker
 from datetime import datetime
-from skill.dairy_api import schedule_url, students_url, journal_url
+from diary.skill.dairy_api import schedule_url, students_url, journal_url
 
 true = True
 false = False

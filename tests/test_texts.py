@@ -1,4 +1,4 @@
-import skill.texts as texts
+from diary.skill import texts
 
 
 class TestMarks:

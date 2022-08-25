@@ -1,6 +1,6 @@
 from datetime import time
 
-from skill.dataclasses.lessons import Schedule
+from diary.skill.dataclasses.lessons import Schedule
 
 
 class TestLessons:

@@ -1,4 +1,4 @@
-from skill.tools.synonym_names import find_synonym
+from diary.skill.tools.synonym_names import find_synonym
 
 
 def test_synonym_exists():
