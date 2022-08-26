@@ -426,11 +426,13 @@ class TestHomework:
     def test_wrong_student(self, scene_id, students_dump, requests_mock):
         setup_mock_schedule_with_params(requests_mock, token="111")
         setup_mock_big_journal_with_params(requests_mock, token="111")
+        fio = AliceEntity().fio(first_name="Георгий")
         test = (
             AliceRequest()
             .command("Что задали Гоше")
             .from_scene(scene_id)
             .access_token("111")
+            .add_entity(fio)
             .add_to_state_user("students", students_dump)
             .build()
         )
@@ -446,12 +448,14 @@ class TestHomework:
         setup_mock_big_journal_with_params(
             requests_mock, token="111", edu_id="100", empty=True
         )
+        fio = AliceEntity().fio(first_name="Алиса")
 
         test = (
             AliceRequest()
             .command("Какая домашка у Алисы")
             .from_scene("Welcome")
             .access_token("111")
+            .add_entity(fio)
             .add_to_state_user("students", students_dump)
             .build()
         )
@@ -461,16 +465,16 @@ class TestHomework:
         assert "Дмитрий" not in result.text
 
     def test_synonym_of_student(self, students_dump, requests_mock):
-        setup_mock_schedule_with_params(requests_mock, token="111", edu_id="1")
         setup_mock_schedule_with_params(requests_mock, token="111", edu_id="100")
-        setup_mock_big_journal_with_params(requests_mock, token="111", edu_id="1")
         setup_mock_big_journal_with_params(requests_mock, token="111", edu_id="100")
+        fio = AliceEntity().fio(first_name="Дима")
 
         test = (
             AliceRequest()
             .command("Какое домашнее задание у Димы")
             .from_scene("Welcome")
             .access_token("111")
+            .add_entity(fio)
             .add_to_state_user("students", students_dump)
             .build()
         )
