@@ -944,7 +944,7 @@ def setup_mock_schedule_auth(m: Mocker):
 
 
 def setup_mock_schedule_with_params(
-    m: Mocker, *, edu_id=None, ask_day=None, token: str, num: int
+    m: Mocker, *, edu_id=None, ask_day=None, token: str, num=1
 ):
     if num == 0:
         json = json_empty()
