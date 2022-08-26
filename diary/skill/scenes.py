@@ -128,13 +128,13 @@ def global_scene_from_request(
 ]:
     if len(intersection_list(intents.help_word_list, request.tokens)) > 0:
         next_scene = HelpMenuStart  # type: ignore
-    # elif isIntentWhatCanYouDo(request.tokens):
-    #     next_scene = WhatCanDo  # type: ignore
+    elif isIntentWhatCanYouDo(request.tokens):
+        next_scene = WhatCanDo  # type: ignore
     elif len(list(set(intents.clear_settings_word_list) & set(request.tokens))) > 0:
         next_scene = ClearSettings  # type: ignore
     # TODO: Не читать из файла
-    # elif isIntentRepeat(request.tokens):
-    #     next_scene = Repeat  # type: ignore
+    elif isIntentRepeat(request.tokens):
+        next_scene = Repeat  # type: ignore
     elif len(intersection_list(intents.exit_word_list, request.tokens)) > 0:
         next_scene = Goodbye  # type: ignore
     # Глобальные команды
