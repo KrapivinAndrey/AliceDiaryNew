@@ -243,6 +243,22 @@ def __how_many_lessons(n: int) -> str:
     return f"{str(n)} {last}"
 
 
+def __how_many_tasks(n: int) -> str:
+    if n == 0:
+        return "Нет домашнего задания."
+    first = n % 10
+    second = n % 100
+
+    if (2 <= first <= 4) and not (12 <= second <= 14):
+        last = "задания."
+    elif first == 1 and not second == 11:
+        last = "задание."
+    else:
+        last = "заданий."
+
+    return f"{str(n)} {last}"
+
+
 # endregion
 
 
@@ -266,6 +282,14 @@ def schedule_title(req_date):
     title = title_date(req_date)
     text = f"Расписание уроков. {title}"
     tts = f"Расписание на {title}"
+
+    return text, tts
+
+
+def homework_title(req_date):
+    title = title_date(req_date)
+    text = f"Домашнее задание. {title}"
+    tts = f"Домашнее задание на {title}"
 
     return text, tts
 
@@ -310,6 +334,37 @@ def schedule_for_student(student: Student, schedule: Schedule):
     tts.append(f"Уроки закончатся в {schedule.lessons[-1].end_time}")
 
     return "\n".join(text), "sil<[100]>".join(tts)
+
+
+def homework_for_student(student: Student, homework: List):
+    count = len(homework)
+    count_str = __how_many_tasks(count)
+
+    text = [f"{student.name}. {count_str}"]
+    tts = [f"У {student.inflect['родительный']} {count_str}"]
+    if not homework:
+        return text[0], tts[0]
+
+    # Домашка
+    for lesson, task in homework:
+        text.append(f"{lesson}. {task}")
+        tts.append(__tell_about_task(lesson, task))
+
+    return "\n".join(text), "sil<[100]>".join(tts)
+
+
+def __tell_about_task(lesson: str, task: str):
+    tell_task = (
+        task.replace("§", "параграф ")
+        .replace("№№", "номера ")
+        .replace("№", "номер ")
+        .replace("стр.", "страница ")
+        .replace("с.", "страница ")
+        .replace("упр.", "упражнение ")
+        .replace("у.", "упражнение ")
+        .replace("ур.", "урок ")
+    )
+    return f"sil<[200]> {lesson} sil<[300]> {tell_task}"
 
 
 def lesson_num_title(num: int, req_date):

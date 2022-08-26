@@ -92,7 +92,7 @@ class TestHelp:
     def test_helpme(self, scene_id):
         test = (
             AliceRequest()
-            .command("Па-ма-ги-тееее!")
+            .command("Помощь")
             .from_scene(scene_id)
             .add_intent(AliceIntent().help())
             .build()
