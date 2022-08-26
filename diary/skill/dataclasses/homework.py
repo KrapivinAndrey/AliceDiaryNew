@@ -16,7 +16,9 @@ class Homework:
 
     def filter_by_lessons(self, lessons: List[str]):
         # TODO: добавить нечеткое сравнение строк
-        return [(lesson, task) for lesson, task in self.__tasks.items() if lesson in lessons]
+        return [
+            (lesson, task) for lesson, task in self.__tasks.items() if lesson in lessons
+        ]
 
     @property
     def len(self) -> int:

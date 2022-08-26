@@ -7,7 +7,15 @@ import requests
 
 from . import context as app_context  # type: ignore
 from .constants.exceptions import NeedAuth
-from .dataclasses import Homework, Journal, PlannedLesson, Record, Schedule, Student, Students
+from .dataclasses import (
+    Homework,
+    Journal,
+    PlannedLesson,
+    Record,
+    Schedule,
+    Student,
+    Students,
+)
 from .logger_factory import LoggerFactory
 
 logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
@@ -193,7 +201,11 @@ def get_homework(token, student_id: str, day=None) -> Homework:
     for item in api_homework:
         for task in item.get("tasks", []):
             if task["task_kind_code"] == "homework":
-                result.add(item.get("datetime_from"), item.get("subject_name"), task["task_name"])
+                result.add(
+                    item.get("datetime_from"),
+                    item.get("subject_name"),
+                    task["task_name"],
+                )
 
     return result
 
