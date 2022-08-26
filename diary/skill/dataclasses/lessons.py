@@ -79,3 +79,7 @@ class Schedule:
     @property
     def no_lessons(self):
         return len(self.lessons) == 0
+
+    @property
+    def list(self):
+        return [x.name for x in self.lessons]
