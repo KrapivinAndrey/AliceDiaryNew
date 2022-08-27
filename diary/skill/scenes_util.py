@@ -2,9 +2,10 @@ import json
 from abc import ABC, abstractmethod
 from typing import Optional
 
+from diary.logger_factory import LoggerFactory
+
 from ..skill.alice import Request
 from ..skill.constants.states import PERMANENT_VALUES, PREVIOUS_MOVES, StateResponseKey
-from .logger_factory import LoggerFactory
 
 
 class Scene(ABC):
@@ -88,7 +89,7 @@ class Scene(ABC):
         prev_moves = request.session.get(PREVIOUS_MOVES, [])
         prev_moves.append(request.command)
         webhook_response[StateResponseKey.SESSION][PREVIOUS_MOVES] = prev_moves[-10:]
-        logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
+        logger = LoggerFactory.get_logger(__name__)
         logger.debug(f"RESPONSE {json.dumps(webhook_response, ensure_ascii=False)}")
 
         return webhook_response
