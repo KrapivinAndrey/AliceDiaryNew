@@ -88,7 +88,7 @@ class Scene(ABC):
         prev_moves = request.session.get(PREVIOUS_MOVES, [])
         prev_moves.append(request.command)
         webhook_response[StateResponseKey.SESSION][PREVIOUS_MOVES] = prev_moves[-10:]
-        logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
+        logger = LoggerFactory.get_logger(__name__)
         logger.debug(f"RESPONSE {json.dumps(webhook_response, ensure_ascii=False)}")
 
         return webhook_response
