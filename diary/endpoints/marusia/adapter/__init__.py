@@ -1,3 +1,4 @@
+import os
 import urllib.parse
 import uuid
 from typing import Dict, Optional, Union
@@ -268,8 +269,14 @@ class MarusiaAdapter:
 class AuthAdapter:
     def __init__(self) -> None:
         self._re = requests.session()
-        self._back = "https://functions.yandexcloud.net/d4er5fg80dbecq63tf12"
-        self._front = "https://dnevnik2.petersburgedu.ru/api/journal/user/yandex-login"
+        self._back = os.getenv(
+            "OAUTH_BACK", "https://functions.yandexcloud.net/d4ergf6ref8r56u4oaor"
+        )
+        self._front = os.getenv(
+            "OAUTH_FRONT",
+            "https://dnevnik2.petersburgedu.ru/api/journal/user/yandex-login",
+        )
+        self._secret = os.getenv("OAUTH_SECRET")
         self.need = False
         self.error = False
 
@@ -277,7 +284,10 @@ class AuthAdapter:
         resp = self._re.get(
             f"{self._back}",
             params={"state": user_id},
-            headers={"X-Method": "get-jwt"},
+            headers={
+                "X-Method": "get-jwt",
+                "X-Secret": self._secret,
+            },
         )
         if resp.status_code == 200:
             return resp.text
