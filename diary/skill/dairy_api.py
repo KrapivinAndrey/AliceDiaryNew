@@ -5,7 +5,7 @@ from datetime import date, datetime, time, timedelta
 
 import requests
 
-from . import context as app_context  # type: ignore
+from .. import context as app_context
 from .constants.exceptions import NeedAuth
 from .dataclasses import (
     Homework,
@@ -16,9 +16,9 @@ from .dataclasses import (
     Student,
     Students,
 )
-from .logger_factory import LoggerFactory
+from diary.logger_factory import LoggerFactory
 
-logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
+logger = LoggerFactory.get_logger(__name__)
 # region URLs
 
 
