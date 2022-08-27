@@ -12,7 +12,9 @@ from .constants.exceptions import NeedAuth
 from .constants.images import CONFUSED, GOODBYE
 from .dataclasses import Students
 from .scenes_util import Scene
-from .tools.dates_transformations import transform_yandex_datetime_value_to_datetime as ya_date_transform
+from .tools.dates_transformations import (
+    transform_yandex_datetime_value_to_datetime as ya_date_transform,
+)
 
 logger = LoggerFactory.get_logger(__name__)
 # region Выделение данных для запроса
