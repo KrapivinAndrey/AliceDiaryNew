@@ -1,8 +1,9 @@
 from diary.skill import dairy_api
 from tests.mocking import (
+    setup_mock_big_journal_with_params,
     setup_mock_children,
-    setup_mock_schedule_with_params,
     setup_mock_journal_with_params,
+    setup_mock_schedule_with_params,
 )
 
 
@@ -36,3 +37,12 @@ def test_get_journal_empty(requests_mock):
     journal = dairy_api.get_marks("111", "111")
 
     assert journal.len == 0
+
+
+def test_get_homework(requests_mock):
+    setup_mock_big_journal_with_params(
+        requests_mock, edu_id="111", token="111"
+    )
+    tasks = dairy_api.get_homework("111", "111")
+
+    assert tasks.len

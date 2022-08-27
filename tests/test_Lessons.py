@@ -45,3 +45,6 @@ class TestSchedule:
     def test_get_by_time_none(self, schedule):
         test_time = time(17, 30)
         assert schedule.find_by_time(test_time) is None
+
+    def test_list(self, schedule):
+        assert schedule.list_of_lessons == ["Алгебра", "Русский язык", "Геометрия"]

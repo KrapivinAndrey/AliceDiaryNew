@@ -1,13 +1,21 @@
 # mypy: ignore-errors
 
 import os
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 
 import requests
 
 from . import context as app_context  # type: ignore
 from .constants.exceptions import NeedAuth
-from .dataclasses import Journal, PlannedLesson, Record, Schedule, Student, Students
+from .dataclasses import (
+    Homework,
+    Journal,
+    PlannedLesson,
+    Record,
+    Schedule,
+    Student,
+    Students,
+)
 from .logger_factory import LoggerFactory
 
 logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
@@ -155,6 +163,49 @@ def get_marks(token: str, student_id: str, day=None):
                 rec.get("estimate_comment"),
             )
             result.add(item.get("subject_name"), record)
+
+    return result
+
+
+@app_context.perfmon
+def get_homework(token, student_id: str, day=None) -> Homework:
+    if day is None:
+        day = date.today()
+    start_time = datetime.combine(day - timedelta(days=7), time.min)
+    finish_time = datetime.combine(day, time.max)
+
+    response = requests.get(
+        journal_url(),
+        params={
+            "p_educations[]": student_id,
+            "p_datetime_from": datetime.strftime(start_time, "%d.%m.%Y %H:%M:%S"),
+            "p_datetime_to": datetime.strftime(finish_time, "%d.%m.%Y %H:%M:%S"),
+        },
+        cookies={"X-JWT-Token": token},
+        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
+    )
+
+    if response.status_code == 401:
+        raise NeedAuth()
+
+    result = Homework()
+
+    try:
+        api_homework = response.json().get("data", {}).get("items", [])
+    except (Exception,):
+        logger.exception(
+            f"Не удалось разобрать тело ответа", extra={"body": response.text}
+        )
+        raise
+
+    for item in api_homework:
+        for task in item.get("tasks", []):
+            if task["task_kind_code"] == "homework":
+                result.add(
+                    item.get("datetime_from"),
+                    item.get("subject_name"),
+                    task["task_name"],
+                )
 
     return result
 
