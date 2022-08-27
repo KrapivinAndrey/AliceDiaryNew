@@ -5,18 +5,11 @@ from datetime import date, datetime, time, timedelta
 
 import requests
 
-from .. import context as app_context
-from .constants.exceptions import NeedAuth
-from .dataclasses import (
-    Homework,
-    Journal,
-    PlannedLesson,
-    Record,
-    Schedule,
-    Student,
-    Students,
-)
+from diary import context as app_context
 from diary.logger_factory import LoggerFactory
+
+from .constants.exceptions import NeedAuth
+from .dataclasses import Homework, Journal, PlannedLesson, Record, Schedule, Student, Students
 
 logger = LoggerFactory.get_logger(__name__)
 # region URLs

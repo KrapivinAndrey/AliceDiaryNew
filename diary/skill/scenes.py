@@ -3,17 +3,16 @@ import inspect
 import sys
 from typing import List, Union
 
+from diary.logger_factory import LoggerFactory
+
 from . import dairy_api, gr, texts
 from .alice import Request, big_image, button
 from .constants import entities, intents, states
 from .constants.exceptions import NeedAuth
 from .constants.images import CONFUSED, GOODBYE
 from .dataclasses import Students
-from diary.logger_factory import LoggerFactory
 from .scenes_util import Scene
-from .tools.dates_transformations import (
-    transform_yandex_datetime_value_to_datetime as ya_date_transform,
-)
+from .tools.dates_transformations import transform_yandex_datetime_value_to_datetime as ya_date_transform
 
 logger = LoggerFactory.get_logger(__name__)
 # region Выделение данных для запроса

@@ -1,8 +1,9 @@
-from ..skill.alice import Request
-from ..skill.constants.states import PREVIOUS_MOVES
-from ..skill.scenes import DEFAULT_SCENE, SCENES, global_scene_from_request
-from .. import context as app_context
+from diary import context as app_context
 from diary.logger_factory import LoggerFactory
+from diary.skill.alice import Request
+from diary.skill.constants.states import PREVIOUS_MOVES
+from diary.skill.scenes import DEFAULT_SCENE, SCENES, global_scene_from_request
+
 from .tools.perfmon import PerfMonitor
 
 logger = LoggerFactory.get_logger(__name__)
