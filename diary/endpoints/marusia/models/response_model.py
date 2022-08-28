@@ -11,14 +11,6 @@ from pydantic import BaseModel
 from . import common_model
 
 
-class Card(BaseModel):
-    type: str = "Link"
-    url: str = ""
-    title: str = None
-    text: str = None
-    image_id: int = ""
-
-
 class Button(BaseModel):
     title: str
     payload: Union[Dict[str, Any], None] = None
@@ -46,8 +38,7 @@ class Response(BaseModel):
     tts: Union[str, None] = None
     tts_type: Union[str, None] = None
     ssml: Union[str, None] = None
-    buttons: List[Button] = None
-    card: Card = None
+    buttons: List[Button] = []
     commands: List[Union[CommandWidget, CommandText]] = []
     push: Union[Push, None] = None
     end_session: bool = True
