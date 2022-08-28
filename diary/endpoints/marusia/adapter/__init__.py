@@ -253,10 +253,12 @@ class MarusiaAdapter:
         response = response_model.Response()
         response.text = "Привет, нажмите на кнопку чтобы войти в дневник"
         user_thumbprint = self._user_thumbprint(self._last_request)
-        button = response_model.Button(
-            title="Войти", url=self._auth.build_login_uri(user_thumbprint)
+        response.card = response_model.Card(
+            url=f"[{self._auth.build_login_uri(user_thumbprint)}]",
+            title="Авторизация в навыке",
+            text="Введите логик и пароль",
+            image_id=457239018,
         )
-        response.buttons.append(button)
         return response_model.Model(response=response)
 
     def _auth_dialog_error(self):
