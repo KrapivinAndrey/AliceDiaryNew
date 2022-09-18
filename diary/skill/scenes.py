@@ -775,16 +775,17 @@ def isIntentMakrs(intentList):
     result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
     return result
 
+
 def isConfirm(intentList):
     ListKey = intents.confirm_word_list
-    result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
+    result = len(listIntersection(intentList, ListKey)) > 0
     return result
+
 
 def isDiscard(intentList):
     ListKey = intents.discard_word_list
-    result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
+    result = len(listIntersection(intentList, ListKey)) > 0
     return result
-
 
 
 SCENES = {scene.id(): scene for scene in _list_scenes()}
