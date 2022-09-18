@@ -208,7 +208,7 @@ def goodbye():
 
 def title_date(req_date):
     if req_date is None:
-        str_date = "Сегодня"
+        str_date = "сегодня"
     elif req_date.date() in KNOWN_DATES:
         str_date = KNOWN_DATES[req_date.date()]
     else:
@@ -216,7 +216,7 @@ def title_date(req_date):
             f"{req_date.date().day} {text_constants.MONTH_NAME[req_date.date().month]}"
         )
 
-    return str_date
+    return f"На {str_date}"
 
 
 def nothing_to_repeat():
