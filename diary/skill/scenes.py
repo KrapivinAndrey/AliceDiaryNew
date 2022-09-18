@@ -296,7 +296,7 @@ class Welcome(SceneWithAuth):
         )
 
     def handle_local_intents(self, request: Request):
-        if request.is_intent(intents.CONFIRM):
+        if isConfirm(request.tokens):
             return GetSchedule()
 
 
@@ -329,9 +329,9 @@ class HelpMenuStart(GlobalScene):
         return self.make_response(request, text, tts, buttons=YES_NO)
 
     def handle_local_intents(self, request: Request):
-        if request.is_intent(intents.CONFIRM):
+        if isConfirm(request.tokens):
             return HelpMenuMarks()
-        if request.is_intent(intents.REJECT):
+        if isDiscard(request.tokens):
             return Welcome()
 
 
@@ -341,9 +341,9 @@ class HelpMenuMarks(GlobalScene):
         return self.make_response(request, text, tts, buttons=YES_NO)
 
     def handle_local_intents(self, request: Request):
-        if request.is_intent(intents.CONFIRM):
+        if isConfirm(request.tokens):
             return HelpMenuSpec()
-        if request.is_intent(intents.REJECT):
+        if isDiscard(request.tokens):
             return Welcome()
 
 
@@ -368,9 +368,9 @@ class WhatCanDo(GlobalScene):
         )
 
     def handle_local_intents(self, request: Request):
-        if intents.CONFIRM in request.intents:
+        if isConfirm(request.tokens):
             return HelpMenuStart()
-        if intents.REJECT in request.intents:
+        if isDiscard(request.tokens):
             return Welcome()
 
 
@@ -774,6 +774,17 @@ def isIntentMakrs(intentList):
     ListKey = listKeyLessonMarks()
     result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
     return result
+
+def isConfirm(intentList):
+    ListKey = intents.confirm_word_list
+    result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
+    return result
+
+def isDiscard(intentList):
+    ListKey = intents.discard_word_list
+    result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
+    return result
+
 
 
 SCENES = {scene.id(): scene for scene in _list_scenes()}
