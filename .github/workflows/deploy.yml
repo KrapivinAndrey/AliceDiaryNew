@@ -8,7 +8,7 @@ on:
       - '**.txt'
 
 jobs:
-  Deploy:
+  Staging:
     environment:
       name: Staging
     if: github.ref != 'refs/heads/main'
