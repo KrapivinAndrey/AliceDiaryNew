@@ -14,6 +14,7 @@ from tests.mocking import (
     setup_mock_schedule_with_params,
     setup_mock_journal,
     setup_mock_journal_with_params,
+    setup_mock_big_journal_with_params,
 )
 
 
@@ -92,7 +93,7 @@ class TestHelp:
     def test_helpme(self, scene_id):
         test = (
             AliceRequest()
-            .command("Па-ма-ги-тееее!")
+            .command("Помощь")
             .from_scene(scene_id)
             .add_intent(AliceIntent().help())
             .build()
@@ -198,7 +199,7 @@ class TestSchedule:
         )
         result = AliceAnswer(main.handler(test))
         assert (
-            "Расписание уроков. Завтра\n"
+            "Расписание уроков. На Завтра\n"
             "Алиса. Нет уроков.\n"
             "Дмитрий. Нет уроков." == result.text
         )
@@ -225,7 +226,7 @@ class TestSchedule:
         )
         result = AliceAnswer(main.handler(test))
         assert (
-            "1 Января. 4 урок:\n"
+            "На 1 Января. 4 урок:\n"
             "Алиса - Информатика: 12:31 - 12:55\n"
             "Дмитрий - Информатика: 12:31 - 12:55" == result.text
         )
@@ -252,7 +253,7 @@ class TestSchedule:
         )
         result = AliceAnswer(main.handler(test))
         assert (
-            "1 Января. 4 урок:\n"
+            "На 1 Января. 4 урок:\n"
             "Алиса - Информатика: 12:31 - 12:55\n"
             "Дмитрий. Нет урока." == result.text
         )
@@ -416,5 +417,87 @@ class TestMarks:
         )
         result = AliceAnswer(main.handler(test))
         assert "Записи в журнале" in result.text
+        assert "Алиса" in result.text
+        assert "Дмитрий" in result.text
+
+
+class TestHomework:
+    @pytest.mark.parametrize("scene_id", SCENES)
+    def test_wrong_student(self, scene_id, students_dump, requests_mock):
+        setup_mock_schedule_with_params(requests_mock, token="111")
+        setup_mock_big_journal_with_params(requests_mock, token="111")
+        fio = AliceEntity().fio(first_name="Георгий")
+        test = (
+            AliceRequest()
+            .command("Что задали Гоше")
+            .from_scene(scene_id)
+            .access_token("111")
+            .add_entity(fio)
+            .add_to_state_user("students", students_dump)
+            .build()
+        )
+        result = AliceAnswer(main.handler(test))
+        assert result.text == texts.unknown_student()[0]
+
+    def test_name_of_student(self, students_dump, requests_mock):
+        setup_mock_schedule_with_params(requests_mock, token="111", edu_id="1")
+        setup_mock_schedule_with_params(requests_mock, token="111", edu_id="100")
+        setup_mock_big_journal_with_params(
+            requests_mock, token="111", edu_id="1", empty=False
+        )
+        setup_mock_big_journal_with_params(
+            requests_mock, token="111", edu_id="100", empty=True
+        )
+        fio = AliceEntity().fio(first_name="Алиса")
+
+        test = (
+            AliceRequest()
+            .command("Какая домашка у Алисы")
+            .from_scene("Welcome")
+            .access_token("111")
+            .add_entity(fio)
+            .add_to_state_user("students", students_dump)
+            .build()
+        )
+        result = AliceAnswer(main.handler(test))
+        assert "Домашнее задание" in result.text
+        assert "Алиса" in result.text
+        assert "Дмитрий" not in result.text
+
+    def test_synonym_of_student(self, students_dump, requests_mock):
+        setup_mock_schedule_with_params(requests_mock, token="111", edu_id="100")
+        setup_mock_big_journal_with_params(requests_mock, token="111", edu_id="100")
+        fio = AliceEntity().fio(first_name="Дима")
+
+        test = (
+            AliceRequest()
+            .command("Какое домашнее задание у Димы")
+            .from_scene("Welcome")
+            .access_token("111")
+            .add_entity(fio)
+            .add_to_state_user("students", students_dump)
+            .build()
+        )
+        result = AliceAnswer(main.handler(test))
+        assert "Домашнее задание" in result.text
+        assert "Алиса" not in result.text
+        assert "Дмитрий" in result.text
+
+    def test_all_students(self, students_dump, requests_mock):
+        setup_mock_schedule_with_params(requests_mock, token="111", edu_id="1")
+        setup_mock_schedule_with_params(requests_mock, token="111", edu_id="100")
+        setup_mock_big_journal_with_params(requests_mock, token="111", edu_id="1")
+        setup_mock_big_journal_with_params(requests_mock, token="111", edu_id="100")
+
+        test = (
+            AliceRequest()
+            .command("Что задали")
+            .from_scene("Welcome")
+            .access_token("111")
+            .add_to_state_user("students", students_dump)
+            .build()
+        )
+        result = AliceAnswer(main.handler(test))
+        assert "Домашнее задание" in result.text
         assert "Алиса" in result.text
         assert "Дмитрий" in result.text

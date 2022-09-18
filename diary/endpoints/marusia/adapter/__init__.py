@@ -1,3 +1,4 @@
+import os
 import urllib.parse
 import uuid
 from typing import Dict, Optional, Union
@@ -8,7 +9,7 @@ import xmltodict
 
 from ....skill.constants import entities as skill_entities
 from ....skill.constants import intents as skill_intents
-from ....skill.dairy_api import NeedAuth, get_permissions
+from ....skill.dairy_api import NeedAuth, get_students
 from ....skill.main import app_context
 from ....skill.scenes import DAYS, DAYS_RU
 from ..models import request_model, response_model
@@ -181,6 +182,7 @@ class MarusiaAdapter:
         event["request"]["nlu"].setdefault("entities", {})
         event["request"]["nlu"]["entities"].append(value)
 
+    @app_context.perfmon
     def _set_auth_token(self, request: request_model.Model):
 
         auth_token, error = self._refresh_token(request)
@@ -220,6 +222,7 @@ class MarusiaAdapter:
             user_thumbprint = request.session.application.application_id
         return user_thumbprint
 
+    @app_context.perfmon
     def _refresh_token(self, request: request_model.Model):
         error = False
         user_thumbprint = self._user_thumbprint(request)
@@ -230,10 +233,10 @@ class MarusiaAdapter:
             auth_token = request.state.user.auth_token
         # Проактивное обновление токена
         # TODO включить, чтобы обновлять токен проактивно
-        always_check = False
+        always_check = True
         if auth_token and always_check:
             try:
-                get_permissions(auth_token)
+                get_students(auth_token)
             except NeedAuth:
                 auth_token = None
             except:
@@ -253,10 +256,12 @@ class MarusiaAdapter:
         response = response_model.Response()
         response.text = "Привет, нажмите на кнопку чтобы войти в дневник"
         user_thumbprint = self._user_thumbprint(self._last_request)
-        button = response_model.Button(
+        button_login = response_model.Button(
             title="Войти", url=self._auth.build_login_uri(user_thumbprint)
         )
-        response.buttons.append(button)
+        button_help = response_model.Button(title="Что ты умеешь?")
+        response.buttons.append(button_login)
+        response.buttons.append(button_help)
         return response_model.Model(response=response)
 
     def _auth_dialog_error(self):
@@ -268,16 +273,26 @@ class MarusiaAdapter:
 class AuthAdapter:
     def __init__(self) -> None:
         self._re = requests.session()
-        self._back = "https://functions.yandexcloud.net/d4er5fg80dbecq63tf12"
-        self._front = "https://dnevnik2.petersburgedu.ru/api/journal/user/yandex-login"
+        self._back = os.getenv(
+            "OAUTH_BACK", "https://functions.yandexcloud.net/d4ergf6ref8r56u4oaor"
+        )
+        self._front = os.getenv(
+            "OAUTH_FRONT",
+            "https://dnevnik2.petersburgedu.ru/api/journal/user/yandex-login",
+        )
+        self._secret = os.getenv("OAUTH_SECRET")
         self.need = False
         self.error = False
 
+    @app_context.perfmon
     def get_token(self, user_id):
         resp = self._re.get(
             f"{self._back}",
             params={"state": user_id},
-            headers={"X-Method": "get-jwt"},
+            headers={
+                "X-Method": "get-jwt",
+                "X-Secret": self._secret,
+            },
         )
         if resp.status_code == 200:
             return resp.text

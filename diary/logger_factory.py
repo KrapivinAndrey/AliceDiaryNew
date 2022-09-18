@@ -44,11 +44,17 @@ class LoggerFactory(object):
         return LoggerFactory._LOG
 
     @staticmethod
-    def get_logger(log_file, log_level):
+    def get_logger(log_file):
         """
         A static method called by other modules to initialize logger in
         their own module
         """
+
+        if os.environ.get("DEBUG") == "True":
+            log_level = "DEBUG"
+        else:
+            log_level = "INFO"
+
         logger = LoggerFactory.__create_logger(log_file, log_level)
 
         # return the logger object

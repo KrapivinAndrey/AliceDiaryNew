@@ -1,4 +1,4 @@
-from diary.skill.dataclasses.marks import Record, Journal
+from diary.skill.dataclasses import Record, Journal
 
 
 class TestRecord:

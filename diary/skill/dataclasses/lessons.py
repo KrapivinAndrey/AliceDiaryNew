@@ -1,5 +1,5 @@
 from datetime import time
-from typing import Union
+from typing import List, Union
 
 from ..constants.entities import image_ids, subjects
 
@@ -79,3 +79,7 @@ class Schedule:
     @property
     def no_lessons(self):
         return len(self.lessons) == 0
+
+    @property
+    def list_of_lessons(self) -> List[str]:
+        return [x.name for x in self.lessons]

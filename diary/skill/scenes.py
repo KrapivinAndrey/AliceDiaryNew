@@ -3,19 +3,20 @@ import inspect
 import sys
 from typing import List, Union
 
+from diary.logger_factory import LoggerFactory
+
 from . import dairy_api, gr, texts
 from .alice import Request, big_image, button
 from .constants import entities, intents, states
 from .constants.exceptions import NeedAuth
 from .constants.images import CONFUSED, GOODBYE
 from .dataclasses import Students
-from .logger_factory import LoggerFactory
 from .scenes_util import Scene
 from .tools.dates_transformations import (
     transform_yandex_datetime_value_to_datetime as ya_date_transform,
 )
 
-logger = LoggerFactory.get_logger(__name__, log_level="DEBUG")
+logger = LoggerFactory.get_logger(__name__)
 # region Выделение данных для запроса
 
 
@@ -132,6 +133,7 @@ def global_scene_from_request(
         next_scene = WhatCanDo  # type: ignore
     elif len(list(set(intents.clear_settings_word_list) & set(request.tokens))) > 0:
         next_scene = ClearSettings  # type: ignore
+    # TODO: Не читать из файла
     elif isIntentRepeat(request.tokens):
         next_scene = Repeat  # type: ignore
     elif len(intersection_list(intents.exit_word_list, request.tokens)) > 0:
@@ -139,6 +141,8 @@ def global_scene_from_request(
     # Глобальные команды
     elif len(intersection_list(intents.get_schedule_word_list, request.tokens)) > 0:
         next_scene = GetSchedule  # type: ignore
+    elif len(intersection_list(intents.get_homework_word_list, request.tokens)) > 0:
+        next_scene = GetHomework  # type: ignore
     elif len(intersection_list(intents.main_menu_word_list, request.tokens)) > 0:
         next_scene = Welcome  # type: ignore
     elif intents.LESSON_BY_NUM in request.intents:
@@ -292,7 +296,7 @@ class Welcome(SceneWithAuth):
         )
 
     def handle_local_intents(self, request: Request):
-        if request.is_intent(intents.CONFIRM):
+        if isConfirm(request.tokens):
             return GetSchedule()
 
 
@@ -325,9 +329,9 @@ class HelpMenuStart(GlobalScene):
         return self.make_response(request, text, tts, buttons=YES_NO)
 
     def handle_local_intents(self, request: Request):
-        if request.is_intent(intents.CONFIRM):
+        if isConfirm(request.tokens):
             return HelpMenuMarks()
-        if request.is_intent(intents.REJECT):
+        if isDiscard(request.tokens):
             return Welcome()
 
 
@@ -337,9 +341,9 @@ class HelpMenuMarks(GlobalScene):
         return self.make_response(request, text, tts, buttons=YES_NO)
 
     def handle_local_intents(self, request: Request):
-        if request.is_intent(intents.CONFIRM):
+        if isConfirm(request.tokens):
             return HelpMenuSpec()
-        if request.is_intent(intents.REJECT):
+        if isDiscard(request.tokens):
             return Welcome()
 
 
@@ -364,9 +368,9 @@ class WhatCanDo(GlobalScene):
         )
 
     def handle_local_intents(self, request: Request):
-        if intents.CONFIRM in request.intents:
+        if isConfirm(request.tokens):
             return HelpMenuStart()
-        if intents.REJECT in request.intents:
+        if isDiscard(request.tokens):
             return Welcome()
 
 
@@ -434,6 +438,62 @@ class GetSchedule(SceneWithAuth):
                 schedule = dairy_api.get_schedule(token, student.id, req_date)
 
             new_text, new_tts = texts.schedule_for_student(student, schedule)
+            text.append(new_text)
+            tts.append(new_tts)
+
+        result_text = "\n".join(text)
+        result_tts = "sil<[500]>".join(tts)
+        return self.make_response(
+            request,
+            result_text,
+            result_tts,
+            user_state={
+                states.STUDENTS: students.dump(),
+                states.AUTH_TOKEN: token,
+            },
+            state={states.SAVE_TEXT: result_text, states.SAVE_TTS: result_tts},
+        )
+
+
+class GetHomework(SceneWithAuth):
+    def reply(self, request: Request):
+        auth = super().reply(request)
+        if auth is not None:
+            return auth
+
+        if self.students is None:
+            students = Students()
+            students.restore(request.user[states.STUDENTS])
+        else:
+            students = self.students
+        req_students = get_students_from_request(request, students)
+
+        if req_students is None:  # нет данных для запроса. Возможно не то имя
+            text, tts = texts.unknown_student()
+            return self.make_response(
+                request, text, tts, state={states.NEED_FALLBACK: True}
+            )
+
+        token = get_token(request)
+        req_date = get_date_from_request(request)
+        text = []
+        tts = []
+
+        title_text, title_tts = texts.homework_title(req_date)
+        text.append(title_text)
+        tts.append(title_tts)
+
+        for student in req_students:
+            try:
+                schedule = dairy_api.get_schedule(token, student.id, req_date)
+                homework = dairy_api.get_homework(token, student.id, req_date)
+            except NeedAuth:
+                token = dairy_api.refresh_token(token)
+                schedule = dairy_api.get_schedule(token, student.id, req_date)
+                homework = dairy_api.get_homework(token, student.id, req_date)
+
+            real_homework = homework.filter_by_lessons(schedule.list_of_lessons)
+            new_text, new_tts = texts.homework_for_student(student, real_homework)
             text.append(new_text)
             tts.append(new_tts)
 
@@ -714,6 +774,17 @@ def isIntentMakrs(intentList):
     ListKey = listKeyLessonMarks()
     result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
     return result
+
+def isConfirm(intentList):
+    ListKey = intents.confirm_word_list
+    result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
+    return result
+
+def isDiscard(intentList):
+    ListKey = intents.discard_word_list
+    result = len(listIntersection(intentList, ListKey)) > (len(ListKey) - 1)
+    return result
+
 
 
 SCENES = {scene.id(): scene for scene in _list_scenes()}
