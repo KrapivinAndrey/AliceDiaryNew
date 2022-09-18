@@ -27,7 +27,8 @@ def handler(event, context=None):
     event_alice = adapter.parse_request(marusia_request)
     alice_result = main_handler(event_alice)
     marusia_response = adapter.parse_response(alice_result)
-
+    # чтобы скинуть авторизацию
+    # marusia_response.response.end_session = True
     get_perfmon().print_report()
     return {
         "statusCode": 200,

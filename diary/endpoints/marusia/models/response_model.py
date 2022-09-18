@@ -41,7 +41,7 @@ class Response(BaseModel):
     buttons: List[Button] = []
     commands: List[Union[CommandWidget, CommandText]] = []
     push: Union[Push, None] = None
-    end_session: bool = True
+    end_session: bool = False
 
 
 class User(BaseModel):
