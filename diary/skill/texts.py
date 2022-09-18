@@ -216,7 +216,7 @@ def title_date(req_date):
             f"{req_date.date().day} {text_constants.MONTH_NAME[req_date.date().month]}"
         )
 
-    return f"на {str_date}"
+    return f"На {str_date}"
 
 
 def nothing_to_repeat():
