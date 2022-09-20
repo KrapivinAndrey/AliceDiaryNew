@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from .constants import texts as text_constants
 from .dataclasses import Journal, PlannedLesson, Schedule, Student
@@ -227,7 +227,7 @@ def nothing_to_repeat():
     return text, tts
 
 
-def __how_many_lessons(n: int) -> (str, str):
+def __how_many_lessons(n: int) -> Tuple[str, str]:
     if n == 0:
         return "Нет уроков.", "Нет уроков."
     first = n % 10
