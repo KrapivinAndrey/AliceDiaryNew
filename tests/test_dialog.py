@@ -146,7 +146,7 @@ class TestSchedule:
         # в ттс дополнительная информация
         assert "К третьему уроку в 09:45" in result.tts
         assert "Уроки закончатся в 14:40" in result.tts
-        assert "Информатика 2 урока" in result.tts
+        assert "Информатика два урока" in result.tts
 
     def test_synonym_of_student(self, students_dump, requests_mock):
         setup_mock_schedule_with_params(requests_mock, token="111", edu_id="100", num=3)

@@ -227,9 +227,9 @@ def nothing_to_repeat():
     return text, tts
 
 
-def __how_many_lessons(n: int) -> str:
+def __how_many_lessons(n: int) -> (str, str):
     if n == 0:
-        return "Нет уроков."
+        return "Нет уроков.", "Нет уроков."
     first = n % 10
     second = n % 100
 
@@ -240,7 +240,7 @@ def __how_many_lessons(n: int) -> str:
     else:
         last = "уроков"
 
-    return f"{str(n)} {last}"
+    return f"{str(n)} {last}", f"{NUMBER_TTS[n]} {last}"
 
 
 def __how_many_tasks(n: int) -> str:
@@ -296,10 +296,10 @@ def homework_title(req_date):
 
 def schedule_for_student(student: Student, schedule: Schedule):
     count = len(schedule.lessons)
-    count_str = __how_many_lessons(count)
+    count_str, count_tts = __how_many_lessons(count)
 
     text = [f"{student.name}. {count_str}"]
-    tts = [f"У {student.inflect['родительный']} {count_str}"]
+    tts = [f"У {student.inflect['родительный']} {count_tts}"]
     if schedule.no_lessons:
         return text[0], tts[0]
 
@@ -322,14 +322,16 @@ def schedule_for_student(student: Student, schedule: Schedule):
             if schedule.lessons[i - 1] == lesson:
                 repeat_lessons_count += 1
             elif repeat_lessons_count > 1:
-                tts[-1] += " " + __how_many_lessons(repeat_lessons_count)
+                how_many, how_many_tts = __how_many_lessons(repeat_lessons_count)
+                tts[-1] += " " + how_many_tts
                 repeat_lessons_count = 1
                 tts.append(lesson.name)
             else:
                 tts.append(lesson.name)
 
     if repeat_lessons_count > 1:
-        tts[-1] += " " + __how_many_lessons(repeat_lessons_count)
+        how_many, how_many_tts = __how_many_lessons(repeat_lessons_count)
+        tts[-1] += " " + how_many_tts
 
     tts.append(f"Уроки закончатся в {schedule.lessons[-1].end_time}")
 
@@ -453,3 +455,27 @@ KNOWN_DATES = {
     datetime.date.today() + datetime.timedelta(days=-1): "Вчера",
     datetime.date.today() + datetime.timedelta(days=-2): "Позавчера",
 }
+
+NUMBER_TTS = [
+    "ноль",
+    "одни",
+    "два",
+    "три",
+    "четыре",
+    "пять",
+    "шесть",
+    "семь",
+    "восемь",
+    "девять",
+    "десять",
+    "одиннадцать",
+    "двенадцать",
+    "тринадцать",
+    "четырнадцать",
+    "пятнадцать",
+    "шестнадцать",
+    "семнадцать",
+    "восемнадцать",
+    "девятнадцать",
+    "двадцать",
+]
