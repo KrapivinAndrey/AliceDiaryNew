@@ -281,7 +281,7 @@ def unknown_student():
 def schedule_title(req_date):
     title = title_date(req_date)
     text = f"Расписание уроков. {title}"
-    tts = f"Расписание на {title}"
+    tts = f"Расписание {title}"
 
     return text, tts
 
@@ -289,7 +289,7 @@ def schedule_title(req_date):
 def homework_title(req_date):
     title = title_date(req_date)
     text = f"Домашнее задание. {title}"
-    tts = f"Домашнее задание на {title}"
+    tts = f"Домашнее задание {title}"
 
     return text, tts
 
@@ -399,7 +399,7 @@ def num_lesson(student: Student, lesson: PlannedLesson):
 def journal_title(req_date):
     title = title_date(req_date)
     text = f"Записи в журнале. {title}"
-    tts = f"Записи в журнале на {title}"
+    tts = f"Записи в журнале {title}"
 
     return text, tts
 
