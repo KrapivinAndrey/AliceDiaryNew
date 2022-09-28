@@ -171,15 +171,15 @@ class MarusiaAdapter:
                 last_name = parse_word[2]
         if name != "" or last_name != "":
             value = {
-                "type": "FIO",
+                "type": "YANDEX.FIO",
                 "first_name": {name},
                 "patronymic_name": {patronymic},
                 "last_name": {last_name},
             }
-            self._add_intents(event, value)
+            self._add_entities(event, value)
 
-    def _add_intents(self, event, value):
-        event["request"]["nlu"].setdefault("entities", {})
+    def _add_entities(self, event, value):
+        event["request"]["nlu"].setdefault("entities", [])
         event["request"]["nlu"]["entities"].append(value)
 
     @app_context.perfmon
