@@ -46,6 +46,6 @@ jobs:
           function_id: ${{ secrets.MARUSIA_FUNCTION_ID }}
           runtime: 'python39'
           memory: '128'
-          environment: DIARY_URL=${{ secrets.DIARY_URL }},SENTRY_DSN=${{ secrets.SENTRY_DSN }},OAUTH_SECRET={{secrets.OAUTH_SECRET}},DEBUG=False,ENVIRONMENT=Prod
+          environment: DIARY_URL=${{ secrets.DIARY_URL }},SENTRY_DSN=${{ secrets.SENTRY_DSN }},OAUTH_SECRET={{ secrets.OAUTH_SECRET }},DEBUG=False,ENVIRONMENT=Prod
           entrypoint: 'diary.marusia_handler'
           source: './'
